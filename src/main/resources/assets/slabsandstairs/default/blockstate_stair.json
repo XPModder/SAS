@@ -1,0 +1,294 @@
+{
+  "variants": {
+    "facing=north,inverted=false,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,inverted=true,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 270,
+      "y": 90
+    },
+    "facing=east,inverted=false,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east,inverted=true,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 270,
+      "y": 180
+    },
+    "facing=south,inverted=false,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 90,
+      "y": 270
+    },
+    "facing=south,inverted=true,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 270,
+      "y": 270
+    },
+    "facing=west,inverted=false,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 90
+    },
+    "facing=west,inverted=true,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 270
+    },
+    "facing=up,inverted=false,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 90
+    },
+    "facing=up,inverted=true,shape=straight": {
+      "model": "registry_namespace:block/registry_path"
+    },
+    "facing=down,inverted=false,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 180
+    },
+    "facing=down,inverted=true,shape=straight": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 270
+    },
+
+
+    "facing=north,inverted=false,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 270
+    },
+    "facing=east,inverted=false,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 0
+    },
+    "facing=south,inverted=false,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 90
+    },
+    "facing=west,inverted=false,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 180
+    },
+    "facing=up,inverted=false,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 270,
+      "y": 0
+    },
+    "facing=down,inverted=false,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner_mirrored",
+      "x": 270,
+      "y": 180
+    },
+
+
+    "facing=north,inverted=false,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 180
+    },
+    "facing=east,inverted=false,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 270
+    },
+    "facing=south,inverted=false,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 0
+    },
+    "facing=west,inverted=false,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "y": 90
+    },
+    "facing=up,inverted=false,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner_mirrored",
+      "x": 90,
+      "y": 180
+    },
+    "facing=down,inverted=false,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 90,
+      "y": 0
+    },
+
+
+    "facing=north,inverted=false,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 270
+    },
+    "facing=east,inverted=false,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 0
+    },
+    "facing=south,inverted=false,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 90
+    },
+    "facing=west,inverted=false,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 180
+    },
+    "facing=up,inverted=false,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 270,
+      "y": 0
+    },
+    "facing=down,inverted=false,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 0
+    },
+
+
+    "facing=north,inverted=false,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 180
+    },
+    "facing=east,inverted=false,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 270
+    },
+    "facing=south,inverted=false,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 0
+    },
+    "facing=west,inverted=false,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 90
+    },
+    "facing=up,inverted=false,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 0
+    },
+    "facing=down,inverted=false,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 90
+    },
+
+
+    "facing=north,inverted=true,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 0
+    },
+    "facing=east,inverted=true,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 90
+    },
+    "facing=south,inverted=true,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 180
+    },
+    "facing=west,inverted=true,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 270
+    },
+    "facing=up,inverted=true,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner_mirrored",
+      "x": 270,
+      "y": 0
+    },
+    "facing=down,inverted=true,shape=inner_right": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 270,
+      "y": 180
+    },
+
+
+    "facing=north,inverted=true,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 270
+    },
+    "facing=east,inverted=true,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 0
+    },
+    "facing=south,inverted=true,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 90
+    },
+    "facing=west,inverted=true,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 180,
+      "y": 180
+    },
+    "facing=up,inverted=true,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner",
+      "x": 90,
+      "y": 180
+    },
+    "facing=down,inverted=true,shape=inner_left": {
+      "model": "registry_namespace:block/registry_path_inner_mirrored",
+      "x": 90,
+      "y": 0
+    },
+
+
+    "facing=north,inverted=true,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 0
+    },
+    "facing=east,inverted=true,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 90
+    },
+    "facing=south,inverted=true,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 180
+    },
+    "facing=west,inverted=true,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 270
+    },
+    "facing=up,inverted=true,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 180
+    },
+    "facing=down,inverted=true,shape=outer_right": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "y": 90
+    },
+
+
+    "facing=north,inverted=true,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 270
+    },
+    "facing=east,inverted=true,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 0
+    },
+    "facing=south,inverted=true,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 90
+    },
+    "facing=west,inverted=true,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 180
+    },
+    "facing=up,inverted=true,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 270
+    },
+    "facing=down,inverted=true,shape=outer_left": {
+      "model": "registry_namespace:block/registry_path_outer",
+      "x": 180,
+      "y": 180
+    }
+  }
+}

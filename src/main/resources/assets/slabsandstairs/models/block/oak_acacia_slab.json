@@ -1,0 +1,11 @@
+{
+  "parent": "slabsandstairs:block/doubleslab",
+  "textures": {
+    "bottom_bottom": "minecraft:block/oak_planks",
+    "top_bottom": "minecraft:block/oak_planks",
+    "side_bottom": "minecraft:block/oak_planks",
+    "bottom_top": "minecraft:block/acacia_planks",
+    "top_top": "minecraft:block/acacia_planks",
+    "side_top": "minecraft:block/acacia_planks"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "placeholder_input"
+  },
+  "result": "placeholder_output",
+  "count": 4
+}

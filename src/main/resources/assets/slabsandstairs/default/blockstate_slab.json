@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 0
+    },
+    "facing=west": {
+      "model": "registry_namespace:block/registry_path",
+      "y": 90
+    },
+    "facing=up": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 90
+    },
+    "facing=down": {
+      "model": "registry_namespace:block/registry_path",
+      "x": 270
+    }
+  }
+}

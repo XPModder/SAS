@@ -1,0 +1,188 @@
+These are the blocks that i want to add:
+Stone
+Granite
+Polished Granite
+Diorite
+Polished Diorite
+Andesite
+Polished Andesite
+Cobblestone
+Oak Planks
+Spruce Planks
+Birch Planks
+Jungle Planks
+Acacia Planks
+Dark Oak Planks
+Crimson Planks
+Warped Planks
+Stripped Oak Wood
+Stripped Spruce Wood
+Stripped Birch Wood
+Stripped Jungle Wood
+Stripped Acacia Wood
+Stripped Dark Oak Wood
+Stripped Crimson Wood
+Stripped Warped Wood
+Oak Wood
+Spruce Wood
+Birch Wood
+Jungle Wood
+Acacia Wood
+Dark Oak Wood
+Crimson Wood
+Warped Wood
+Glass
+Lapis Lazuli Block
+Sandstone
+Chiseled Sandstone
+Cut Sandstone
+White Wool
+Orange Wool
+Magenta Wool
+Light Blue Wool
+Yellow Wool
+Lime Wool
+Pink Wool
+Gray Wool
+Light Gray Wool
+Cyan Wool
+Purple Wool
+Blue Wool
+Brown Wool
+Green Wool
+Red Wool
+Black Wool
+Block of Gold
+Block of Iron
+Smooth Quartz Block
+Smooth Red Sandstone
+Smooth Sandstone
+Smooth Stone
+Bricks
+Mossy Cooblestone
+Obsidian
+Purpur Block
+Purpur Pillar
+Block of Diamond
+Netherrack
+Soul Soil
+Basalt
+Polished Basalt
+Glowstone
+Stone Bricks
+Mossy Stone Bricks
+Cracked Stone Bricks
+Chiseled Stone Bricks
+Nether Bricks
+Cracked Nether Bricks
+Chiseled Nether Bricks
+End Stone
+End Stone Bricks
+Block of Emerald
+Chiseled Quartz Block
+Block of Quartz
+Quartz Bricks
+Quartz Pillar
+Terracotta
+White Terracotta
+Orange Terracotta
+Magenta Terracotta
+Light Blue Terracotta
+Yellow Terracotta
+Lime Terracotta
+Pink Terracotta
+Gray Terracotta
+Light Gray Terracotta
+Cyan Terracotta
+Purple Terracotta
+Blue Terracotta
+Brown Terracotta
+Green Terracotta
+Red Terracotta
+Black Terracotta
+Block of Coal
+Packed Ice
+White Stained Glass
+Orange Stained Glass
+Magenta Stained Glass
+Light Blue Stained Glass
+Yellow Stained Glass
+Lime Stained Glass
+Pink Stained Glass
+Gray Stained Glass
+Light Gray Stained Glass
+Cyan Stained Glass
+Purple Stained Glass
+Blue Stained Glass
+Brown Stained Glass
+Green Stained Glass
+Red Stained Glass
+Black Stained Glass
+Prismarine
+Prismarine Bricks
+Dark Prismarine
+Sea Lantern
+Red Sandstone
+Chiseled Red Sandstone
+Cut Red Sandstone
+Magma Block
+Nether Wart Block
+Warped Wart Block
+Red Nether Bricks
+Bone Block
+White Concrete
+Orange Concrete
+Magenta Concrete
+Light Blue Concrete
+Yellow Concrete
+Lime Concrete
+Pink Concrete
+Gray Concrete
+Light Gray Concrete
+Cyan Concrete
+Purple Concrete
+Blue Concrete
+Brown Concrete
+Green Concrete
+Red Concrete
+Black Concrete
+Dead Tube Coral Block
+Dead Brain Coral Block
+Dead Bubble Coral Block
+Dead Fire Coral Block
+Dead Horn Coral Block
+Tube Coral Block
+Brain Coral Block
+Bubble Coral Block
+Fire Coral Block
+Horn Coral Block
+Blue Ice
+Dried Kelp Block
+Block of Netherite
+Ancient Debris
+Crying Obsidian
+Blackstone
+Gilded Blackstone
+Polished Blackstone
+Chiseled Polished Blackstone
+Polished Blackstone Bricks
+Cracked Polished Blackstone Bricks
+White Glazed Terracotta
+Orange Glazed Terracotta
+Magenta Glazed Terracotta
+Light Blue Glazed Terracotta
+Yellow Glazed Terracotta
+Lime Glazed Terracotta
+Pink Glazed Terracotta
+Gray Glazed Terracotta
+Light Gray Glazed Terracotta
+Cyan Glazed Terracotta
+Purple Glazed Terracotta
+Blue Glazed Terracotta
+Brown Glazed Terracotta
+Green Glazed Terracotta
+Red Glazed Terracotta
+Black Glazed Terracotta
+Shroomlight
+Honeycomb Block
+Block of Redstone

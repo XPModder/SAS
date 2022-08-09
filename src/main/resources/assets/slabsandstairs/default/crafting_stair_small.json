@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "A  ",
+    "AA "
+  ],
+  "key": {
+    "A": {
+      "item": "placeholder_input"
+    }
+  },
+  "result": {
+    "item": "placeholder_output",
+    "count": 4
+  }
+}

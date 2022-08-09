@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "placeholder_input1"
+    },
+    {
+      "item": "placeholder_input2"
+    },
+    {
+      "item": "placeholder_input3"
+    }
+  ],
+  "result": {
+    "item": "placeholder_output"
+  }
+}
