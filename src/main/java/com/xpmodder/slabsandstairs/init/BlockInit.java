@@ -3,6 +3,7 @@ package com.xpmodder.slabsandstairs.init;
 import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
+import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -19,6 +20,9 @@ public class BlockInit {
 
     public static Set<Block> MY_BLOCKS = new LinkedHashSet<>();
 
+    public static final Block previewStair = new StairBlock(AbstractBlock.Properties.create(Material.ROCK)).setRegistryName(Reference.MODID, "preview_stair");
+    public static final Block previewSlab = new SlabBlock(AbstractBlock.Properties.create(Material.ROCK)).setRegistryName(Reference.MODID, "preview_slab");
+    public static final Block previewQuarter = new QuarterBlock(AbstractBlock.Properties.create(Material.ROCK)).setRegistryName(Reference.MODID, "preview_quarter");
 
     public BlockInit(){
 
@@ -33,6 +37,9 @@ public class BlockInit {
     public void registerBlocks(RegistryEvent.Register<Block> event){
 
         IForgeRegistry<Block> registry = event.getRegistry();
+        registry.register(previewStair);
+        registry.register(previewSlab);
+        registry.register(previewQuarter);
         for(Block block : MY_BLOCKS){
             registry.register(block);
         }

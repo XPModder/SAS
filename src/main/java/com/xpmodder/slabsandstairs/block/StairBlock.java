@@ -4,11 +4,13 @@ import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.EnumProperty;
@@ -24,6 +26,8 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nullable;
 
 public class StairBlock extends SlabBlock{
 
@@ -372,6 +376,23 @@ public class StairBlock extends SlabBlock{
         Direction direction = context.getNearestLookingDirection();
 
         return (BlockState) this.getDefaultState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(fluidState.getFluid() == Fluids.WATER));
+
+    }
+
+
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+
+        //Get all the neighboring blocks
+        BlockState north = worldIn.getBlockState(pos.north());
+        BlockState east  = worldIn.getBlockState(pos.east());
+        BlockState south = worldIn.getBlockState(pos.south());
+        BlockState west  = worldIn.getBlockState(pos.west());
+        BlockState up    = worldIn.getBlockState(pos.up());
+        BlockState down  = worldIn.getBlockState(pos.down());
+
+        if(north.getBlock() instanceof SlabBlock){
+
+        }
 
     }
 

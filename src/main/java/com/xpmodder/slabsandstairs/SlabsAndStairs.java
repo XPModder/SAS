@@ -9,6 +9,9 @@ import com.xpmodder.slabsandstairs.utility.ModResourceLoader;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.resources.DownloadingPackFinder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -17,6 +20,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.ForgeRenderTypes;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -50,6 +54,7 @@ public class SlabsAndStairs {
     public SlabsAndStairs(){
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
+        eventBus.addListener(this::clientSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
         eventBus.register(new BlockInit());
@@ -69,6 +74,12 @@ public class SlabsAndStairs {
             ForgeHooksClient.refreshResources(Minecraft.getInstance(), VanillaResourceType.MODELS);
         }
 
+    }
+
+    private void clientSetup(final FMLClientSetupEvent event){
+        RenderTypeLookup.setRenderLayer(BlockInit.previewStair, RenderType.getTranslucent());
+        RenderTypeLookup.setRenderLayer(BlockInit.previewSlab, RenderType.getTranslucent());
+        RenderTypeLookup.setRenderLayer(BlockInit.previewQuarter, RenderType.getTranslucent());
     }
 
 }

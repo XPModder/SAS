@@ -3,7 +3,10 @@ package com.xpmodder.slabsandstairs.client.rendering;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.sun.javafx.geom.Vec3d;
+import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
+import com.xpmodder.slabsandstairs.block.StairBlock;
+import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -74,7 +77,13 @@ public class PreviewRenderer {
             ItemStack stack = player.getHeldItem(hand);
 
             BlockItemUseContext useContext = new BlockItemUseContext(worldIn, player, hand, stack, (BlockRayTraceResult) blockResult);
-            BlockState placementState = ((BlockItem)stack.getItem()).getBlock().getStateForPlacement(useContext);
+            BlockState placementState = BlockInit.previewSlab.getStateForPlacement(useContext);
+
+            if(((BlockItem) stack.getItem()).getBlock() instanceof StairBlock){
+                placementState = BlockInit.previewStair.getStateForPlacement(useContext);
+            } else if (((BlockItem) stack.getItem()).getBlock() instanceof QuarterBlock) {
+                placementState = BlockInit.previewQuarter.getStateForPlacement(useContext);
+            }
 
             if(placementState == null){
                 return;
@@ -101,9 +110,6 @@ public class PreviewRenderer {
         matrixStack.translate(-projectedView.x + renderCoordinates.x, -projectedView.y + renderCoordinates.y, -projectedView.z + renderCoordinates.z);
 
         matrixStack.scale(0.85f, 0.85f, 0.85f);
-
-
-        //TODO: make rendering translucent
 
         for(RenderType renderType : RenderType.getBlockRenderTypes())
         {
