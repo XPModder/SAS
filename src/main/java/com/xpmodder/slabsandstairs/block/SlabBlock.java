@@ -1,53 +1,63 @@
 package com.xpmodder.slabsandstairs.block;
 
-import net.minecraft.block.*;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.state.*;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import com.xpmodder.slabsandstairs.utility.LogHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import static com.xpmodder.slabsandstairs.block.StairBlock.INVERTED;
+import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
+import static net.minecraft.core.Direction.*;
 
-public class SlabBlock extends Block implements IWaterLoggable {
+public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    protected static final VoxelShape SHAPE_SOUTH = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 8.0D);
-    protected static final VoxelShape SHAPE_EAST = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 8.0D, 16.0D, 16.0D);
-    protected static final VoxelShape SHAPE_NORTH = Block.makeCuboidShape(0.0D, 0.0D, 8.0D, 16.0D, 16.0D, 16.0D);
-    protected static final VoxelShape SHAPE_WEST = Block.makeCuboidShape(8.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-    protected static final VoxelShape SHAPE_UP = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
-    protected static final VoxelShape SHAPE_DOWN = Block.makeCuboidShape(0.0D, 8.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SHAPE_SOUTH = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 8.0D);
+    protected static final VoxelShape SHAPE_EAST = Block.box(0.0D, 0.0D, 0.0D, 8.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SHAPE_NORTH = Block.box(0.0D, 0.0D, 8.0D, 16.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SHAPE_WEST = Block.box(8.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SHAPE_UP = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
+    protected static final VoxelShape SHAPE_DOWN = Block.box(0.0D, 8.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 
     protected String BaseBlock = Blocks.AIR.getRegistryName().toString();
-    protected Block SlabQuarterBlock = Blocks.AIR;
-    protected Block StairBlock = Blocks.AIR;
+    protected String SlabQuarterBlock = Blocks.AIR.getRegistryName().toString();
+    protected String StairBlock = Blocks.AIR.getRegistryName().toString();
 
 
     public SlabBlock(Properties properties) {
         super(properties);
-        this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH).with(WATERLOGGED, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, NORTH).setValue(WATERLOGGED, false));
     }
 
     public String getBaseBlock(){
         return this.BaseBlock;
     }
 
-    public void setReferenceBlocks(String baseBlock, Block slabQuarterBlock, Block stairBlock){
+    public void setReferenceBlocks(String baseBlock, String slabQuarterBlock, String stairBlock){
         this.BaseBlock = baseBlock;
         this.SlabQuarterBlock = slabQuarterBlock;
         this.StairBlock = stairBlock;
@@ -57,30 +67,43 @@ public class SlabBlock extends Block implements IWaterLoggable {
 
 
 
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 
-        Item heldItem = player.getHeldItem(handIn).getItem();
-        if(getSelf() == getBlockFromItem(heldItem)){
+        Item heldItem = player.getItemInHand(handIn).getItem();
+
+        Block SlabQuarterBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.SlabQuarterBlock));
+        Block StairBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.StairBlock));
+
+        if(SlabQuarterBlock == Blocks.AIR){
+            LogHelper.error("Got Air Block as SlabQuarterBlock!");
+            return InteractionResult.PASS;
+        }
+        if(StairBlock == Blocks.AIR){
+            LogHelper.error("Got Air Block as StairBlock!");
+            return InteractionResult.PASS;
+        }
+
+        if(this == getBlockFromItem(heldItem)){
             if(getBlockFromItem(heldItem) instanceof SlabBlock){
-                worldIn.setBlockState(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).getDefaultState());
-                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).getDefaultState().getSoundType();
-                worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundCategory.BLOCKS, soundType.volume, soundType.pitch);
-                return ActionResultType.SUCCESS;
+                worldIn.setBlockAndUpdate(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState());
+                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState().getSoundType();
+                worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                return InteractionResult.SUCCESS;
             }
         }
-        else if(this.SlabQuarterBlock == getBlockFromItem(heldItem)){
-            if(this.SlabQuarterBlock instanceof QuarterBlock){
-                Direction newFacing = Direction.NORTH;
+        else if(SlabQuarterBlock == getBlockFromItem(heldItem)){
+            if(SlabQuarterBlock instanceof QuarterBlock){
+                Direction newFacing = NORTH;
                 boolean newInverted = false;
-                switch(state.get(FACING)){
+                switch(state.getValue(FACING)){
                     case NORTH:
                         newFacing = Direction.DOWN;
                         newInverted = true;
-                        if(player.getHorizontalFacing() == Direction.EAST){
+                        if(hit.getDirection() == EAST){
                             newInverted = false;
                         }
-                        else if(player.getHorizontalFacing() == Direction.SOUTH){
-                            if(player.getRotationYawHead() < 0.0f){
+                        else if(hit.getDirection() == SOUTH){
+                            if(player.getYHeadRot() < 0.0f){
                                 newFacing = Direction.DOWN;
                                 newInverted = false;
                             }
@@ -93,11 +116,11 @@ public class SlabBlock extends Block implements IWaterLoggable {
                     case EAST:
                         newFacing = Direction.UP;
                         newInverted = true;
-                        if(player.getHorizontalFacing() == Direction.SOUTH){
+                        if(hit.getDirection() == SOUTH){
                             newFacing = Direction.DOWN;
                         }
-                        else if(player.getHorizontalFacing() == Direction.WEST){
-                            if(player.getRotationYawHead() < 90.0f){
+                        else if(hit.getDirection() == Direction.WEST){
+                            if(player.getYHeadRot() < 90.0f){
                                 newFacing = Direction.DOWN;
                                 newInverted = true;
                             }
@@ -110,11 +133,11 @@ public class SlabBlock extends Block implements IWaterLoggable {
                     case SOUTH:
                         newFacing = Direction.UP;
                         newInverted = true;
-                        if(player.getHorizontalFacing() == Direction.EAST){
+                        if(hit.getDirection() == EAST){
                             newInverted = false;
                         }
-                        else if(player.getHorizontalFacing() == Direction.NORTH){
-                            if(player.getRotationYawHead() < 0.0f){
+                        else if(hit.getDirection() == NORTH){
+                            if(player.getYHeadRot() < 0.0f){
                                 newFacing = Direction.UP;
                                 newInverted = false;
                             }
@@ -127,11 +150,11 @@ public class SlabBlock extends Block implements IWaterLoggable {
                     case WEST:
                         newFacing = Direction.DOWN;
                         newInverted = false;
-                        if(player.getHorizontalFacing() == Direction.NORTH){
+                        if(hit.getDirection() == NORTH){
                             newFacing = Direction.UP;
                         }
-                        else if(player.getHorizontalFacing() == Direction.EAST){
-                            if(player.getRotationYawHead() < -90.0f){
+                        else if(hit.getDirection() == EAST){
+                            if(player.getYHeadRot() < -90.0f){
                                 newFacing = Direction.UP;
                                 newInverted = false;
                             }
@@ -142,38 +165,38 @@ public class SlabBlock extends Block implements IWaterLoggable {
                         }
                         break;
                     case UP:
-                        newFacing = player.getHorizontalFacing();
+                        newFacing = hit.getDirection();
                         newInverted = false;
                         break;
                     case DOWN:
-                        newFacing = player.getHorizontalFacing();
+                        newFacing = hit.getDirection();
                         newInverted = true;
                         break;
                     default:
 
                 }
-                worldIn.setBlockState(pos, this.StairBlock.getDefaultState().with(FACING, newFacing).with(INVERTED, newInverted));
-                SoundType soundType = this.StairBlock.getDefaultState().getSoundType();
-                worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundCategory.BLOCKS, soundType.volume, soundType.pitch);
-                return ActionResultType.SUCCESS;
+                worldIn.setBlockAndUpdate(pos, StairBlock.defaultBlockState().setValue(FACING, newFacing).setValue(INVERTED, newInverted));
+                SoundType soundType = StairBlock.defaultBlockState().getSoundType();
+                worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                return InteractionResult.SUCCESS;
             }
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         Pose pose = context.getPlayer().getPose();
-        FluidState fluidState = context.getWorld().getFluidState(context.getPos());
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
         Direction direction = context.getNearestLookingDirection();
-        return (BlockState)this.getDefaultState().with(FACING, (pose == Pose.CROUCHING ? direction : direction.getOpposite())).with(WATERLOGGED, Boolean.valueOf(fluidState.getFluid() == Fluids.WATER));
+        return (BlockState)this.defaultBlockState().setValue(FACING, (pose == Pose.CROUCHING ? direction : direction.getOpposite())).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
     }
 
     public boolean isTransparent(BlockState blockState){
         return true;
     }
 
-    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
-        switch(state.get(FACING)){
+    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+        switch(state.getValue(FACING)){
             case NORTH:
                 return SHAPE_NORTH;
             case EAST:
@@ -191,16 +214,16 @@ public class SlabBlock extends Block implements IWaterLoggable {
         }
     }
 
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, WATERLOGGED);
     }
 
     public BlockState rotate(BlockState state, Rotation rot) {
-        return state.with(FACING, rot.rotate(state.get(FACING)));
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
 }

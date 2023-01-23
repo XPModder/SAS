@@ -1,10 +1,9 @@
 package com.xpmodder.slabsandstairs.init;
 
 import com.xpmodder.slabsandstairs.SlabsAndStairs;
-import com.xpmodder.slabsandstairs.utility.LogHelper;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -23,7 +22,7 @@ public class ItemInit {
         IForgeRegistry registry = event.getRegistry();
 
         for(Block block : BlockInit.MY_BLOCKS){
-            Item newItem = new BlockItem(block, new Item.Properties().group(SlabsAndStairs.ITEM_GROUP_SAS)).setRegistryName(block.getRegistryName().getPath());
+            Item newItem = new BlockItem(block, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS)).setRegistryName(block.getRegistryName().getPath());
             registry.register(newItem);
             MY_ITEMS.add(newItem);
         }

@@ -1,22 +1,18 @@
 package com.xpmodder.slabsandstairs.utility;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.CallbackI;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.sql.Ref;
 
 public class ResourceGenerator {
 
@@ -76,7 +72,7 @@ public class ResourceGenerator {
 
             JsonObject object = new Gson().fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), JsonObject.class);
 
-            output = object.get(block.getTranslationKey()).getAsString();
+            output = object.get(block.getDescriptionId()).getAsString();
 
         }
         catch (Exception ex){
@@ -228,7 +224,7 @@ public class ResourceGenerator {
 
                 //Language file entry
                 //Get the key and the name of the base block
-                String key = block.getTranslationKey();
+                String key = block.getDescriptionId();
                 String baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock())));
                 Block baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock()));
                 String entry = "";

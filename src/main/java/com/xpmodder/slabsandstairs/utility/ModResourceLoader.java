@@ -1,28 +1,21 @@
 package com.xpmodder.slabsandstairs.utility;
 
 
-import com.google.common.collect.Lists;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.impl.DataPackCommand;
-import net.minecraft.resources.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.client.event.RecipesUpdatedEvent;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraft.server.packs.FolderPackResources;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.xpmodder.slabsandstairs.reference.Reference.DATAPACK_FOLDER;
 import static com.xpmodder.slabsandstairs.reference.Reference.RESOURCE_FOLDER;
@@ -92,8 +85,8 @@ public class ModResourceLoader {
             }
         }
 
-        Minecraft.getInstance().getResourcePackList().addPackFinder((consumer, iFactory) -> {
-            final ResourcePackInfo packInfo = ResourcePackInfo.createResourcePack(Reference.MODID, true, () -> new FolderPack(RESOURCE_FOLDER), iFactory, ResourcePackInfo.Priority.TOP, IPackNameDecorator.BUILTIN);
+        Minecraft.getInstance().getResourcePackRepository().addPackFinder((consumer, iFactory) -> {
+            final Pack packInfo = Pack.create(Reference.MODID, true, () -> new FolderPackResources(RESOURCE_FOLDER), iFactory, Pack.Position.TOP, PackSource.BUILT_IN);
             if(packInfo == null){
                 LogHelper.error("Failed to load resource pack!");
                 LogHelper.error("Blocks will have missing textures and models!");
@@ -105,7 +98,7 @@ public class ModResourceLoader {
     }
 
     @SubscribeEvent
-    public void onLoadWorld(FMLServerStartingEvent event){
+    public void onLoadWorld(ServerStartingEvent event){
 
         try {
 
@@ -115,8 +108,8 @@ public class ModResourceLoader {
                 return;
             }
 
-            server.getResourcePacks().addPackFinder((consumer, iFactory) -> {
-                final ResourcePackInfo packInfo = ResourcePackInfo.createResourcePack(Reference.MODID, true, () -> new FolderPack(DATAPACK_FOLDER), iFactory, ResourcePackInfo.Priority.TOP, IPackNameDecorator.BUILTIN);
+            server.getPackRepository().addPackFinder((consumer, iFactory) -> {
+                final Pack packInfo = Pack.create(Reference.MODID, true, () -> new FolderPackResources(DATAPACK_FOLDER), iFactory, Pack.Position.TOP, PackSource.BUILT_IN);
                 if (packInfo == null) {
                     LogHelper.error("Failed to load datapack!");
                     LogHelper.error("Blocks will have missing recipes!");
@@ -125,11 +118,10 @@ public class ModResourceLoader {
                 consumer.accept(packInfo);
             });
 
-            server.getResourcePacks().reloadPacksFromFinders();
+            server.getPackRepository().reload();
 
-            ResourcePackList resourcePackList = server.getResourcePacks();
-            List<ResourcePackInfo> list = Lists.newArrayList(resourcePackList.getEnabledPacks());
-            server.func_240780_a_(list.stream().map(ResourcePackInfo::getName).collect(Collectors.toList()));
+            PackRepository resourcePackList = server.getPackRepository();
+            server.reloadResources(resourcePackList.getSelectedIds());
 
         }
         catch(NullPointerException ex){

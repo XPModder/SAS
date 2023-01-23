@@ -1,47 +1,41 @@
 package com.xpmodder.slabsandstairs.client.rendering;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.sun.javafx.geom.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3d;
 import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
 import com.xpmodder.slabsandstairs.init.BlockInit;
-import com.xpmodder.slabsandstairs.utility.LogHelper;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.Random;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class PreviewRenderer {
 
     @SubscribeEvent
-    public static void renderWorldLastEvent(RenderWorldLastEvent event){
+    public static void renderWorldLastEvent(RenderLevelStageEvent event){
 
         Minecraft instance = Minecraft.getInstance();
-        PlayerEntity player = instance.player;
-        World worldIn = instance.world;
-
-        Vector3d projectedView = instance.gameRenderer.getActiveRenderInfo().getProjectedView();
+        Player player = instance.player;
+        Level worldIn = instance.level;
 
         if(player == null){
             return;
@@ -51,73 +45,69 @@ public class PreviewRenderer {
             return;
         }
 
-        Hand hand = null;
-        if(player.getHeldItemMainhand().getItem() instanceof BlockItem &&
-                ((BlockItem)player.getHeldItemMainhand().getItem()).getBlock() instanceof SlabBlock){
-            hand = Hand.MAIN_HAND;
+        InteractionHand hand = null;
+        if(player.getMainHandItem().getItem() instanceof BlockItem &&
+                ((BlockItem)player.getMainHandItem().getItem()).getBlock() instanceof SlabBlock){
+            hand = InteractionHand.MAIN_HAND;
         }
-        else if(player.getHeldItemOffhand().getItem() instanceof BlockItem &&
-                ((BlockItem)player.getHeldItemOffhand().getItem()).getBlock() instanceof SlabBlock){
-            hand = Hand.OFF_HAND;
+        else if(player.getOffhandItem().getItem() instanceof BlockItem &&
+                ((BlockItem)player.getOffhandItem().getItem()).getBlock() instanceof SlabBlock){
+            hand = InteractionHand.OFF_HAND;
         }
 
         if(hand == null){
             return;
         }
 
-        RayTraceResult blockResult = player.pick(20, 0, false);
+        HitResult blockResult = player.pick(20, 0, false);
 
-        if(blockResult.getType() == RayTraceResult.Type.BLOCK){
+        if(blockResult.getType() == HitResult.Type.BLOCK){
 
-            BlockPos pos = ((BlockRayTraceResult)blockResult).getPos();
-            Direction face = ((BlockRayTraceResult)blockResult).getFace();
+            BlockPos pos = ((BlockHitResult)blockResult).getBlockPos();
+            Direction face = ((BlockHitResult)blockResult).getDirection();
             //Get the position one block in the direction of the player aka. the position where the block would be placed
-            pos = pos.offset(face);
+            pos = pos.offset(face.getNormal());
 
-            ItemStack stack = player.getHeldItem(hand);
+            ItemStack stack = player.getItemInHand(hand);
 
-            BlockItemUseContext useContext = new BlockItemUseContext(worldIn, player, hand, stack, (BlockRayTraceResult) blockResult);
-            BlockState placementState = BlockInit.previewSlab.getStateForPlacement(useContext);
+            BlockPlaceContext useContext = new BlockPlaceContext(worldIn, player, hand, stack, (BlockHitResult) blockResult);
+            BlockState placementState = BlockInit.previewSlab.get().getStateForPlacement(useContext);
 
             if(((BlockItem) stack.getItem()).getBlock() instanceof StairBlock){
-                placementState = BlockInit.previewStair.getStateForPlacement(useContext);
+                placementState = BlockInit.previewStair.get().getStateForPlacement(useContext);
             } else if (((BlockItem) stack.getItem()).getBlock() instanceof QuarterBlock) {
-                placementState = BlockInit.previewQuarter.getStateForPlacement(useContext);
+                placementState = BlockInit.previewQuarter.get().getStateForPlacement(useContext);
             }
 
             if(placementState == null){
                 return;
             }
 
-            MatrixStack matrixStack = event.getMatrixStack();
+            PoseStack matrixStack = event.getPoseStack();
 
-            IRenderTypeBuffer.Impl renderTypeBuffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-
-            renderBlock(matrixStack, renderTypeBuffer, worldIn, placementState, pos, projectedView, new Vector3d(pos.getX() + 0.075f, pos.getY() + 0.075, pos.getZ() + 0.075f));
-
-            renderTypeBuffer.finish();
+            renderBlock(matrixStack, placementState, new Vector3d(pos.getX() + 0.075f, pos.getY() + 0.075, pos.getZ() + 0.075f));
 
         }
 
     }
 
-    public static void renderBlock(MatrixStack matrixStack, IRenderTypeBuffer.Impl renderTypeBuffer, World world, BlockState blockState, BlockPos logicPos, Vector3d projectedView, Vector3d renderCoordinates)
+    public static void renderBlock(PoseStack matrixStack, BlockState blockState, Vector3d renderCoordinates)
     {
-        BlockRendererDispatcher blockRendererDispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        BlockRenderDispatcher blockRendererDispatcher = Minecraft.getInstance().getBlockRenderer();
         int i = OverlayTexture.NO_OVERLAY;
 
-        matrixStack.push();
-        matrixStack.translate(-projectedView.x + renderCoordinates.x, -projectedView.y + renderCoordinates.y, -projectedView.z + renderCoordinates.z);
+        matrixStack.pushPose();
+        matrixStack.translate(renderCoordinates.x, renderCoordinates.y, renderCoordinates.z);
 
         matrixStack.scale(0.85f, 0.85f, 0.85f);
 
-        for(RenderType renderType : RenderType.getBlockRenderTypes())
+        for(RenderType renderType : RenderType.chunkBufferLayers())
         {
-            if(RenderTypeLookup.canRenderInLayer(blockState, renderType))
-                blockRendererDispatcher.getBlockModelRenderer().renderModel(world, blockRendererDispatcher.getModelForState(blockState), blockState, logicPos, matrixStack, renderTypeBuffer.getBuffer(renderType), true, new Random(), blockState.getPositionRandom(logicPos), i, net.minecraftforge.client.model.data.EmptyModelData.INSTANCE);
+            if(ItemBlockRenderTypes.canRenderInLayer(blockState, renderType))
+                blockRendererDispatcher.renderSingleBlock(blockState, matrixStack, Minecraft.getInstance().renderBuffers().crumblingBufferSource(), 15728880, OverlayTexture.NO_OVERLAY);
         }
 
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
 }

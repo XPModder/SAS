@@ -1,6 +1,5 @@
 package com.xpmodder.slabsandstairs.config;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 

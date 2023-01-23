@@ -1,52 +1,58 @@
 package com.xpmodder.slabsandstairs.block;
 
 import com.xpmodder.slabsandstairs.utility.LogHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.StairsShape;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+
+import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
 
 public class StairBlock extends SlabBlock{
 
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
     public static final EnumProperty<StairsShape> CONNECTED = BlockStateProperties.STAIRS_SHAPE;
 
-    protected static final VoxelShape NWD_CORNER = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 8.0D, 8.0D, 8.0D);
-    protected static final VoxelShape SWD_CORNER = Block.makeCuboidShape(0.0D, 0.0D, 8.0D, 8.0D, 8.0D, 16.0D);
-    protected static final VoxelShape NWU_CORNER = Block.makeCuboidShape(0.0D, 8.0D, 0.0D, 8.0D, 16.0D, 8.0D);
-    protected static final VoxelShape SWU_CORNER = Block.makeCuboidShape(0.0D, 8.0D, 8.0D, 8.0D, 16.0D, 16.0D);
-    protected static final VoxelShape NED_CORNER = Block.makeCuboidShape(8.0D, 0.0D, 0.0D, 16.0D, 8.0D, 8.0D);
-    protected static final VoxelShape SED_CORNER = Block.makeCuboidShape(8.0D, 0.0D, 8.0D, 16.0D, 8.0D, 16.0D);
-    protected static final VoxelShape NEU_CORNER = Block.makeCuboidShape(8.0D, 8.0D, 0.0D, 16.0D, 16.0D, 8.0D);
-    protected static final VoxelShape SEU_CORNER = Block.makeCuboidShape(8.0D, 8.0D, 8.0D, 16.0D, 16.0D, 16.0D);
+    protected static final VoxelShape NWD_CORNER = Block.box(0.0D, 0.0D, 0.0D, 8.0D, 8.0D, 8.0D);
+    protected static final VoxelShape SWD_CORNER = Block.box(0.0D, 0.0D, 8.0D, 8.0D, 8.0D, 16.0D);
+    protected static final VoxelShape NWU_CORNER = Block.box(0.0D, 8.0D, 0.0D, 8.0D, 16.0D, 8.0D);
+    protected static final VoxelShape SWU_CORNER = Block.box(0.0D, 8.0D, 8.0D, 8.0D, 16.0D, 16.0D);
+    protected static final VoxelShape NED_CORNER = Block.box(8.0D, 0.0D, 0.0D, 16.0D, 8.0D, 8.0D);
+    protected static final VoxelShape SED_CORNER = Block.box(8.0D, 0.0D, 8.0D, 16.0D, 8.0D, 16.0D);
+    protected static final VoxelShape NEU_CORNER = Block.box(8.0D, 8.0D, 0.0D, 16.0D, 16.0D, 8.0D);
+    protected static final VoxelShape SEU_CORNER = Block.box(8.0D, 8.0D, 8.0D, 16.0D, 16.0D, 16.0D);
 
 
     public StairBlock(Properties properties) {
         super(properties);
-        this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH).with(WATERLOGGED, false).with(INVERTED, false).with(CONNECTED, StairsShape.STRAIGHT));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false).setValue(INVERTED, false).setValue(CONNECTED, StairsShape.STRAIGHT));
     }
 
     //Creates the correct voxel shape for the hitbox based on the orientation of the stairs
@@ -59,43 +65,43 @@ public class StairBlock extends SlabBlock{
             case NORTH:
                 if(inverted){
 
-                    shape = VoxelShapes.or(NWU_CORNER, NEU_CORNER);
-                    shape = VoxelShapes.or(shape, SWU_CORNER);
-                    shape = VoxelShapes.or(shape, SEU_CORNER);
+                    shape = Shapes.or(NWU_CORNER, NEU_CORNER);
+                    shape = Shapes.or(shape, SWU_CORNER);
+                    shape = Shapes.or(shape, SEU_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, NWD_CORNER);
+                        shape = Shapes.or(shape, NWD_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, NED_CORNER);
+                        shape = Shapes.or(shape, NED_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, SED_CORNER);
+                        shape = Shapes.or(shape, SED_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, SWD_CORNER);
+                        shape = Shapes.or(shape, SWD_CORNER);
                     }
 
                 }
                 else{
 
-                    shape = VoxelShapes.or(NWD_CORNER, NED_CORNER);
-                    shape = VoxelShapes.or(shape, SWD_CORNER);
-                    shape = VoxelShapes.or(shape, SED_CORNER);
+                    shape = Shapes.or(NWD_CORNER, NED_CORNER);
+                    shape = Shapes.or(shape, SWD_CORNER);
+                    shape = Shapes.or(shape, SED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, NWU_CORNER);
+                        shape = Shapes.or(shape, NWU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, NEU_CORNER);
+                        shape = Shapes.or(shape, NEU_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, SEU_CORNER);
+                        shape = Shapes.or(shape, SEU_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, SWU_CORNER);
+                        shape = Shapes.or(shape, SWU_CORNER);
                     }
 
                 }
@@ -103,43 +109,43 @@ public class StairBlock extends SlabBlock{
             case EAST:
                 if(inverted){
 
-                    shape = VoxelShapes.or(NWU_CORNER, NEU_CORNER);
-                    shape = VoxelShapes.or(shape, SWU_CORNER);
-                    shape = VoxelShapes.or(shape, SEU_CORNER);
+                    shape = Shapes.or(NWU_CORNER, NEU_CORNER);
+                    shape = Shapes.or(shape, SWU_CORNER);
+                    shape = Shapes.or(shape, SEU_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, NED_CORNER);
+                        shape = Shapes.or(shape, NED_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, SED_CORNER);
+                        shape = Shapes.or(shape, SED_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, SWD_CORNER);
+                        shape = Shapes.or(shape, SWD_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, NWD_CORNER);
+                        shape = Shapes.or(shape, NWD_CORNER);
                     }
 
                 }
                 else{
 
-                    shape = VoxelShapes.or(NWD_CORNER, NED_CORNER);
-                    shape = VoxelShapes.or(shape, SWD_CORNER);
-                    shape = VoxelShapes.or(shape, SED_CORNER);
+                    shape = Shapes.or(NWD_CORNER, NED_CORNER);
+                    shape = Shapes.or(shape, SWD_CORNER);
+                    shape = Shapes.or(shape, SED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, NEU_CORNER);
+                        shape = Shapes.or(shape, NEU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, SEU_CORNER);
+                        shape = Shapes.or(shape, SEU_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, SWU_CORNER);
+                        shape = Shapes.or(shape, SWU_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, NWU_CORNER);
+                        shape = Shapes.or(shape, NWU_CORNER);
                     }
 
                 }
@@ -147,43 +153,43 @@ public class StairBlock extends SlabBlock{
             case SOUTH:
                 if(inverted){
 
-                    shape = VoxelShapes.or(NWU_CORNER, NEU_CORNER);
-                    shape = VoxelShapes.or(shape, SWU_CORNER);
-                    shape = VoxelShapes.or(shape, SEU_CORNER);
+                    shape = Shapes.or(NWU_CORNER, NEU_CORNER);
+                    shape = Shapes.or(shape, SWU_CORNER);
+                    shape = Shapes.or(shape, SEU_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, SED_CORNER);
+                        shape = Shapes.or(shape, SED_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, SWD_CORNER);
+                        shape = Shapes.or(shape, SWD_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, NWD_CORNER);
+                        shape = Shapes.or(shape, NWD_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, NED_CORNER);
+                        shape = Shapes.or(shape, NED_CORNER);
                     }
 
                 }
                 else{
 
-                    shape = VoxelShapes.or(NWD_CORNER, NED_CORNER);
-                    shape = VoxelShapes.or(shape, SWD_CORNER);
-                    shape = VoxelShapes.or(shape, SED_CORNER);
+                    shape = Shapes.or(NWD_CORNER, NED_CORNER);
+                    shape = Shapes.or(shape, SWD_CORNER);
+                    shape = Shapes.or(shape, SED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, SEU_CORNER);
+                        shape = Shapes.or(shape, SEU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, SWU_CORNER);
+                        shape = Shapes.or(shape, SWU_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, NWU_CORNER);
+                        shape = Shapes.or(shape, NWU_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, NEU_CORNER);
+                        shape = Shapes.or(shape, NEU_CORNER);
                     }
 
                 }
@@ -191,43 +197,43 @@ public class StairBlock extends SlabBlock{
             case WEST:
                 if(inverted){
 
-                    shape = VoxelShapes.or(NWU_CORNER, NEU_CORNER);
-                    shape = VoxelShapes.or(shape, SWU_CORNER);
-                    shape = VoxelShapes.or(shape, SEU_CORNER);
+                    shape = Shapes.or(NWU_CORNER, NEU_CORNER);
+                    shape = Shapes.or(shape, SWU_CORNER);
+                    shape = Shapes.or(shape, SEU_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, SWD_CORNER);
+                        shape = Shapes.or(shape, SWD_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, NWD_CORNER);
+                        shape = Shapes.or(shape, NWD_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, NED_CORNER);
+                        shape = Shapes.or(shape, NED_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, SED_CORNER);
+                        shape = Shapes.or(shape, SED_CORNER);
                     }
 
                 }
                 else{
 
-                    shape = VoxelShapes.or(NWD_CORNER, NED_CORNER);
-                    shape = VoxelShapes.or(shape, SWD_CORNER);
-                    shape = VoxelShapes.or(shape, SED_CORNER);
+                    shape = Shapes.or(NWD_CORNER, NED_CORNER);
+                    shape = Shapes.or(shape, SWD_CORNER);
+                    shape = Shapes.or(shape, SED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, SWU_CORNER);
+                        shape = Shapes.or(shape, SWU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, NWU_CORNER);
+                        shape = Shapes.or(shape, NWU_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, NEU_CORNER);
+                        shape = Shapes.or(shape, NEU_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, SEU_CORNER);
+                        shape = Shapes.or(shape, SEU_CORNER);
                     }
 
                 }
@@ -235,44 +241,44 @@ public class StairBlock extends SlabBlock{
             case UP:
                 if(inverted){
 
-                    shape = VoxelShapes.or(NWU_CORNER, NEU_CORNER);
-                    shape = VoxelShapes.or(shape, NWD_CORNER);
-                    shape = VoxelShapes.or(shape, NED_CORNER);
+                    shape = Shapes.or(NWU_CORNER, NEU_CORNER);
+                    shape = Shapes.or(shape, NWD_CORNER);
+                    shape = Shapes.or(shape, NED_CORNER);
 
                     //For vertical stairs, RIGHT corner is considered DOWN and LEFT is UP
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, SWU_CORNER);
+                        shape = Shapes.or(shape, SWU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, SWD_CORNER);
+                        shape = Shapes.or(shape, SWD_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, SED_CORNER);
+                        shape = Shapes.or(shape, SED_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, SEU_CORNER);
+                        shape = Shapes.or(shape, SEU_CORNER);
                     }
 
                 }
                 else{
 
-                    shape = VoxelShapes.or(NWU_CORNER, NEU_CORNER);
-                    shape = VoxelShapes.or(shape, NWD_CORNER);
-                    shape = VoxelShapes.or(shape, NED_CORNER);
+                    shape = Shapes.or(NWU_CORNER, NEU_CORNER);
+                    shape = Shapes.or(shape, NWD_CORNER);
+                    shape = Shapes.or(shape, NED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, SEU_CORNER);
+                        shape = Shapes.or(shape, SEU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, SED_CORNER);
+                        shape = Shapes.or(shape, SED_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, SWD_CORNER);
+                        shape = Shapes.or(shape, SWD_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, SWU_CORNER);
+                        shape = Shapes.or(shape, SWU_CORNER);
                     }
 
                 }
@@ -280,64 +286,64 @@ public class StairBlock extends SlabBlock{
             case DOWN:
                 if(inverted){
 
-                    shape = VoxelShapes.or(SWU_CORNER, SEU_CORNER);
-                    shape = VoxelShapes.or(shape, SWD_CORNER);
-                    shape = VoxelShapes.or(shape, SED_CORNER);
+                    shape = Shapes.or(SWU_CORNER, SEU_CORNER);
+                    shape = Shapes.or(shape, SWD_CORNER);
+                    shape = Shapes.or(shape, SED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, NWU_CORNER);
+                        shape = Shapes.or(shape, NWU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, NWD_CORNER);
+                        shape = Shapes.or(shape, NWD_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, NED_CORNER);
+                        shape = Shapes.or(shape, NED_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, NEU_CORNER);
+                        shape = Shapes.or(shape, NEU_CORNER);
                     }
 
                 }
                 else{
 
-                    shape = VoxelShapes.or(SWU_CORNER, SEU_CORNER);
-                    shape = VoxelShapes.or(shape, SWD_CORNER);
-                    shape = VoxelShapes.or(shape, SED_CORNER);
+                    shape = Shapes.or(SWU_CORNER, SEU_CORNER);
+                    shape = Shapes.or(shape, SWD_CORNER);
+                    shape = Shapes.or(shape, SED_CORNER);
 
                     if(connected != StairsShape.INNER_RIGHT) {
-                        shape = VoxelShapes.or(shape, NEU_CORNER);
+                        shape = Shapes.or(shape, NEU_CORNER);
                     }
                     if(connected != StairsShape.INNER_LEFT){
-                        shape = VoxelShapes.or(shape, NED_CORNER);
+                        shape = Shapes.or(shape, NED_CORNER);
                     }
 
                     if(connected == StairsShape.OUTER_RIGHT){
-                        shape = VoxelShapes.or(shape, NWD_CORNER);
+                        shape = Shapes.or(shape, NWD_CORNER);
                     }
                     else if(connected == StairsShape.OUTER_LEFT){
-                        shape = VoxelShapes.or(shape, NWU_CORNER);
+                        shape = Shapes.or(shape, NWU_CORNER);
                     }
 
                 }
                 break;
             default:
-                shape = VoxelShapes.or(NWD_CORNER, NED_CORNER);
-                shape = VoxelShapes.or(shape, SWD_CORNER);
-                shape = VoxelShapes.or(shape, SED_CORNER);
+                shape = Shapes.or(NWD_CORNER, NED_CORNER);
+                shape = Shapes.or(shape, SWD_CORNER);
+                shape = Shapes.or(shape, SED_CORNER);
 
                 if(connected != StairsShape.INNER_RIGHT) {
-                    shape = VoxelShapes.or(shape, NWU_CORNER);
+                    shape = Shapes.or(shape, NWU_CORNER);
                 }
                 if(connected != StairsShape.INNER_LEFT){
-                    shape = VoxelShapes.or(shape, NEU_CORNER);
+                    shape = Shapes.or(shape, NEU_CORNER);
                 }
 
                 if(connected == StairsShape.OUTER_RIGHT){
-                    shape = VoxelShapes.or(shape, SEU_CORNER);
+                    shape = Shapes.or(shape, SEU_CORNER);
                 }
                 else if(connected == StairsShape.OUTER_LEFT){
-                    shape = VoxelShapes.or(shape, SWU_CORNER);
+                    shape = Shapes.or(shape, SWU_CORNER);
                 }
 
         }
@@ -346,49 +352,61 @@ public class StairBlock extends SlabBlock{
 
     }
 
-    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
-        return makeShape(state.get(FACING), state.get(INVERTED), state.get(CONNECTED));
+    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+        return makeShape(state.getValue(FACING), state.getValue(INVERTED), state.getValue(CONNECTED));
     }
 
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, WATERLOGGED, INVERTED, CONNECTED);
     }
 
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 
-        Item heldItem = player.getHeldItem(handIn).getItem();
-        if(this.SlabQuarterBlock == getBlockFromItem(heldItem)){
-            if(this.SlabQuarterBlock instanceof QuarterBlock){
-                worldIn.setBlockState(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).getDefaultState());
-                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).getDefaultState().getSoundType();
-                worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundCategory.BLOCKS, soundType.volume, soundType.pitch);
-                return ActionResultType.SUCCESS;
+        Block SlabQuarterBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.SlabQuarterBlock));
+        Block StairBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.StairBlock));
+
+        if(SlabQuarterBlock == Blocks.AIR){
+            LogHelper.error("Got Air Block as SlabQuarterBlock!");
+            return InteractionResult.PASS;
+        }
+        if(StairBlock == Blocks.AIR){
+            LogHelper.error("Got Air Block as StairBlock!");
+            return InteractionResult.PASS;
+        }
+
+        Item heldItem = player.getItemInHand(handIn).getItem();
+        if(SlabQuarterBlock == getBlockFromItem(heldItem)){
+            if(SlabQuarterBlock instanceof QuarterBlock){
+                worldIn.setBlockAndUpdate(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState());
+                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState().getSoundType();
+                worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                return InteractionResult.SUCCESS;
             }
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
 
 
-    public BlockState getStateForPlacement(BlockItemUseContext context){
+    public BlockState getStateForPlacement(BlockPlaceContext context){
 
-        FluidState fluidState = context.getWorld().getFluidState(context.getPos());
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
         Direction direction = context.getNearestLookingDirection();
 
-        return (BlockState) this.getDefaultState().with(FACING, direction).with(WATERLOGGED, Boolean.valueOf(fluidState.getFluid() == Fluids.WATER));
+        return (BlockState) this.defaultBlockState().setValue(FACING, direction).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
 
     }
 
 
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 
         //Get all the neighboring blocks
         BlockState north = worldIn.getBlockState(pos.north());
         BlockState east  = worldIn.getBlockState(pos.east());
         BlockState south = worldIn.getBlockState(pos.south());
         BlockState west  = worldIn.getBlockState(pos.west());
-        BlockState up    = worldIn.getBlockState(pos.up());
-        BlockState down  = worldIn.getBlockState(pos.down());
+        BlockState up    = worldIn.getBlockState(pos.above());
+        BlockState down  = worldIn.getBlockState(pos.below());
 
         if(north.getBlock() instanceof SlabBlock){
 
