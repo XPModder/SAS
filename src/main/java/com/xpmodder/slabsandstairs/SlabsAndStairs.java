@@ -55,8 +55,6 @@ public class SlabsAndStairs {
 
         resourceLoader.load();
 
-        //TODO: Fix Quarter crafting recipes and slab crafting recipes
-
     }
 
     private void setup(final FMLCommonSetupEvent event){
@@ -69,9 +67,9 @@ public class SlabsAndStairs {
     }
 
     private void clientSetup(final FMLClientSetupEvent event){
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.cutout());
     }
 
 }

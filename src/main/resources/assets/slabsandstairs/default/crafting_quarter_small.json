@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "   ",
-    " A ",
+    "AA ",
     "A  "
   ],
   "key": {
@@ -12,6 +12,6 @@
   },
   "result": {
     "item": "placeholder_output",
-    "count": 8
+    "count": 12
   }
 }

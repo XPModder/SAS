@@ -574,15 +574,12 @@ public class ResourceGenerator {
                     File recipeShapeless1 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless1.json");
                     File recipeShapeless2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless2.json");
                     File recipeShapeless3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless3.json");
-                    File recipeShapeless4 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless4.json");
                     InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
                     InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
                     InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
-                    InputStream in4 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
                     OutputStream out1 = new FileOutputStream(recipeShapeless1);
                     OutputStream out2 = new FileOutputStream(recipeShapeless2);
                     OutputStream out3 = new FileOutputStream(recipeShapeless3);
-                    OutputStream out4 = new FileOutputStream(recipeShapeless4);
 
                     String quarter = "";
                     String regName = block.getRegistryName().getPath();
@@ -608,7 +605,6 @@ public class ResourceGenerator {
                         copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, quarter, block.getRegistryName().toString()});
                         copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock)block).getBaseBlock()});
                         copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "2"});
-                        copyFileAndReplace(in4, out4, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{((SlabBlock)block).getBaseBlock(), block.getRegistryName().toString(), "2"});
                     }
 
                 }
