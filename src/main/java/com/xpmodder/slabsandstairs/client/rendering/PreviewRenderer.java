@@ -1,15 +1,11 @@
 package com.xpmodder.slabsandstairs.client.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3d;
 import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
 import com.xpmodder.slabsandstairs.init.BlockInit;
-import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -24,10 +20,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.model.ModelDataManager;
-import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -93,28 +88,27 @@ public class PreviewRenderer {
 
             PoseStack matrixStack = event.getPoseStack();
 
-            renderBlock(matrixStack, placementState, new BlockPos(pos.getX() + 0.075f, pos.getY() + 0.075, pos.getZ() + 0.075f));
+            Vec3 cameraPosition = event.getCamera().getPosition();
+
+            renderBlock(matrixStack, placementState, new BlockPos(pos.getX() + 0.075f, pos.getY() + 0.075, pos.getZ() + 0.075f), cameraPosition);
 
         }
 
     }
 
-    public static void renderBlock(PoseStack matrixStack, BlockState blockState, BlockPos pos)
+    public static void renderBlock(PoseStack matrixStack, BlockState blockState, BlockPos pos, Vec3 cameraPos)
     {
-        //TODO: Fix this!
 
         Minecraft instance = Minecraft.getInstance();
 
         BlockRenderDispatcher blockRendererDispatcher = instance.getBlockRenderer();
 
         matrixStack.pushPose();
-        matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+        matrixStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
 
         matrixStack.scale(0.85f, 0.85f, 0.85f);
 
-        blockRendererDispatcher.getModelRenderer().renderModel(matrixStack.last(), instance.renderBuffers().bufferSource().getBuffer(RenderType.cutout()), blockState, blockRendererDispatcher.getBlockModel(blockState), 255.0f, 255.0f, 255.0f, 15728880, OverlayTexture.NO_OVERLAY);
-
-        //blockRendererDispatcher.renderSingleBlock(blockState, matrixStack, Minecraft.getInstance().renderBuffers().crumblingBufferSource(), 15728880, OverlayTexture.NO_OVERLAY);
+        blockRendererDispatcher.getModelRenderer().renderModel(matrixStack.last(), instance.renderBuffers().bufferSource().getBuffer(RenderType.translucent()), blockState, blockRendererDispatcher.getBlockModel(blockState), 255.0f, 255.0f, 255.0f, 15728880, OverlayTexture.NO_OVERLAY, net.minecraftforge.client.model.data.EmptyModelData.INSTANCE);
 
         matrixStack.popPose();
     }

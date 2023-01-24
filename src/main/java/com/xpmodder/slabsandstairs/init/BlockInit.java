@@ -25,7 +25,7 @@ public class BlockInit {
     public static final RegistryObject<Block> previewSlab = BLOCKS.register("preview_slab", () -> new SlabBlock(BlockBehaviour.Properties.of(Material.STONE)));
     public static final RegistryObject<Block> previewStair = BLOCKS.register("preview_stair", () -> new StairBlock(BlockBehaviour.Properties.of(Material.STONE)));
 
-    public BlockInit(){
+    static{
 
         NewBlock("minecraft:oak_planks", Material.WOOD);
         NewBlock("minecraft:oak_log", Material.WOOD);
@@ -41,19 +41,19 @@ public class BlockInit {
         String RegistryNameSlab = RegistryPath + "_slab_sas";
         String RegistryNameStair = RegistryPath + "_stair_sas";
 
-        RegistryObject<Block> regQuarter = BLOCKS.register(RegistryNameQuarter, () -> {
+        BLOCKS.register(RegistryNameQuarter, () -> {
             QuarterBlock quarter = new QuarterBlock(BlockBehaviour.Properties.of(material));
             quarter.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameSlab, Reference.MODID + ":" + RegistryNameStair);
             MY_BLOCKS.add(quarter);
             return quarter;
         });
-        RegistryObject<Block> regSlab = BLOCKS.register(RegistryNameSlab, () -> {
+        BLOCKS.register(RegistryNameSlab, () -> {
             SlabBlock slab = new SlabBlock(BlockBehaviour.Properties.of(material));
             slab.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameStair);
             MY_BLOCKS.add(slab);
             return slab;
         });
-        RegistryObject<Block> regStair = BLOCKS.register(RegistryNameStair, () -> {
+        BLOCKS.register(RegistryNameStair, () -> {
             StairBlock stair = new StairBlock(BlockBehaviour.Properties.of(material));
             stair.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameSlab);
             MY_BLOCKS.add(stair);

@@ -40,13 +40,11 @@ public class SlabsAndStairs {
 
     public SlabsAndStairs(){
 
-        BlockInit blockInit = new BlockInit();
-
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
 
-        blockInit.BLOCKS.register(eventBus);
+        BlockInit.BLOCKS.register(eventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
         eventBus.register(new ItemInit());
@@ -67,9 +65,9 @@ public class SlabsAndStairs {
     }
 
     private void clientSetup(final FMLClientSetupEvent event){
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
     }
 
 }
