@@ -1,13 +1,14 @@
 package com.xpmodder.slabsandstairs.block;
 
+import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
+import com.xpmodder.slabsandstairs.utility.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,6 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import static com.xpmodder.slabsandstairs.block.StairBlock.INVERTED;
 import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
@@ -46,6 +48,10 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     protected String BaseBlock = Blocks.AIR.getRegistryName().toString();
     protected String SlabQuarterBlock = Blocks.AIR.getRegistryName().toString();
     protected String StairBlock = Blocks.AIR.getRegistryName().toString();
+
+    protected static Direction placementRotation = null;
+
+    protected static boolean placementInverted = false;
 
 
     public SlabBlock(Properties properties) {
@@ -184,45 +190,65 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         return InteractionResult.PASS;
     }
 
+    protected void rotatePlacement(){
+        if(placementRotation == DOWN){
+            placementInverted = !placementInverted;
+        }
+        placementRotation = Util.nextDirection(placementRotation);
+    }
+
+
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Pose pose = context.getPlayer().getPose();
         FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
-        Direction direction = context.getNearestLookingDirection();
-        return (BlockState)this.defaultBlockState().setValue(FACING, (pose == Pose.CROUCHING ? direction : direction.getOpposite())).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+        Direction direction = context.getNearestLookingDirection().getOpposite();
+        BlockPos blockPos = context.getClickedPos();
+
+        if(placementRotation == null){
+            placementRotation = direction;
+        }
+
+        if(KeyInit.placementModeMapping.isDown()){
+            if(KeyInit.placementRotateMapping.consumeClick()){
+                this.rotatePlacement();
+            }
+            if(this.defaultBlockState().hasProperty(INVERTED)){
+                return this.defaultBlockState().setValue(FACING, placementRotation).setValue(INVERTED, placementInverted).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+            }
+            return this.defaultBlockState().setValue(FACING, placementRotation).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+        }
+
+        if((context.getClickLocation().y - (double)blockPos.getY()) > 0.5D){
+            return this.defaultBlockState().setValue(FACING, DOWN).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+        }
+        else{
+            return this.defaultBlockState().setValue(FACING, UP).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+        }
     }
 
     public boolean isTransparent(BlockState blockState){
         return true;
     }
 
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
-        switch(state.getValue(FACING)){
-            case NORTH:
-                return SHAPE_NORTH;
-            case EAST:
-                return SHAPE_EAST;
-            case WEST:
-                return SHAPE_WEST;
-            case SOUTH:
-                return SHAPE_SOUTH;
-            case UP:
-                return SHAPE_UP;
-            case DOWN:
-                return SHAPE_DOWN;
-            default:
-                return SHAPE_NORTH;
-        }
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+        return switch (state.getValue(FACING)) {
+            case EAST -> SHAPE_EAST;
+            case WEST -> SHAPE_WEST;
+            case SOUTH -> SHAPE_SOUTH;
+            case UP -> SHAPE_UP;
+            case DOWN -> SHAPE_DOWN;
+            default -> SHAPE_NORTH;
+        };
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, WATERLOGGED);
     }
 
-    public BlockState rotate(BlockState state, Rotation rot) {
+    public @NotNull BlockState rotate(BlockState state, Rotation rot) {
         return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
-    public FluidState getFluidState(BlockState state) {
+    public @NotNull FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 

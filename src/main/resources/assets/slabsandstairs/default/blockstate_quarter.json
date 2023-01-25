@@ -18,20 +18,20 @@
     },
     "facing=up,inverted=false": {
       "model": "registry_namespace:block/registry_path",
-      "x": 270
+      "x": 90
     },
     "facing=down,inverted=false": {
       "model": "registry_namespace:block/registry_path",
-      "x": 90
+      "x": 270
     },
     "facing=up,inverted=true": {
       "model": "registry_namespace:block/registry_path",
-      "x": 270,
+      "x": 90,
       "y": 180
     },
     "facing=down,inverted=true": {
       "model": "registry_namespace:block/registry_path",
-      "x": 90,
+      "x": 270,
       "y": 180
     }
   }

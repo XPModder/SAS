@@ -12,4 +12,6 @@ public class Reference {
     public static final File RESOURCE_FOLDER = new File(FMLPaths.GAMEDIR.get().toFile(), MODID + "/modResources");
     public static final File DATAPACK_FOLDER = new File(FMLPaths.GAMEDIR.get().toFile(), MODID + "/modDatapack");
 
+    public static final String KEY_CATEGORY = "key.categories." + MODID;
+
 }

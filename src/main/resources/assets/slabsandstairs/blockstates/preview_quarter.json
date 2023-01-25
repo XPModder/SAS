@@ -18,20 +18,20 @@
     },
     "facing=up,inverted=false": {
       "model": "slabsandstairs:block/preview_quarter",
-      "x": 270
+      "x": 90
     },
     "facing=down,inverted=false": {
       "model": "slabsandstairs:block/preview_quarter",
-      "x": 90
+      "x": 270
     },
     "facing=up,inverted=true": {
       "model": "slabsandstairs:block/preview_quarter",
-      "x": 270,
+      "x": 90,
       "y": 180
     },
     "facing=down,inverted=true": {
       "model": "slabsandstairs:block/preview_quarter",
-      "x": 90,
+      "x": 270,
       "y": 180
     }
   }

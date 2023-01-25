@@ -2,6 +2,7 @@ package com.xpmodder.slabsandstairs;
 
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.ItemInit;
+import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.ModResourceLoader;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
@@ -68,6 +69,8 @@ public class SlabsAndStairs {
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
+
+        KeyInit.init();
     }
 
 }

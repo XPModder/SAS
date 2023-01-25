@@ -106,7 +106,7 @@ public class PreviewRenderer {
         matrixStack.pushPose();
         matrixStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
 
-        matrixStack.scale(0.85f, 0.85f, 0.85f);
+        matrixStack.scale(1.0f, 1.0f, 1.0f);
 
         blockRendererDispatcher.getModelRenderer().renderModel(matrixStack.last(), instance.renderBuffers().bufferSource().getBuffer(RenderType.translucent()), blockState, blockRendererDispatcher.getBlockModel(blockState), 255.0f, 255.0f, 255.0f, 15728880, OverlayTexture.NO_OVERLAY, net.minecraftforge.client.model.data.EmptyModelData.INSTANCE);
 
