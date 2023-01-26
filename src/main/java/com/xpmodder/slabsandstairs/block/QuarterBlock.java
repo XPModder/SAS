@@ -35,6 +35,10 @@ public class QuarterBlock extends SlabBlock {
     protected static final VoxelShape SHAPE_WEST = Block.box(8.0D, 0.0D, 0.0D, 16.0D, 16.0D, 8.0D);
     protected static final VoxelShape SHAPE_EAST = Block.box(0.0D, 0.0D, 8.0D, 8.0D, 16.0D, 16.0D);
     protected static final VoxelShape SHAPE_NORTH = Block.box(8.0D, 0.0D, 8.0D, 16.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SHAPE_SOUTH_INV = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 8.0D);
+    protected static final VoxelShape SHAPE_WEST_INV = Block.box(0.0D, 8.0D, 0.0D, 16.0D, 16.0D, 8.0D);
+    protected static final VoxelShape SHAPE_EAST_INV = Block.box(0.0D, 0.0D, 8.0D, 16.0D, 8.0D, 16.0D);
+    protected static final VoxelShape SHAPE_NORTH_INV = Block.box(0.0D, 8.0D, 8.0D, 16.0D, 16.0D, 16.0D);
     protected static final VoxelShape SHAPE_UP = Block.box(0.0D, 0.0D, 0.0D, 8.0D, 8.0D, 16.0D);
     protected static final VoxelShape SHAPE_DOWN = Block.box(0.0D, 8.0D, 0.0D, 8.0D, 16.0D, 16.0D);
     protected static final VoxelShape SHAPE_UP_INV = Block.box(8.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
@@ -48,12 +52,12 @@ public class QuarterBlock extends SlabBlock {
 
     public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
         return switch (state.getValue(FACING)) {
-            case EAST -> SHAPE_EAST;
-            case WEST -> SHAPE_WEST;
-            case SOUTH -> SHAPE_SOUTH;
+            case EAST -> (state.getValue(INVERTED) ? SHAPE_EAST_INV : SHAPE_EAST);
+            case WEST -> (state.getValue(INVERTED) ? SHAPE_WEST_INV : SHAPE_WEST);
+            case SOUTH -> (state.getValue(INVERTED) ? SHAPE_SOUTH_INV : SHAPE_SOUTH);
             case UP -> (state.getValue(INVERTED) ? SHAPE_UP_INV : SHAPE_UP);
             case DOWN -> (state.getValue(INVERTED) ? SHAPE_DOWN_INV : SHAPE_DOWN);
-            default -> SHAPE_NORTH;
+            default -> (state.getValue(INVERTED) ? SHAPE_NORTH_INV : SHAPE_NORTH);
         };
     }
 
@@ -66,11 +70,11 @@ public class QuarterBlock extends SlabBlock {
         Block SlabQuarterBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.SlabQuarterBlock));
         Block StairBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.StairBlock));
 
-        if(SlabQuarterBlock == Blocks.AIR){
+        if(SlabQuarterBlock == Blocks.AIR || SlabQuarterBlock == null){
             LogHelper.error("Got Air Block as SlabQuarterBlock!");
             return InteractionResult.PASS;
         }
-        if(StairBlock == Blocks.AIR){
+        if(StairBlock == Blocks.AIR || StairBlock == null){
             LogHelper.error("Got Air Block as StairBlock!");
             return InteractionResult.PASS;
         }
@@ -78,6 +82,8 @@ public class QuarterBlock extends SlabBlock {
         Item heldItem = player.getItemInHand(handIn).getItem();
         if(this == getBlockFromItem(heldItem)){
             if(getBlockFromItem(heldItem) instanceof QuarterBlock){
+                //Quarter (in world) right-clicked with Quarter (in hand)
+
                 BlockState slabState = SlabQuarterBlock.defaultBlockState();
 
                 if(state.getValue(FACING) == UP){
@@ -129,51 +135,87 @@ public class QuarterBlock extends SlabBlock {
                     }
                 }
                 else if(state.getValue(FACING) == NORTH){
-                    if(hit.getDirection() == WEST || hit.getDirection() == EAST){
-                        slabState = slabState.setValue(FACING, NORTH);
-                    }
-                    else if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH){
-                        slabState = slabState.setValue(FACING, WEST);
+                    if(state.getValue(INVERTED)) {
+                        if (hit.getDirection() == NORTH || hit.getDirection() == SOUTH) {
+                            slabState = slabState.setValue(FACING, DOWN);
+                        } else if (hit.getDirection() == DOWN || hit.getDirection() == UP) {
+                            slabState = slabState.setValue(FACING, NORTH);
+                        } else {
+                            slabState = slabState.setValue(FACING, DOWN);
+                        }
                     }
                     else{
-                        slabState = slabState.setValue(FACING, NORTH);
+                        if (hit.getDirection() == WEST || hit.getDirection() == EAST) {
+                            slabState = slabState.setValue(FACING, NORTH);
+                        } else if (hit.getDirection() == NORTH || hit.getDirection() == SOUTH) {
+                            slabState = slabState.setValue(FACING, WEST);
+                        } else {
+                            slabState = slabState.setValue(FACING, NORTH);
+                        }
                     }
                 }
                 else if(state.getValue(FACING) == EAST){
-                    if(hit.getDirection() == EAST || hit.getDirection() == WEST){
-                        slabState = slabState.setValue(FACING, NORTH);
-                    }
-                    else if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH){
-                        slabState = slabState.setValue(FACING, EAST);
+                    if(state.getValue(INVERTED)) {
+                        if (hit.getDirection() == NORTH || hit.getDirection() == SOUTH) {
+                            slabState = slabState.setValue(FACING, UP);
+                        } else if (hit.getDirection() == UP || hit.getDirection() == DOWN) {
+                            slabState = slabState.setValue(FACING, NORTH);
+                        } else {
+                            slabState = slabState.setValue(FACING, UP);
+                        }
                     }
                     else{
-                        slabState = slabState.setValue(FACING, NORTH);
+                        if (hit.getDirection() == EAST || hit.getDirection() == WEST) {
+                            slabState = slabState.setValue(FACING, NORTH);
+                        } else if (hit.getDirection() == NORTH || hit.getDirection() == SOUTH) {
+                            slabState = slabState.setValue(FACING, EAST);
+                        } else {
+                            slabState = slabState.setValue(FACING, NORTH);
+                        }
                     }
                 }
                 else if(state.getValue(FACING) == SOUTH){
-                    if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH){
-                        slabState = slabState.setValue(FACING, EAST);
-                    }
-                    else if(hit.getDirection() == EAST || hit.getDirection() == WEST){
-                        slabState = slabState.setValue(FACING, SOUTH);
+                    if(state.getValue(INVERTED)) {
+                        if (hit.getDirection() == SOUTH || hit.getDirection() == NORTH) {
+                            slabState = slabState.setValue(FACING, UP);
+                        } else if (hit.getDirection() == UP || hit.getDirection() == DOWN) {
+                            slabState = slabState.setValue(FACING, SOUTH);
+                        } else {
+                            slabState = slabState.setValue(FACING, UP);
+                        }
                     }
                     else{
-                        slabState = slabState.setValue(FACING, SOUTH);
+                        if (hit.getDirection() == SOUTH || hit.getDirection() == NORTH) {
+                            slabState = slabState.setValue(FACING, EAST);
+                        } else if (hit.getDirection() == EAST || hit.getDirection() == WEST) {
+                            slabState = slabState.setValue(FACING, SOUTH);
+                        } else {
+                            slabState = slabState.setValue(FACING, SOUTH);
+                        }
                     }
                 }
-                else {
-                    if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH){
-                        slabState = slabState.setValue(FACING, WEST);
-                    }
-                    else if(hit.getDirection() == WEST || hit.getDirection() == EAST){
-                        slabState = slabState.setValue(FACING, SOUTH);
+                else {  //WEST
+                    if(state.getValue(INVERTED)) {
+                        if (hit.getDirection() == SOUTH || hit.getDirection() == NORTH) {
+                            slabState = slabState.setValue(FACING, DOWN);
+                        } else if (hit.getDirection() == DOWN || hit.getDirection() == UP) {
+                            slabState = slabState.setValue(FACING, SOUTH);
+                        } else {
+                            slabState = slabState.setValue(FACING, DOWN);
+                        }
                     }
                     else{
-                        slabState = slabState.setValue(FACING, SOUTH);
+                        if (hit.getDirection() == SOUTH || hit.getDirection() == NORTH) {
+                            slabState = slabState.setValue(FACING, WEST);
+                        } else if (hit.getDirection() == WEST || hit.getDirection() == EAST) {
+                            slabState = slabState.setValue(FACING, SOUTH);
+                        } else {
+                            slabState = slabState.setValue(FACING, SOUTH);
+                        }
                     }
                 }
 
-                worldIn.setBlockAndUpdate(pos, slabState);
+                worldIn.setBlockAndUpdate(pos, slabState.setValue(WATERLOGGED, state.getValue(WATERLOGGED)));
                 SoundType soundType = SlabQuarterBlock.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
                 return InteractionResult.SUCCESS;
@@ -181,7 +223,162 @@ public class QuarterBlock extends SlabBlock {
         }
         else if(SlabQuarterBlock == getBlockFromItem(heldItem)){
             if(SlabQuarterBlock instanceof SlabBlock){
-                worldIn.setBlockAndUpdate(pos, StairBlock.defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(INVERTED, state.getValue(INVERTED)));
+                //Quarter Block (in world), right-clicked with slab (in hand)
+
+                BlockState stairState = StairBlock.defaultBlockState();
+
+                switch(state.getValue(FACING)){
+                    case UP:
+                        if(state.getValue(INVERTED)){
+                            if(hit.getDirection() == WEST || hit.getDirection() == EAST){
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                            else if(hit.getDirection() == UP || hit.getDirection() == DOWN){
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            if(hit.getDirection() == EAST || hit.getDirection() == WEST){
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                            else if(hit.getDirection() == UP || hit.getDirection() == DOWN){
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                        }
+                        break;
+
+                    case DOWN:
+                        if(state.getValue(INVERTED)){
+                            if(hit.getDirection() == WEST || hit.getDirection() == EAST){
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else if(hit.getDirection() == DOWN || hit.getDirection() == UP){
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                        }
+                        else{
+                            if(hit.getDirection() == EAST || hit.getDirection() == WEST){
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            else if(hit.getDirection() == DOWN || hit.getDirection() == UP){
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                        }
+                        break;
+
+                    case NORTH:
+                        if(state.getValue(INVERTED)){
+                            if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH){
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else if(hit.getDirection() == DOWN || hit.getDirection() == UP){
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            if(hit.getDirection() == WEST || hit.getDirection() == EAST){
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH){
+                                stairState = stairState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                        }
+                        break;
+
+                    case EAST:
+                        if(state.getValue(INVERTED)){
+                            if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH){
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                            else if(hit.getDirection() == UP || hit.getDirection() == DOWN){
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            if(hit.getDirection() == EAST || hit.getDirection() == WEST){
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH){
+                                stairState = stairState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                        }
+                        break;
+
+                    case SOUTH:
+                        if(state.getValue(INVERTED)){
+                            if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH){
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                            else if(hit.getDirection() == UP || hit.getDirection() == DOWN){
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH){
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else if(hit.getDirection() == EAST || hit.getDirection() == WEST){
+                                stairState = stairState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                        }
+                        break;
+
+                    case WEST:
+                        if(state.getValue(INVERTED)){
+                            if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH){
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            else if(hit.getDirection() == DOWN || hit.getDirection() == UP){
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH){
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else if(hit.getDirection() == WEST || hit.getDirection() == EAST){
+                                stairState = stairState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            else{
+                                stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                        }
+                }
+
+                worldIn.setBlockAndUpdate(pos, stairState.setValue(WATERLOGGED, state.getValue(WATERLOGGED)));
                 SoundType soundType = StairBlock.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
                 return InteractionResult.SUCCESS;
@@ -189,8 +386,16 @@ public class QuarterBlock extends SlabBlock {
         }
         else if(StairBlock == getBlockFromItem(heldItem)){
             if(StairBlock instanceof StairBlock){
-                worldIn.setBlockAndUpdate(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState());
-                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState().getSoundType();
+                //Quarter (in world) right-clicked with stair (in hand)
+
+                Block base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock));
+                if(base == null){
+                    LogHelper.error("Error: Could not get Base Block for " + this.getRegistryName());
+                    return InteractionResult.PASS;
+                }
+
+                worldIn.setBlockAndUpdate(pos, base.defaultBlockState());
+                SoundType soundType = base.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
                 return InteractionResult.SUCCESS;
             }
