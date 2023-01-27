@@ -91,98 +91,166 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
         if(this == getBlockFromItem(heldItem)){
             if(getBlockFromItem(heldItem) instanceof SlabBlock){
-                worldIn.setBlockAndUpdate(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState());
-                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState().getSoundType();
+                Block base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock));
+                if(base == null){
+                    LogHelper.error("Error: Could not get Base Block for " + this.getRegistryName());
+                    return InteractionResult.PASS;
+                }
+                worldIn.setBlockAndUpdate(pos, base.defaultBlockState());
+                SoundType soundType = base.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
                 return InteractionResult.SUCCESS;
             }
         }
         else if(SlabQuarterBlock == getBlockFromItem(heldItem)){
             if(SlabQuarterBlock instanceof QuarterBlock){
-                Direction newFacing = NORTH;
-                boolean newInverted = false;
+
+                if(StairBlock == null){
+                    LogHelper.error("Error: Unable to get stair block for " + this.getRegistryName());
+                    return InteractionResult.PASS;
+                }
+
+                BlockState stairState = StairBlock.defaultBlockState();
+
                 switch(state.getValue(FACING)){
                     case NORTH:
-                        newFacing = Direction.DOWN;
-                        newInverted = true;
-                        if(hit.getDirection() == EAST){
-                            newInverted = false;
+                        if(hit.getDirection() == SOUTH || hit.getDirection() == NORTH) {
+                            //Was the top half clicked?
+                            if (hit.getLocation().y - (double) hit.getBlockPos().getY() > 0.5D) {
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            } else {
+                                stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
                         }
-                        else if(hit.getDirection() == SOUTH){
-                            if(player.getYHeadRot() < 0.0f){
-                                newFacing = Direction.DOWN;
-                                newInverted = false;
-                            }
-                            else{
-                                newFacing = Direction.DOWN;
-                                newInverted = true;
-                            }
+                        else if(hit.getDirection() == UP){
+                            stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == DOWN){
+                            stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == EAST){
+                            stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                        }
+                        else{   //WEST
+                            stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
                         }
                         break;
                     case EAST:
-                        newFacing = Direction.UP;
-                        newInverted = true;
-                        if(hit.getDirection() == SOUTH){
-                            newFacing = Direction.DOWN;
-                        }
-                        else if(hit.getDirection() == Direction.WEST){
-                            if(player.getYHeadRot() < 90.0f){
-                                newFacing = Direction.DOWN;
-                                newInverted = true;
+                        if(hit.getDirection() == WEST || hit.getDirection() == EAST){
+                            //Was the top half clicked?
+                            if (hit.getLocation().y - (double) hit.getBlockPos().getY() > 0.5D) {
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
                             }
                             else{
-                                newFacing = Direction.UP;
-                                newInverted = true;
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
                             }
+                        }
+                        else if(hit.getDirection() == UP){
+                            stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == DOWN){
+                            stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == NORTH){
+                            stairState = stairState.setValue(FACING, UP).setValue(INVERTED, true);
+                        }
+                        else {   //SOUTH
+                            stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
                         }
                         break;
                     case SOUTH:
-                        newFacing = Direction.UP;
-                        newInverted = true;
-                        if(hit.getDirection() == EAST){
-                            newInverted = false;
+                        if(hit.getDirection() == NORTH || hit.getDirection() == SOUTH) {
+                            //Was the top half clicked?
+                            if (hit.getLocation().y - (double) hit.getBlockPos().getY() > 0.5D) {
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            } else {
+                                stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
                         }
-                        else if(hit.getDirection() == NORTH){
-                            if(player.getYHeadRot() < 0.0f){
-                                newFacing = Direction.UP;
-                                newInverted = false;
-                            }
-                            else{
-                                newFacing = Direction.UP;
-                                newInverted = true;
-                            }
+                        else if(hit.getDirection() == UP){
+                            stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == DOWN){
+                            stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == EAST){
+                            stairState = stairState.setValue(FACING, UP).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == WEST){
+                            stairState = stairState.setValue(FACING, UP).setValue(INVERTED, true);
                         }
                         break;
                     case WEST:
-                        newFacing = Direction.DOWN;
-                        newInverted = false;
-                        if(hit.getDirection() == NORTH){
-                            newFacing = Direction.UP;
+                        if(hit.getDirection() == EAST || hit.getDirection() == WEST) {
+                            //Was the top half clicked?
+                            if (hit.getLocation().y - (double) hit.getBlockPos().getY() > 0.5D) {
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            } else {
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
                         }
-                        else if(hit.getDirection() == EAST){
-                            if(player.getYHeadRot() < -90.0f){
-                                newFacing = Direction.UP;
-                                newInverted = false;
-                            }
-                            else{
-                                newFacing = Direction.DOWN;
-                                newInverted = false;
-                            }
+                        else if(hit.getDirection() == UP){
+                            stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == DOWN){
+                            stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == NORTH){
+                            stairState = stairState.setValue(FACING, UP).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == SOUTH){
+                            stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
                         }
                         break;
                     case UP:
-                        newFacing = hit.getDirection();
-                        newInverted = false;
+                        if(hit.getDirection() == UP || hit.getDirection() == DOWN) {
+                            //Was the back half clicked?
+                            if (hit.getLocation().x - (double) hit.getBlockPos().getX() > 0.5D) {
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            } else {
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                        }
+                        else if(hit.getDirection() == EAST){
+                            stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == WEST){
+                            stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == NORTH){
+                            stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                        }
+                        else if(hit.getDirection() == SOUTH){
+                            stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                        }
                         break;
                     case DOWN:
-                        newFacing = hit.getDirection();
-                        newInverted = true;
+                        if(hit.getDirection() == UP || hit.getDirection() == DOWN) {
+                            //Was the back half clicked?
+                            if (hit.getLocation().x - (double) hit.getBlockPos().getX() > 0.5D) {
+                                stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            } else {
+                                stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hit.getDirection() == EAST){
+                            stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == WEST){
+                            stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == NORTH){
+                            stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                        }
+                        else if(hit.getDirection() == SOUTH){
+                            stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                        }
                         break;
                     default:
 
                 }
-                worldIn.setBlockAndUpdate(pos, StairBlock.defaultBlockState().setValue(FACING, newFacing).setValue(INVERTED, newInverted));
-                SoundType soundType = StairBlock.defaultBlockState().getSoundType();
+                worldIn.setBlockAndUpdate(pos, stairState.setValue(WATERLOGGED, state.getValue(WATERLOGGED)));
+                SoundType soundType = stairState.getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
                 return InteractionResult.SUCCESS;
             }
@@ -225,9 +293,6 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         }
     }
 
-    public boolean isTransparent(BlockState blockState){
-        return true;
-    }
 
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
         return switch (state.getValue(FACING)) {
