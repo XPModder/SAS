@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs.config;
 
+import com.xpmodder.slabsandstairs.SlabsAndStairs;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
@@ -63,16 +64,20 @@ public class BlockListHandler {
 
                 try {
 
+                    LogHelper.info("Copying block list file...");
+
                     ResourceLocation inRes = new ResourceLocation(Reference.MODID, "default/blocklist.csv");
 
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(inRes).getInputStream();
+                    //InputStream in = Minecraft.getInstance().getResourceManager().getResource(inRes).getInputStream();
+                    InputStream in = SlabsAndStairs.class.getClassLoader().getResourceAsStream("assets/" + Reference.MODID + "/default/blocklist.csv");
                     OutputStream out = new FileOutputStream(Reference.BLOCK_LIST);
 
                     ResourceGenerator.copyFile(in, out);
 
                 }
                 catch (Exception ex){
-                    LogHelper.error("Could not generate BLOCK_LIST file! Exception: " + ex.getMessage());
+                    LogHelper.error("Could not generate BLOCK_LIST file!");
+                    ex.printStackTrace();
                 }
 
             }

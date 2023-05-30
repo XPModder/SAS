@@ -62,6 +62,8 @@ public class SlabsAndStairs {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigurationHandler.COMMON_SPEC);
 
+        LogHelper.info("HANDLER");
+
         BlockListHandler.read();
 
         resourceLoader.load();
@@ -70,6 +72,10 @@ public class SlabsAndStairs {
 
 
     private void setup(final FMLCommonSetupEvent event){
+
+        LogHelper.info("SETUP");
+
+        LogHelper.info(ResourceGenerator.getTextureForBlock(Blocks.DRIED_KELP_BLOCK, "top"));
 
         ResourceGenerator.generate();
         if(resourceLoader.hasGenerated) {

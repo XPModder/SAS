@@ -106,6 +106,27 @@ public final class ResourceGenerator {
             else if(object.getAsJsonObject("textures").has("end")){
                 output = object.getAsJsonObject("textures").get("end").getAsString();
             }
+            else if(object.getAsJsonObject("textures").has("pattern")){
+                output = object.getAsJsonObject("textures").get("pattern").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("up") && texture.contains("top")){
+                output = object.getAsJsonObject("textures").get("up").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("down") && texture.contains("bottom")){
+                output = object.getAsJsonObject("textures").get("down").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("north") && texture.contains("side")){
+                output = object.getAsJsonObject("textures").get("north").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("east") && texture.contains("side")){
+                output = object.getAsJsonObject("textures").get("east").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("south") && texture.contains("side")){
+                output = object.getAsJsonObject("textures").get("south").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("west") && texture.contains("side")){
+                output = object.getAsJsonObject("textures").get("west").getAsString();
+            }
 
         }
         catch(Exception ex){
@@ -127,6 +148,8 @@ public final class ResourceGenerator {
             while((line = in.readLine()) != null) {
                 out.println(line);
             }
+            in.close();
+            out.close();
         }
         catch (IOException ex){
             LogHelper.error("Error copying file!");
