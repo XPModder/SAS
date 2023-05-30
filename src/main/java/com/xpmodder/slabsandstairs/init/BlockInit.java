@@ -4,6 +4,7 @@ import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
 import com.xpmodder.slabsandstairs.reference.Reference;
+import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -27,14 +28,14 @@ public class BlockInit {
 
     static{
 
-        NewBlock("minecraft:oak_planks", Material.WOOD);
+        /*NewBlock("minecraft:oak_planks", Material.WOOD);
         NewBlock("minecraft:oak_log", Material.WOOD);
         NewBlock("minecraft:blue_concrete", Material.STONE);
-        NewBlock("minecraft:red_concrete", Material.STONE);
+        NewBlock("minecraft:red_concrete", Material.STONE);*/
 
     }
 
-    protected static void NewBlock(String RegistryName, Material material){
+    public static void NewBlock(String RegistryName, Material material){
 
         String RegistryPath = RegistryName.split(":")[1];
         String RegistryNameQuarter = RegistryPath + "_quarter_sas";

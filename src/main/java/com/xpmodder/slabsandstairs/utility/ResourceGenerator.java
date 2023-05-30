@@ -14,11 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class ResourceGenerator {
+public final class ResourceGenerator {
 
     //Utility method that checks if the given file exists and if not attempts to create it.
     //Returns true when the file exists or has been created and is writable
-    public boolean makeFile(File fileToMake){
+    public static boolean makeFile(File fileToMake){
 
         try {
             if (!fileToMake.exists()) {                                 //Check if the file already exists, if not
@@ -49,7 +49,7 @@ public class ResourceGenerator {
 
     //Utility method that checks if a directory exists and if not attempts to create it.
     //Return true if the directory exists or has been created successfully.
-    public boolean makeDir(@NotNull File dirToMake){
+    public static boolean makeDir(@NotNull File dirToMake){
         if(!dirToMake.exists()){
             if(!dirToMake.mkdirs()){
                 LogHelper.error("Could not create folder at " + dirToMake);
@@ -60,7 +60,7 @@ public class ResourceGenerator {
     }
 
     //Gets the english name for a given block
-    public String getNameForBlock(Block block){
+    public static String getNameForBlock(Block block){
 
         String output = "";
 
@@ -85,7 +85,7 @@ public class ResourceGenerator {
 
     //Gets the path for the texture file for the given block and the given texture (aka "top" or "bottom" or "side")
     //Tries to get the requested texture, otherwise gets "all"
-    public String getTextureForBlock(Block block, String texture){
+    public static String getTextureForBlock(Block block, String texture){
 
         String output = "";
 
@@ -116,9 +116,27 @@ public class ResourceGenerator {
 
     }
 
+    //Copies the input file to the output file
+    public static void copyFile(InputStream input, OutputStream output){
+
+        try{
+            BufferedReader in = new BufferedReader(new InputStreamReader(input));
+            PrintWriter out = new PrintWriter(new BufferedOutputStream(output));
+
+            String line;
+            while((line = in.readLine()) != null) {
+                out.println(line);
+            }
+        }
+        catch (IOException ex){
+            LogHelper.error("Error copying file!");
+        }
+
+    }
+
 
     //Copies all data from input to output whilst replacing target with replacement.
-    public void copyFileAndReplace(InputStream input, OutputStream output, String target, String replacement){
+    public static void copyFileAndReplace(InputStream input, OutputStream output, String target, String replacement){
 
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(input));
@@ -143,7 +161,7 @@ public class ResourceGenerator {
 
 
     //Copies all data from input to output whilst replacing target with replacement. Accepts multiple targets and replacements
-    public void copyFileAndReplace(InputStream input, OutputStream output, String[] target, String[] replacement){
+    public static void copyFileAndReplace(InputStream input, OutputStream output, String[] target, String[] replacement){
 
         if(target.length != replacement.length){
             LogHelper.error("Invalid Arguments! The target and replacement arrays need to be the same length");
@@ -175,7 +193,7 @@ public class ResourceGenerator {
 
 
     //Generates the resource files like blockstates, block and item models as well as display text
-    public void generate(){
+    public static void generate(){
 
         File blockstates = new File(Reference.RESOURCE_FOLDER, "assets/" + Reference.MODID + "/blockstates");
         File blockModels = new File(Reference.RESOURCE_FOLDER, "assets/" + Reference.MODID + "/models/block");

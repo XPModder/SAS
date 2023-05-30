@@ -1,9 +1,12 @@
 package com.xpmodder.slabsandstairs;
 
+import com.xpmodder.slabsandstairs.config.BlockListHandler;
+import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.ItemInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
+import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.ModResourceLoader;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
 import net.minecraft.client.Minecraft;
@@ -12,9 +15,14 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -52,13 +60,18 @@ public class SlabsAndStairs {
 
         MinecraftForge.EVENT_BUS.register(resourceLoader);
 
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigurationHandler.COMMON_SPEC);
+
+        BlockListHandler.read();
+
         resourceLoader.load();
 
     }
 
+
     private void setup(final FMLCommonSetupEvent event){
 
-        new ResourceGenerator().generate();
+        ResourceGenerator.generate();
         if(resourceLoader.hasGenerated) {
             Minecraft.getInstance().reloadResourcePacks();
         }
@@ -72,5 +85,6 @@ public class SlabsAndStairs {
 
         KeyInit.init();
     }
+
 
 }
