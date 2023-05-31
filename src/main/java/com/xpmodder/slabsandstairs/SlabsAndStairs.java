@@ -2,6 +2,7 @@ package com.xpmodder.slabsandstairs;
 
 import com.xpmodder.slabsandstairs.config.BlockListHandler;
 import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
+import com.xpmodder.slabsandstairs.init.BlockEntityInit;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.ItemInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
@@ -53,9 +54,10 @@ public class SlabsAndStairs {
         eventBus.addListener(this::clientSetup);
 
         BlockInit.BLOCKS.register(eventBus);
+        BlockEntityInit.BLOCK_ENTITIES.register(eventBus);
+        ItemInit.ITEMS.register(eventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
-        eventBus.register(new ItemInit());
 
         MinecraftForge.EVENT_BUS.register(resourceLoader);
 
@@ -87,7 +89,7 @@ public class SlabsAndStairs {
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
-
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.combinedBlock.get(), RenderType.translucent());
 
 
         KeyInit.init();
