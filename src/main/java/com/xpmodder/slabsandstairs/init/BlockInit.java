@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs.init;
 
+import com.xpmodder.slabsandstairs.block.CombinedBlock;
 import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
@@ -25,6 +26,9 @@ public class BlockInit {
     public static final RegistryObject<Block> previewQuarter = BLOCKS.register("preview_quarter", () -> new QuarterBlock(BlockBehaviour.Properties.of(Material.STONE)));
     public static final RegistryObject<Block> previewSlab = BLOCKS.register("preview_slab", () -> new SlabBlock(BlockBehaviour.Properties.of(Material.STONE)));
     public static final RegistryObject<Block> previewStair = BLOCKS.register("preview_stair", () -> new StairBlock(BlockBehaviour.Properties.of(Material.STONE)));
+
+    public static final RegistryObject<Block> testBlock = BLOCKS.register("test_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE)));
+
 
     public static void NewBlock(String RegistryName, Material material){
 

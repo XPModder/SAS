@@ -2,5 +2,6 @@
   "item.slabsandstairs.test_item": "Test Item",
   "itemGroup.slabs_and_stairs": "Slabs and Stairs",
   "key.categories.slabsandstairs": "Slabs and Stairs",
-  "key.slabsandstairs.placementMode": "Placement Mode"
+  "key.slabsandstairs.placementMode": "Placement Mode",
+  "key.slabsandstairs.placementRotate": "Rotate Placement"
 }

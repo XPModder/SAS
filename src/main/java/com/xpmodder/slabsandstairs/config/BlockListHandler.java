@@ -6,11 +6,8 @@ import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.MaterialUtil;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
 
 import java.io.*;
-import java.sql.Ref;
 
 public class BlockListHandler {
 
@@ -66,9 +63,6 @@ public class BlockListHandler {
 
                     LogHelper.info("Copying block list file...");
 
-                    ResourceLocation inRes = new ResourceLocation(Reference.MODID, "default/blocklist.csv");
-
-                    //InputStream in = Minecraft.getInstance().getResourceManager().getResource(inRes).getInputStream();
                     InputStream in = SlabsAndStairs.class.getClassLoader().getResourceAsStream("assets/" + Reference.MODID + "/default/blocklist.csv");
                     OutputStream out = new FileOutputStream(Reference.BLOCK_LIST);
 
