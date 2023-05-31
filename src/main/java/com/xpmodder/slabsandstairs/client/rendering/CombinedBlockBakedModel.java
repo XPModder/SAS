@@ -4,6 +4,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
 import com.xpmodder.slabsandstairs.block.CombinedBlock;
+import com.xpmodder.slabsandstairs.block.CombinedBlockEntity;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -35,6 +36,12 @@ import java.util.Random;
 
 public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
+    public static ModelProperty<BlockState> BLOCK1 = new ModelProperty<>();
+    public static ModelProperty<BlockState> BLOCK2 = new ModelProperty<>();
+    public static ModelProperty<BlockState> BLOCK3 = new ModelProperty<>();
+    public static ModelProperty<BlockState> BLOCK4 = new ModelProperty<>();
+    public static ModelProperty<Integer> NUM_BLOCKS = new ModelProperty<>();
+
 
     @NotNull
     @Override
@@ -44,19 +51,32 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
 
+        LogHelper.info("getQuads!");
+
         try {
 
             if(state == null){
                 return Collections.emptyList();
             }
 
-            CombinedBlock block = (CombinedBlock) state.getBlock();
+            if(extraData.hasProperty(NUM_BLOCKS)){
 
-            /*for (BlockState subState : block.otherBlockStates) {
+                LogHelper.info("NUM_BLOCKS:" + extraData.getData(NUM_BLOCKS));
 
-                quads.addAll(shaper.getBlockModel(subState).getQuads(subState, side, rand, extraData));
+                if(extraData.getData(NUM_BLOCKS) >= 1){
+                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK1)).getQuads(extraData.getData(BLOCK1), side, rand, extraData));
+                }
+                if(extraData.getData(NUM_BLOCKS) >= 2){
+                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK2)).getQuads(extraData.getData(BLOCK2), side, rand, extraData));
+                }
+                if(extraData.getData(NUM_BLOCKS) >= 3){
+                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK3)).getQuads(extraData.getData(BLOCK3), side, rand, extraData));
+                }
+                if(extraData.getData(NUM_BLOCKS) == 4){
+                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK4)).getQuads(extraData.getData(BLOCK4), side, rand, extraData));
+                }
 
-            }*/
+            }
 
         }
         catch (NullPointerException ex){

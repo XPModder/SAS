@@ -35,6 +35,7 @@ import static net.minecraft.core.Direction.*;
 public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
@@ -56,7 +57,7 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     public SlabBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, NORTH).setValue(WATERLOGGED, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, NORTH).setValue(WATERLOGGED, false).setValue(INVERTED, false));
     }
 
     public String getBaseBlock(){
@@ -286,10 +287,10 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         }
 
         if((context.getClickLocation().y - (double)blockPos.getY()) > 0.5D){
-            return this.defaultBlockState().setValue(FACING, DOWN).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+            return this.defaultBlockState().setValue(FACING, DOWN).setValue(WATERLOGGED, fluidState.is(Fluids.WATER)).setValue(INVERTED, false);
         }
         else{
-            return this.defaultBlockState().setValue(FACING, UP).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
+            return this.defaultBlockState().setValue(FACING, UP).setValue(WATERLOGGED, fluidState.is(Fluids.WATER)).setValue(INVERTED, false);
         }
     }
 
@@ -306,7 +307,7 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, WATERLOGGED);
+        builder.add(FACING, WATERLOGGED, INVERTED);
     }
 
     public @NotNull BlockState rotate(BlockState state, Rotation rot) {

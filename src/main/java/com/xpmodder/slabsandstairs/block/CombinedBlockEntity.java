@@ -1,26 +1,40 @@
 package com.xpmodder.slabsandstairs.block;
 
+import com.xpmodder.slabsandstairs.client.rendering.CombinedBlockBakedModel;
 import com.xpmodder.slabsandstairs.init.BlockEntityInit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 public class CombinedBlockEntity extends BlockEntity {
 
-    private String block1, block2, block3, block4;
-    private Direction block1Dir, block2Dir, block3Dir, block4Dir;
-    private Boolean block1Inv, block2Inv, block3Inv, block4Inv;
+    public BlockState Block1 = Blocks.AIR.defaultBlockState(),
+            Block2 = Blocks.AIR.defaultBlockState(),
+            Block3 = Blocks.AIR.defaultBlockState(),
+            Block4 = Blocks.AIR.defaultBlockState();
 
-    private BlockState Block1, Block2, Block3, Block4;
-
-    private int numSubBlocks;
+    public int numSubBlocks = 1;
 
     public CombinedBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntityInit.COMBINED_BLOCK.get(), blockPos, blockState);
+    }
+
+    public CombinedBlockEntity(BlockPos blockPos, BlockState blockState, BlockState block1){
+        super(BlockEntityInit.COMBINED_BLOCK.get(), blockPos, blockState);
+        this.Block1 = block1;
+        this.numSubBlocks = 1;
     }
 
     @Override
@@ -28,21 +42,37 @@ public class CombinedBlockEntity extends BlockEntity {
 
         tag.putInt("numSubBlocks", this.numSubBlocks);
 
-        tag.putString("block1", this.block1);
-        tag.putString("block1Dir", this.block1Dir.getName());
-        tag.putBoolean("block1Inv", this.block1Inv);
+        if(numSubBlocks >= 1) {
 
-        tag.putString("block2", this.block1);
-        tag.putString("block2Dir", this.block1Dir.getName());
-        tag.putBoolean("block2Inv", this.block1Inv);
+            tag.putString("block1", this.Block1.getBlock().getRegistryName().toString());
+            tag.putString("block1Dir", this.Block1.getValue(SlabBlock.FACING).getName());
+            tag.putBoolean("block1Inv", this.Block1.getValue(StairBlock.INVERTED));
 
-        tag.putString("block3", this.block1);
-        tag.putString("block3Dir", this.block1Dir.getName());
-        tag.putBoolean("block3Inv", this.block1Inv);
+        }
 
-        tag.putString("block4", this.block1);
-        tag.putString("block4Dir", this.block1Dir.getName());
-        tag.putBoolean("block4Inv", this.block1Inv);
+        if(numSubBlocks >= 2) {
+
+            tag.putString("block2", this.Block2.getBlock().getRegistryName().toString());
+            tag.putString("block2Dir", this.Block2.getValue(SlabBlock.FACING).getName());
+            tag.putBoolean("block2Inv", this.Block2.getValue(StairBlock.INVERTED));
+
+        }
+
+        if(numSubBlocks >= 3) {
+
+            tag.putString("block3", this.Block3.getBlock().getRegistryName().toString());
+            tag.putString("block3Dir", this.Block3.getValue(SlabBlock.FACING).getName());
+            tag.putBoolean("block3Inv", this.Block3.getValue(StairBlock.INVERTED));
+
+        }
+
+        if(numSubBlocks >= 4) {
+
+            tag.putString("block4", this.Block4.getBlock().getRegistryName().toString());
+            tag.putString("block4Dir", this.Block4.getValue(SlabBlock.FACING).getName());
+            tag.putBoolean("block4Inv", this.Block4.getValue(StairBlock.INVERTED));
+
+        }
 
         super.saveAdditional(tag);
     }
@@ -50,26 +80,110 @@ public class CombinedBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
 
+        String block1, block2, block3, block4;
+        Direction block1Dir, block2Dir, block3Dir, block4Dir;
+        boolean block1Inv, block2Inv, block3Inv, block4Inv;
+
         this.numSubBlocks = tag.getInt("numSubBlocks");
 
-        this.block1 = tag.getString("block1");
-        this.block1Dir = Direction.byName(tag.getString("block1Dir"));
-        this.block1Inv = tag.getBoolean("block1Inv");
+        Block block;
 
-        this.block2 = tag.getString("block1");
-        this.block2Dir = Direction.byName(tag.getString("block1Dir"));
-        this.block2Inv = tag.getBoolean("block1Inv");
+        if(tag.contains("block1")) {
 
-        this.block3 = tag.getString("block1");
-        this.block3Dir = Direction.byName(tag.getString("block1Dir"));
-        this.block3Inv = tag.getBoolean("block1Inv");
+            block1 = tag.getString("block1");
+            block1Dir = Direction.byName(tag.getString("block1Dir"));
+            block1Inv = tag.getBoolean("block1Inv");
 
-        this.block4 = tag.getString("block1");
-        this.block4Dir = Direction.byName(tag.getString("block1Dir"));
-        this.block4Inv = tag.getBoolean("block1Inv");
+            if(block1Dir == null){
+                block1Dir = Direction.NORTH;
+            }
 
-        //this.Block1 = ForgeRegistries.BLOCKS.getValue(block1).getStateDefinition().any().setValue()
+            block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block1));
+            if(block instanceof SlabBlock){
+                this.Block1 = block.defaultBlockState().setValue(SlabBlock.FACING, block1Dir).setValue(StairBlock.INVERTED, block1Inv);
+            }
+
+        }
+
+        if(tag.contains("block2")) {
+
+            block2 = tag.getString("block1");
+            block2Dir = Direction.byName(tag.getString("block1Dir"));
+            block2Inv = tag.getBoolean("block1Inv");
+
+            if(block2Dir == null){
+                block2Dir = Direction.NORTH;
+            }
+
+            block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block2));
+            if(block instanceof SlabBlock){
+                this.Block2 = block.defaultBlockState().setValue(SlabBlock.FACING, block2Dir).setValue(StairBlock.INVERTED, block2Inv);
+            }
+
+        }
+
+        if(tag.contains("block3")) {
+
+            block3 = tag.getString("block1");
+            block3Dir = Direction.byName(tag.getString("block1Dir"));
+            block3Inv = tag.getBoolean("block1Inv");
+
+            if(block3Dir == null){
+                block3Dir = Direction.NORTH;
+            }
+
+            block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block3));
+            if(block instanceof SlabBlock){
+                this.Block3 = block.defaultBlockState().setValue(SlabBlock.FACING, block3Dir).setValue(StairBlock.INVERTED, block3Inv);
+            }
+
+        }
+
+        if(tag.contains("block4")) {
+
+            block4 = tag.getString("block1");
+            block4Dir = Direction.byName(tag.getString("block1Dir"));
+            block4Inv = tag.getBoolean("block1Inv");
+
+            if(block4Dir == null){
+                block4Dir = Direction.NORTH;
+            }
+
+            block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block4));
+            if(block instanceof SlabBlock){
+                this.Block4 = block.defaultBlockState().setValue(SlabBlock.FACING, block4Dir).setValue(StairBlock.INVERTED, block4Inv);
+            }
+
+        }
 
         super.load(tag);
     }
+
+    @Override
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
+    {
+        super.onDataPacket(net, pkt);
+        requestModelDataUpdate();
+        if (level != null && level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+
+    @NotNull
+    @Override
+    public IModelData getModelData() {
+
+        IModelData data = super.getModelData();
+
+        data.setData(CombinedBlockBakedModel.BLOCK1, this.Block1);
+        data.setData(CombinedBlockBakedModel.BLOCK2, this.Block2);
+        data.setData(CombinedBlockBakedModel.BLOCK3, this.Block3);
+        data.setData(CombinedBlockBakedModel.BLOCK4, this.Block4);
+        data.setData(CombinedBlockBakedModel.NUM_BLOCKS, this.numSubBlocks);
+
+        return data;
+    }
+
+
 }

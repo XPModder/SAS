@@ -1,11 +1,14 @@
 package com.xpmodder.slabsandstairs.init;
 
+import com.xpmodder.slabsandstairs.SlabsAndStairs;
 import com.xpmodder.slabsandstairs.block.CombinedBlock;
 import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -16,6 +19,9 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import static com.xpmodder.slabsandstairs.init.ItemInit.ITEMS;
+import static com.xpmodder.slabsandstairs.init.ItemInit.MY_ITEMS;
 
 public class BlockInit {
 
@@ -28,7 +34,7 @@ public class BlockInit {
     public static final RegistryObject<Block> previewSlab = BLOCKS.register("preview_slab", () -> new SlabBlock(BlockBehaviour.Properties.of(Material.STONE)));
     public static final RegistryObject<Block> previewStair = BLOCKS.register("preview_stair", () -> new StairBlock(BlockBehaviour.Properties.of(Material.STONE)));
 
-    public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE), Blocks.OAK_SLAB.defaultBlockState()));
+    public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE), previewSlab.get().defaultBlockState()));
 
 
     public static void NewBlock(String RegistryName, Material material){
@@ -42,18 +48,27 @@ public class BlockInit {
             QuarterBlock quarter = new QuarterBlock(BlockBehaviour.Properties.of(material));
             quarter.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameSlab, Reference.MODID + ":" + RegistryNameStair);
             MY_BLOCKS.add(quarter);
+            Item newItem = new BlockItem(quarter, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
+            ITEMS.register(RegistryNameQuarter, () -> newItem);
+            MY_ITEMS.add(newItem);
             return quarter;
         });
         BLOCKS.register(RegistryNameSlab, () -> {
             SlabBlock slab = new SlabBlock(BlockBehaviour.Properties.of(material));
             slab.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameStair);
             MY_BLOCKS.add(slab);
+            Item newItem = new BlockItem(slab, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
+            ITEMS.register(RegistryNameSlab, () -> newItem);
+            MY_ITEMS.add(newItem);
             return slab;
         });
         BLOCKS.register(RegistryNameStair, () -> {
             StairBlock stair = new StairBlock(BlockBehaviour.Properties.of(material));
             stair.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameSlab);
             MY_BLOCKS.add(stair);
+            Item newItem = new BlockItem(stair, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
+            ITEMS.register(RegistryNameStair, () -> newItem);
+            MY_ITEMS.add(newItem);
             return stair;
         });
 

@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,15 +20,17 @@ import java.util.List;
 public class CombinedBlock extends Block implements EntityBlock {
 
 
+    private final BlockState block1;
+
     public CombinedBlock(BlockBehaviour.Properties properties, BlockState initialState) {
         super(properties);
+        block1 = initialState;
     }
-
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState state) {
-        return new CombinedBlockEntity(blockPos, state);
+    public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState state) {
+        return new CombinedBlockEntity(blockPos, state, this.block1);
     }
 
 

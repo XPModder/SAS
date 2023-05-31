@@ -42,7 +42,6 @@ import static net.minecraft.core.Direction.*;
 
 public class StairBlock extends SlabBlock{
 
-    public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
     public static final EnumProperty<StairsShape> CONNECTED = BlockStateProperties.STAIRS_SHAPE;
 
     protected static final VoxelShape NWD_CORNER = Block.box(0.0D, 0.0D, 0.0D, 8.0D, 8.0D, 8.0D);

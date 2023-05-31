@@ -29,8 +29,6 @@ import static net.minecraft.core.Direction.*;
 
 public class QuarterBlock extends SlabBlock {
 
-    public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
-
     protected static final VoxelShape SHAPE_SOUTH = Block.box(0.0D, 0.0D, 0.0D, 8.0D, 16.0D, 8.0D);
     protected static final VoxelShape SHAPE_WEST = Block.box(8.0D, 0.0D, 0.0D, 16.0D, 16.0D, 8.0D);
     protected static final VoxelShape SHAPE_EAST = Block.box(0.0D, 0.0D, 8.0D, 8.0D, 16.0D, 16.0D);
