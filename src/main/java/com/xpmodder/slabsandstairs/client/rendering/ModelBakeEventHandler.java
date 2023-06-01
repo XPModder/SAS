@@ -1,22 +1,15 @@
 package com.xpmodder.slabsandstairs.client.rendering;
 
-import com.xpmodder.slabsandstairs.block.CombinedBlock;
 import com.xpmodder.slabsandstairs.init.BlockInit;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.MultiLayerModel;
-import net.minecraftforge.client.model.data.MultipartModelData;
-import net.minecraftforge.client.model.generators.loaders.MultiLayerModelBuilder;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ModelBakeEventHandler {
@@ -57,6 +50,11 @@ public class ModelBakeEventHandler {
 
         }
 
+    }
+
+    @SubscribeEvent
+    public void onModelRegistryEvent(ModelRegistryEvent event){
+        ModelLoaderRegistry.registerLoader(CombinedBlockModelLoader.COMBINED_BLOCK_LOADER, new CombinedBlockModelLoader());
     }
 
 }
