@@ -1,15 +1,10 @@
 package com.xpmodder.slabsandstairs.init;
 
-import com.xpmodder.slabsandstairs.SlabsAndStairs;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.LinkedHashSet;
