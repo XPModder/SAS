@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs.block;
 
+import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.core.BlockPos;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.world.level.material.FluidState;
@@ -32,7 +32,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -387,6 +386,85 @@ public class StairBlock extends SlabBlock{
                 return InteractionResult.SUCCESS;
             }
         }
+        else if(getBlockFromItem(heldItem) instanceof QuarterBlock){
+
+            BlockState quarterState = getBlockFromItem(heldItem).defaultBlockState();
+            BlockState stairState = worldIn.getBlockState(pos).setValue(CONNECTED, StairsShape.STRAIGHT);
+
+            switch (worldIn.getBlockState(pos).getValue(FACING)){
+
+                case NORTH:
+                    if(worldIn.getBlockState(pos).getValue(INVERTED)){
+                        quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                    }
+                    else{
+                        quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                    }
+                    break;
+
+                case EAST:
+                    if(worldIn.getBlockState(pos).getValue(INVERTED)){
+                        quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                    }
+                    else{
+                        quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                    }
+                    break;
+
+                case SOUTH:
+                    if(worldIn.getBlockState(pos).getValue(INVERTED)){
+                        quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                    }
+                    else{
+                        quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                    }
+                    break;
+
+                case WEST:
+                    if(worldIn.getBlockState(pos).getValue(INVERTED)){
+                        quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                    }
+                    else{
+                        quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                    }
+                    break;
+
+                case UP:
+                    if(worldIn.getBlockState(pos).getValue(INVERTED)){
+                        quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                    }
+                    else{
+                        quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                    }
+                    break;
+
+                case DOWN:
+                    if(worldIn.getBlockState(pos).getValue(INVERTED)){
+                        quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                    }
+                    else{
+                        quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                    }
+                    break;
+
+
+            }
+
+            BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
+
+            worldIn.setBlockAndUpdate(pos, combinedState);
+            ((CombinedBlock) combinedState.getBlock()).setBlocks(stairState, quarterState);
+
+            SoundType sound = quarterState.getSoundType();
+            worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+
+            return InteractionResult.SUCCESS;
+
+
+        }
+
+
+
         return InteractionResult.PASS;
     }
 

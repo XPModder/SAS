@@ -1,34 +1,21 @@
 package com.xpmodder.slabsandstairs.client.rendering;
 
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Transformation;
-import com.xpmodder.slabsandstairs.block.CombinedBlock;
-import com.xpmodder.slabsandstairs.block.CombinedBlockEntity;
+import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.MultiLayerModel;
-import net.minecraftforge.client.model.QuadTransformer;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.client.model.generators.loaders.MultiLayerModelBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +29,13 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     public static ModelProperty<BlockState> BLOCK4 = new ModelProperty<>();
     public static ModelProperty<Integer> NUM_BLOCKS = new ModelProperty<>();
 
+    public static ModelDataMap getEmptyIModelData(){
+        ModelDataMap.Builder builder = new ModelDataMap.Builder();
+        builder.withInitial(NUM_BLOCKS, 1).withInitial(BLOCK1, BlockInit.previewSlab.get().defaultBlockState())
+                .withProperty(BLOCK2).withProperty(BLOCK3).withProperty(BLOCK4);
+        return builder.build();
+    }
+
 
     @NotNull
     @Override
@@ -50,8 +44,6 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
         List<BakedQuad> quads = new ArrayList<>();
 
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
-
-        LogHelper.info("getQuads!");
 
         try {
 
@@ -64,15 +56,19 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
                 LogHelper.info("NUM_BLOCKS:" + extraData.getData(NUM_BLOCKS));
 
                 if(extraData.getData(NUM_BLOCKS) >= 1){
+                    LogHelper.info("Block1: " + extraData.getData(BLOCK1));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK1)).getQuads(extraData.getData(BLOCK1), side, rand, extraData));
                 }
                 if(extraData.getData(NUM_BLOCKS) >= 2){
+                    LogHelper.info("Block2: " + extraData.getData(BLOCK2));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK2)).getQuads(extraData.getData(BLOCK2), side, rand, extraData));
                 }
                 if(extraData.getData(NUM_BLOCKS) >= 3){
+                    LogHelper.info("Block3: " + extraData.getData(BLOCK3));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK3)).getQuads(extraData.getData(BLOCK3), side, rand, extraData));
                 }
                 if(extraData.getData(NUM_BLOCKS) == 4){
+                    LogHelper.info("Block4: " + extraData.getData(BLOCK4));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK4)).getQuads(extraData.getData(BLOCK4), side, rand, extraData));
                 }
 
@@ -109,11 +105,23 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
     @Override
     public TextureAtlasSprite getParticleIcon() {
-        return null;
+        BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
+        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(new ModelDataMap.Builder().build());
     }
 
     @Override
     public ItemOverrides getOverrides() {
-        return null;
+        BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
+        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getOverrides();
     }
+
+    @Override
+    public TextureAtlasSprite getParticleIcon(IModelData modelData){
+        BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
+        if(modelData.hasProperty(BLOCK1)){
+            return shaper.getBlockModel(modelData.getData(BLOCK1)).getParticleIcon(new ModelDataMap.Builder().build());
+        }
+        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(new ModelDataMap.Builder().build());
+    }
+
 }

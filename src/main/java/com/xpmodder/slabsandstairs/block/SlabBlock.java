@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs.block;
 
+import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.Util;
@@ -28,7 +29,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import static com.xpmodder.slabsandstairs.block.StairBlock.INVERTED;
 import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
 import static net.minecraft.core.Direction.*;
 
@@ -256,6 +256,150 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
                 return InteractionResult.SUCCESS;
             }
         }
+        else if(getBlockFromItem(heldItem) instanceof SlabBlock && !(getBlockFromItem(heldItem) instanceof QuarterBlock) && !(getBlockFromItem(heldItem) instanceof StairBlock)){
+
+            BlockState thisState = worldIn.getBlockState(pos);
+            BlockState otherState = getBlockFromItem(heldItem).defaultBlockState().setValue(FACING, thisState.getValue(FACING).getOpposite());
+
+            BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
+
+            worldIn.setBlockAndUpdate(pos, combinedState);
+            ((CombinedBlock) combinedState.getBlock()).setBlocks(thisState, otherState);
+
+            SoundType sound = otherState.getSoundType();
+            worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+
+            return InteractionResult.SUCCESS;
+
+        }
+        else if(getBlockFromItem(heldItem) instanceof QuarterBlock){
+
+            BlockState slabState = worldIn.getBlockState(pos);
+            BlockState quarterState = getBlockFromItem(heldItem).defaultBlockState();
+
+            switch (slabState.getValue(FACING)){
+
+                case NORTH:
+                    switch (player.getDirection()){
+                        case NORTH, SOUTH:
+                            if(hit.getLocation().y - pos.getY() > 0.5D){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            break;
+                        case EAST:
+                            quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            break;
+                        case WEST:
+                            quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            break;
+                    }
+                    break;
+                case EAST:
+                    switch (player.getDirection()){
+                        case NORTH:
+                            quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            break;
+                        case EAST, WEST:
+                            if(hit.getLocation().y - pos.getY() > 0.5D){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else {
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            break;
+                        case SOUTH:
+                            quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            break;
+                    }
+                    break;
+                case SOUTH:
+                    switch (player.getDirection()){
+                        case NORTH, SOUTH:
+                            if(hit.getLocation().y - pos.getY() > 0.5D){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            break;
+                        case EAST:
+                            quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            break;
+                        case WEST:
+                            quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            break;
+                    }
+                    break;
+                case WEST:
+                    switch (player.getDirection()){
+                        case NORTH:
+                            quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            break;
+                        case EAST, WEST:
+                            if(hit.getLocation().y - pos.getY() > 0.5D){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else {
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            break;
+                        case SOUTH:
+                            quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            break;
+                    }
+                    break;
+                case UP:
+                    switch (player.getDirection()){
+                        case NORTH:
+                            quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            break;
+                        case EAST:
+                            quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            break;
+                        case SOUTH:
+                            quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            break;
+                        case WEST:
+                            quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            break;
+                    }
+                    break;
+                case DOWN:
+                    switch (player.getDirection()){
+                        case NORTH:
+                            quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            break;
+                        case EAST:
+                            quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            break;
+                        case SOUTH:
+                            quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            break;
+                        case WEST:
+                            quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            break;
+                    }
+                    break;
+
+            }
+
+            BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
+
+            worldIn.setBlockAndUpdate(pos, combinedState);
+            ((CombinedBlock) combinedState.getBlock()).setBlocks(slabState, quarterState);
+
+            SoundType sound = quarterState.getSoundType();
+            worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+
+            return InteractionResult.SUCCESS;
+
+
+        }
+
+
         return InteractionResult.PASS;
     }
 

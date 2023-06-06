@@ -11,10 +11,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,8 +35,12 @@ public class CombinedBlockEntity extends BlockEntity {
         this.numSubBlocks = 1;
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
+    public void updateModelData(){
+        requestModelDataUpdate();
+    }
+
+
+    public CompoundTag write(CompoundTag tag){
 
         tag.putInt("numSubBlocks", this.numSubBlocks);
 
@@ -74,6 +76,23 @@ public class CombinedBlockEntity extends BlockEntity {
 
         }
 
+        return tag;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(){
+        CompoundTag tag = new CompoundTag();
+
+        return write(tag);
+
+    }
+
+
+    @Override
+    protected void saveAdditional(CompoundTag tag) {
+
+        tag = write(tag);
+
         super.saveAdditional(tag);
     }
 
@@ -107,9 +126,9 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(tag.contains("block2")) {
 
-            block2 = tag.getString("block1");
-            block2Dir = Direction.byName(tag.getString("block1Dir"));
-            block2Inv = tag.getBoolean("block1Inv");
+            block2 = tag.getString("block2");
+            block2Dir = Direction.byName(tag.getString("block2Dir"));
+            block2Inv = tag.getBoolean("block2Inv");
 
             if(block2Dir == null){
                 block2Dir = Direction.NORTH;
@@ -124,9 +143,9 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(tag.contains("block3")) {
 
-            block3 = tag.getString("block1");
-            block3Dir = Direction.byName(tag.getString("block1Dir"));
-            block3Inv = tag.getBoolean("block1Inv");
+            block3 = tag.getString("block3");
+            block3Dir = Direction.byName(tag.getString("block3Dir"));
+            block3Inv = tag.getBoolean("block3Inv");
 
             if(block3Dir == null){
                 block3Dir = Direction.NORTH;
@@ -141,9 +160,9 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(tag.contains("block4")) {
 
-            block4 = tag.getString("block1");
-            block4Dir = Direction.byName(tag.getString("block1Dir"));
-            block4Inv = tag.getBoolean("block1Inv");
+            block4 = tag.getString("block4");
+            block4Dir = Direction.byName(tag.getString("block4Dir"));
+            block4Inv = tag.getBoolean("block4Inv");
 
             if(block4Dir == null){
                 block4Dir = Direction.NORTH;
@@ -155,6 +174,8 @@ public class CombinedBlockEntity extends BlockEntity {
             }
 
         }
+
+        updateModelData();
 
         super.load(tag);
     }
@@ -174,7 +195,7 @@ public class CombinedBlockEntity extends BlockEntity {
     @Override
     public IModelData getModelData() {
 
-        IModelData data = super.getModelData();
+        IModelData data = CombinedBlockBakedModel.getEmptyIModelData();
 
         data.setData(CombinedBlockBakedModel.BLOCK1, this.Block1);
         data.setData(CombinedBlockBakedModel.BLOCK2, this.Block2);

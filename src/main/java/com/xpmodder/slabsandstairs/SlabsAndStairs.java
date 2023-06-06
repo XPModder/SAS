@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs;
 
+import com.xpmodder.slabsandstairs.client.rendering.ModelBakeEventHandler;
 import com.xpmodder.slabsandstairs.config.BlockListHandler;
 import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
 import com.xpmodder.slabsandstairs.init.BlockEntityInit;
@@ -13,8 +14,6 @@ import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -46,12 +45,14 @@ public class SlabsAndStairs {
     };
 
     ModResourceLoader resourceLoader = new ModResourceLoader();
+    ModelBakeEventHandler modelBakeEventHandler = new ModelBakeEventHandler();
 
     public SlabsAndStairs(){
 
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
+        eventBus.register(modelBakeEventHandler);
 
         BlockInit.BLOCKS.register(eventBus);
         BlockEntityInit.BLOCK_ENTITIES.register(eventBus);
@@ -89,7 +90,7 @@ public class SlabsAndStairs {
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.combinedBlock.get(), RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(BlockInit.combinedBlock.get(), RenderType.solid());
 
 
         KeyInit.init();
