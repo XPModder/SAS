@@ -453,7 +453,10 @@ public class StairBlock extends SlabBlock{
             BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
 
             worldIn.setBlockAndUpdate(pos, combinedState);
-            ((CombinedBlock) combinedState.getBlock()).setBlocks(stairState, quarterState);
+            if(worldIn.getBlockEntity(pos) == null){
+                return InteractionResult.PASS;
+            }
+            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(stairState, quarterState);
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);

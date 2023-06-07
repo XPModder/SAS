@@ -1,7 +1,6 @@
 package com.xpmodder.slabsandstairs.client.rendering;
 
 import com.xpmodder.slabsandstairs.init.BlockInit;
-import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,8 +14,6 @@ public class ModelBakeEventHandler {
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
     public void onBakeModel(ModelBakeEvent event){
-
-        LogHelper.info("onBakeModel!");
 
         for(BlockState state : BlockInit.combinedBlock.get().getStateDefinition().getPossibleStates()){
 

@@ -77,8 +77,6 @@ public class SlabsAndStairs {
 
         LogHelper.info("SETUP");
 
-        LogHelper.info(ResourceGenerator.getTextureForBlock(Blocks.DRIED_KELP_BLOCK, "top"));
-
         ResourceGenerator.generate();
         if(resourceLoader.hasGenerated) {
             Minecraft.getInstance().reloadResourcePacks();
@@ -90,7 +88,7 @@ public class SlabsAndStairs {
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.combinedBlock.get(), RenderType.solid());
+        //ItemBlockRenderTypes.setRenderLayer(BlockInit.combinedBlock.get(), RenderType.translucent());
 
 
         KeyInit.init();

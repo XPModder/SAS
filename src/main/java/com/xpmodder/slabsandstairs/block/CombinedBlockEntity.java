@@ -35,6 +35,36 @@ public class CombinedBlockEntity extends BlockEntity {
         this.numSubBlocks = 1;
     }
 
+    public void setBlocks(BlockState block1, BlockState block2) {
+
+        this.Block1 = block1;
+        this.Block2 = block2;
+        this.numSubBlocks = 2;
+        this.updateModelData();
+
+    }
+
+    public void setBlocks(BlockState block1, BlockState block2, BlockState block3) {
+
+        this.Block1 = block1;
+        this.Block2 = block2;
+        this.Block3 = block3;
+        this.numSubBlocks = 3;
+        this.updateModelData();
+
+    }
+
+    public void setBlocks(BlockState block1, BlockState block2, BlockState block3, BlockState block4) {
+
+        this.Block1 = block1;
+        this.Block2 = block2;
+        this.Block3 = block3;
+        this.Block4 = block4;
+        this.numSubBlocks = 4;
+        this.updateModelData();
+
+    }
+
     public void updateModelData(){
         requestModelDataUpdate();
     }

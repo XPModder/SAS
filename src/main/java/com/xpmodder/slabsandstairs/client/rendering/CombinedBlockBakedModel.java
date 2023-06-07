@@ -53,22 +53,16 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
             if(extraData.hasProperty(NUM_BLOCKS)){
 
-                LogHelper.info("NUM_BLOCKS:" + extraData.getData(NUM_BLOCKS));
-
                 if(extraData.getData(NUM_BLOCKS) >= 1){
-                    LogHelper.info("Block1: " + extraData.getData(BLOCK1));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK1)).getQuads(extraData.getData(BLOCK1), side, rand, extraData));
                 }
                 if(extraData.getData(NUM_BLOCKS) >= 2){
-                    LogHelper.info("Block2: " + extraData.getData(BLOCK2));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK2)).getQuads(extraData.getData(BLOCK2), side, rand, extraData));
                 }
                 if(extraData.getData(NUM_BLOCKS) >= 3){
-                    LogHelper.info("Block3: " + extraData.getData(BLOCK3));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK3)).getQuads(extraData.getData(BLOCK3), side, rand, extraData));
                 }
                 if(extraData.getData(NUM_BLOCKS) == 4){
-                    LogHelper.info("Block4: " + extraData.getData(BLOCK4));
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK4)).getQuads(extraData.getData(BLOCK4), side, rand, extraData));
                 }
 

@@ -264,7 +264,10 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
 
             worldIn.setBlockAndUpdate(pos, combinedState);
-            ((CombinedBlock) combinedState.getBlock()).setBlocks(thisState, otherState);
+            if(worldIn.getBlockEntity(pos) == null){
+                return InteractionResult.PASS;
+            }
+            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(thisState, otherState);
 
             SoundType sound = otherState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
@@ -389,7 +392,10 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
 
             worldIn.setBlockAndUpdate(pos, combinedState);
-            ((CombinedBlock) combinedState.getBlock()).setBlocks(slabState, quarterState);
+            if(worldIn.getBlockEntity(pos) == null){
+                return InteractionResult.PASS;
+            }
+            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(slabState, quarterState);
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
