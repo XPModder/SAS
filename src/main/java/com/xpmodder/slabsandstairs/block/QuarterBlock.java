@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs.block;
 
+import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -216,6 +217,9 @@ public class QuarterBlock extends SlabBlock {
                 worldIn.setBlockAndUpdate(pos, slabState.setValue(WATERLOGGED, state.getValue(WATERLOGGED)));
                 SoundType soundType = SlabQuarterBlock.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                if(!player.isCreative()) {
+                    player.getItemInHand(handIn).shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
@@ -379,6 +383,9 @@ public class QuarterBlock extends SlabBlock {
                 worldIn.setBlockAndUpdate(pos, stairState.setValue(WATERLOGGED, state.getValue(WATERLOGGED)));
                 SoundType soundType = StairBlock.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                if(!player.isCreative()) {
+                    player.getItemInHand(handIn).shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
@@ -395,9 +402,624 @@ public class QuarterBlock extends SlabBlock {
                 worldIn.setBlockAndUpdate(pos, base.defaultBlockState());
                 SoundType soundType = base.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                if(!player.isCreative()) {
+                    player.getItemInHand(handIn).shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
+
+
+        else if(getBlockFromItem(heldItem) instanceof SlabBlock && !(getBlockFromItem(heldItem) instanceof StairBlock) && !(getBlockFromItem(heldItem) instanceof QuarterBlock)){
+            //Holding a slab - any slab
+            BlockState slabState = getBlockFromItem(heldItem).defaultBlockState();
+            Direction hitDirection = hit.getDirection();
+
+            boolean shouldPlace = false;
+            boolean invertDir = true;
+
+            switch(state.getValue(FACING)){
+
+                case NORTH:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == NORTH || hitDirection == DOWN){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == SOUTH || hitDirection == UP){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    else{
+                        if(hitDirection == WEST || hitDirection == NORTH){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == EAST || hitDirection == SOUTH){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    break;
+                case EAST:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == UP || hitDirection == NORTH){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == DOWN || hitDirection == SOUTH){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    else{
+                        if(hitDirection == NORTH || hitDirection == EAST){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == SOUTH || hitDirection == WEST){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    break;
+                case SOUTH:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == UP || hitDirection == SOUTH){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == DOWN || hitDirection == NORTH){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    else{
+                        if(hitDirection == EAST || hitDirection == SOUTH){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == WEST || hitDirection == NORTH){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    break;
+                case WEST:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == DOWN || hitDirection == SOUTH){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == UP || hitDirection == NORTH){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    else{
+                        if(hitDirection == SOUTH || hitDirection == WEST){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == NORTH || hitDirection == EAST){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    break;
+                case UP:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == UP || hitDirection == WEST){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == DOWN || hitDirection == EAST){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    else{
+                        if(hitDirection == UP || hitDirection == EAST){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == DOWN || hitDirection == WEST){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    break;
+                case DOWN:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == DOWN || hitDirection == WEST){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == UP || hitDirection == EAST){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    else{
+                        if(hitDirection == DOWN || hitDirection == EAST){
+                            shouldPlace = true;
+                        }
+                        else if(hitDirection == UP || hitDirection == WEST){
+                            invertDir = false;
+                            shouldPlace = true;
+                        }
+                    }
+                    break;
+            }
+
+            if(!shouldPlace){
+                return InteractionResult.PASS;
+            }
+
+            slabState = slabState.setValue(FACING, (invertDir ? hitDirection.getOpposite() : hitDirection)).setValue(INVERTED, true);
+
+            BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
+
+            worldIn.setBlockAndUpdate(pos, combinedState);
+            if(worldIn.getBlockEntity(pos) == null){
+                return InteractionResult.PASS;
+            }
+            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(state, slabState);
+
+            SoundType sound = slabState.getSoundType();
+            worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            if(!player.isCreative()) {
+                player.getItemInHand(handIn).shrink(1);
+            }
+
+            return InteractionResult.SUCCESS;
+
+        }
+
+
+        else if(getBlockFromItem(heldItem) instanceof StairBlock){
+
+            BlockState stairState = getBlockFromItem(heldItem).defaultBlockState();
+
+            switch(state.getValue(FACING)){
+
+                case NORTH:
+                    if(state.getValue(INVERTED)){
+                        stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                    }
+                    else{
+                        stairState = stairState.setValue(FACING, UP).setValue(INVERTED, true);
+                    }
+                    break;
+
+                case EAST:
+                    if(state.getValue(INVERTED)){
+                        stairState = stairState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                    }
+                    else{
+                        stairState = stairState.setValue(FACING, UP).setValue(INVERTED, false);
+                    }
+                    break;
+
+                case SOUTH:
+                    if(state.getValue(INVERTED)){
+                        stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                    }
+                    else{
+                        stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                    }
+                    break;
+
+                case WEST:
+                    if(state.getValue(INVERTED)){
+                        stairState = stairState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                    }
+                    else{
+                        stairState = stairState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                    }
+                    break;
+
+                case UP:
+                    if(state.getValue(INVERTED)){
+                        stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, true);
+                    }
+                    else{
+                        stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, true);
+                    }
+                    break;
+
+                case DOWN:
+                    if(state.getValue(INVERTED)){
+                        stairState = stairState.setValue(FACING, WEST).setValue(INVERTED, false);
+                    }
+                    else{
+                        stairState = stairState.setValue(FACING, EAST).setValue(INVERTED, false);
+                    }
+                    break;
+            }
+
+
+            BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
+
+            worldIn.setBlockAndUpdate(pos, combinedState);
+            if(worldIn.getBlockEntity(pos) == null){
+                return InteractionResult.PASS;
+            }
+            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(state, stairState);
+
+            SoundType sound = stairState.getSoundType();
+            worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            if(!player.isCreative()) {
+                player.getItemInHand(handIn).shrink(1);
+            }
+
+            return InteractionResult.SUCCESS;
+
+
+        }
+
+
+        else if(getBlockFromItem(heldItem) instanceof QuarterBlock){
+
+            BlockState quarterState = getBlockFromItem(heldItem).defaultBlockState();
+            Direction hitDirection = hit.getDirection();
+            Direction playerDirection = player.getDirection();
+
+            switch(state.getValue(FACING)){
+
+                case NORTH:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == NORTH|| hitDirection == SOUTH){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == UP|| hitDirection == DOWN){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                        }
+                    }
+                    else{
+                        if(hitDirection == NORTH|| hitDirection == SOUTH){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                        }
+                        else if(hitDirection == WEST|| hitDirection == EAST){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                        }
+                    }
+                    break;
+
+                case EAST:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == NORTH|| hitDirection == SOUTH){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == UP|| hitDirection == DOWN){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                        }
+                    }
+                    else{
+                        if(hitDirection == NORTH|| hitDirection == SOUTH){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else if(hitDirection == EAST|| hitDirection == WEST){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                        }
+                    }
+                    break;
+
+                case SOUTH:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == SOUTH|| hitDirection == NORTH){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == UP|| hitDirection == DOWN){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                        }
+                    }
+                    else{
+                        if(hitDirection == SOUTH|| hitDirection == NORTH){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                        }
+                        else if(hitDirection == EAST|| hitDirection == WEST){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                        }
+                    }
+                    break;
+
+                case WEST:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == DOWN|| hitDirection == UP){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == SOUTH|| hitDirection == NORTH){
+                            if(playerDirection == EAST){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == WEST){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                        }
+                    }
+                    else{
+                        if(hitDirection == SOUTH|| hitDirection == NORTH){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else if(hitDirection == WEST|| hitDirection == EAST){
+                            if(hit.getLocation().y() - hit.getBlockPos().getY() > 0.7){
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                            else if(hit.getLocation().y() - hit.getBlockPos().getY() < 0.3){
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                        }
+                    }
+                    break;
+
+                case UP:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == UP|| hitDirection == DOWN){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == WEST|| hitDirection == EAST){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                        }
+                    }
+                    else{
+                        if(hitDirection == EAST|| hitDirection == WEST){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == UP|| hitDirection == DOWN){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                        }
+                    }
+                    break;
+
+                case DOWN:
+                    if(state.getValue(INVERTED)){
+                        if(hitDirection == DOWN|| hitDirection == UP){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                            }
+                        }
+                        else if(hitDirection == WEST|| hitDirection == EAST){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, false);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                        }
+                    }
+                    else{
+                        if(hitDirection == DOWN|| hitDirection == UP){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, SOUTH).setValue(INVERTED, true);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, EAST).setValue(INVERTED, true);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, false);
+                            }
+                        }
+                        else if(hitDirection == EAST|| hitDirection == WEST){
+                            if(playerDirection == NORTH){
+                                quarterState = quarterState.setValue(FACING, WEST).setValue(INVERTED, false);
+                            }
+                            else if(playerDirection == SOUTH){
+                                quarterState = quarterState.setValue(FACING, NORTH).setValue(INVERTED, false);
+                            }
+                            else{
+                                quarterState = quarterState.setValue(FACING, DOWN).setValue(INVERTED, true);
+                            }
+                        }
+                        else{
+                            quarterState = quarterState.setValue(FACING, UP).setValue(INVERTED, true);
+                        }
+                    }
+                    break;
+
+            }
+
+            BlockState combinedState = BlockInit.combinedBlock.get().defaultBlockState();
+
+            worldIn.setBlockAndUpdate(pos, combinedState);
+            if(worldIn.getBlockEntity(pos) == null){
+                return InteractionResult.PASS;
+            }
+            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(state, quarterState);
+
+            SoundType sound = quarterState.getSoundType();
+            worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            if(!player.isCreative()) {
+                player.getItemInHand(handIn).shrink(1);
+            }
+
+            return InteractionResult.SUCCESS;
+
+        }
+
+
         return InteractionResult.PASS;
     }
 

@@ -383,6 +383,9 @@ public class StairBlock extends SlabBlock{
                 worldIn.setBlockAndUpdate(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState());
                 SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                if(!player.isCreative()) {
+                    player.getItemInHand(handIn).shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
@@ -460,6 +463,9 @@ public class StairBlock extends SlabBlock{
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            if(!player.isCreative()) {
+                player.getItemInHand(handIn).shrink(1);
+            }
 
             return InteractionResult.SUCCESS;
 

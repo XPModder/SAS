@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -218,6 +219,13 @@ public class CombinedBlockEntity extends BlockEntity {
         if (level != null && level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
+    }
+
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag){
+        super.handleUpdateTag(tag);
+        updateModelData();
     }
 
 

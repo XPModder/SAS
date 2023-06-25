@@ -28,10 +28,12 @@ public class BlockListHandler {
             while((line = reader.readLine()) != null){
 
                 String name, material;
+                float strength = 1.0f;
+                int light = 0;
 
                 String[] data = line.split(";");
 
-                if(data.length != 2){
+                if(data.length < 2){
                     LogHelper.error("Incorrect line in block list! Cannot read: " + line);
                     continue;
                 }
@@ -39,7 +41,15 @@ public class BlockListHandler {
                 name = data[0].trim();
                 material = data[1].trim();
 
-                BlockInit.NewBlock(name, MaterialUtil.getMaterialFromString(material));
+                if(data.length >= 3){
+                    strength = Float.parseFloat(data[2].trim());
+                }
+
+                if(data.length >= 4){
+                    light = Integer.parseInt(data[3].trim());
+                }
+
+                BlockInit.NewBlock(name, MaterialUtil.getMaterialFromString(material), strength, light);
 
             }
 

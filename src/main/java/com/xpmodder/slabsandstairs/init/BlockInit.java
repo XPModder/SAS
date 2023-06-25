@@ -32,10 +32,10 @@ public class BlockInit {
     public static final RegistryObject<Block> previewSlab = BLOCKS.register("preview_slab", () -> new SlabBlock(BlockBehaviour.Properties.of(Material.STONE)));
     public static final RegistryObject<Block> previewStair = BLOCKS.register("preview_stair", () -> new StairBlock(BlockBehaviour.Properties.of(Material.STONE)));
 
-    public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE).noOcclusion(), previewSlab.get().defaultBlockState()));
+    public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE).strength(1.0f), previewSlab.get().defaultBlockState()));
 
 
-    public static void NewBlock(String RegistryName, Material material){
+    public static void NewBlock(String RegistryName, Material material, float strength, int light){
 
         String RegistryPath = RegistryName.split(":")[1];
         String RegistryNameQuarter = RegistryPath + "_quarter_sas";
@@ -43,7 +43,7 @@ public class BlockInit {
         String RegistryNameStair = RegistryPath + "_stair_sas";
 
         BLOCKS.register(RegistryNameQuarter, () -> {
-            QuarterBlock quarter = new QuarterBlock(BlockBehaviour.Properties.of(material));
+            QuarterBlock quarter = new QuarterBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state)->light/4));
             quarter.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameSlab, Reference.MODID + ":" + RegistryNameStair);
             MY_BLOCKS.add(quarter);
             Item newItem = new BlockItem(quarter, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
@@ -52,7 +52,7 @@ public class BlockInit {
             return quarter;
         });
         BLOCKS.register(RegistryNameSlab, () -> {
-            SlabBlock slab = new SlabBlock(BlockBehaviour.Properties.of(material));
+            SlabBlock slab = new SlabBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state)->light/2));
             slab.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameStair);
             MY_BLOCKS.add(slab);
             Item newItem = new BlockItem(slab, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
@@ -61,7 +61,7 @@ public class BlockInit {
             return slab;
         });
         BLOCKS.register(RegistryNameStair, () -> {
-            StairBlock stair = new StairBlock(BlockBehaviour.Properties.of(material));
+            StairBlock stair = new StairBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state)->(light*3)/4));
             stair.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameSlab);
             MY_BLOCKS.add(stair);
             Item newItem = new BlockItem(stair, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));

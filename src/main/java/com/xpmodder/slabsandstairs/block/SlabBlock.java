@@ -100,6 +100,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
                 worldIn.setBlockAndUpdate(pos, base.defaultBlockState());
                 SoundType soundType = base.defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                if(!player.isCreative()) {
+                    player.getItemInHand(handIn).shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
@@ -253,6 +256,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
                 worldIn.setBlockAndUpdate(pos, stairState.setValue(WATERLOGGED, state.getValue(WATERLOGGED)));
                 SoundType soundType = stairState.getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+                if(!player.isCreative()) {
+                    player.getItemInHand(handIn).shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
@@ -271,6 +277,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
             SoundType sound = otherState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            if(!player.isCreative()) {
+                player.getItemInHand(handIn).shrink(1);
+            }
 
             return InteractionResult.SUCCESS;
 
@@ -399,6 +408,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            if(!player.isCreative()) {
+                player.getItemInHand(handIn).shrink(1);
+            }
 
             return InteractionResult.SUCCESS;
 
