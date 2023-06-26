@@ -29,7 +29,7 @@ public class BlockListHandler {
 
                 String name, material;
                 float strength = 1.0f;
-                int light = 0;
+                int light = 0, power = 0;
 
                 String[] data = line.split(";");
 
@@ -43,13 +43,20 @@ public class BlockListHandler {
 
                 if(data.length >= 3){
                     strength = Float.parseFloat(data[2].trim());
+                    if(strength < 0.01f){
+                        strength = 1.0f;
+                    }
                 }
 
                 if(data.length >= 4){
                     light = Integer.parseInt(data[3].trim());
                 }
 
-                BlockInit.NewBlock(name, MaterialUtil.getMaterialFromString(material), strength, light);
+                if(data.length >= 5){
+                    power = Integer.parseInt(data[4].trim());
+                }
+
+                BlockInit.NewBlock(name, MaterialUtil.getMaterialFromString(material), strength, light, power);
 
             }
 

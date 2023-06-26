@@ -6,6 +6,8 @@ import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -16,16 +18,19 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +41,6 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
-
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     protected static final VoxelShape SHAPE_SOUTH = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 8.0D);
@@ -49,6 +53,8 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     protected String BaseBlock = Blocks.AIR.getRegistryName().toString();
     protected String SlabQuarterBlock = Blocks.AIR.getRegistryName().toString();
     protected String StairBlock = Blocks.AIR.getRegistryName().toString();
+
+    protected int Power = 0;
 
     protected static Direction placementRotation = null;
 
@@ -70,8 +76,17 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         this.StairBlock = stairBlock;
     }
 
+    public void setPower(int power){
+        this.Power = power;
+    }
 
+    public boolean isSignalSource(BlockState state) {
+        return this.Power > 0;
+    }
 
+    public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
+        return this.Power;
+    }
 
 
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {

@@ -35,7 +35,7 @@ public class BlockInit {
     public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE).strength(1.0f), previewSlab.get().defaultBlockState()));
 
 
-    public static void NewBlock(String RegistryName, Material material, float strength, int light){
+    public static void NewBlock(String RegistryName, Material material, float strength, int light, int power){
 
         String RegistryPath = RegistryName.split(":")[1];
         String RegistryNameQuarter = RegistryPath + "_quarter_sas";
@@ -45,6 +45,7 @@ public class BlockInit {
         BLOCKS.register(RegistryNameQuarter, () -> {
             QuarterBlock quarter = new QuarterBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state)->light/4));
             quarter.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameSlab, Reference.MODID + ":" + RegistryNameStair);
+            quarter.setPower(power/4);
             MY_BLOCKS.add(quarter);
             Item newItem = new BlockItem(quarter, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
             ITEMS.register(RegistryNameQuarter, () -> newItem);
@@ -54,6 +55,7 @@ public class BlockInit {
         BLOCKS.register(RegistryNameSlab, () -> {
             SlabBlock slab = new SlabBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state)->light/2));
             slab.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameStair);
+            slab.setPower(power/2);
             MY_BLOCKS.add(slab);
             Item newItem = new BlockItem(slab, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
             ITEMS.register(RegistryNameSlab, () -> newItem);
@@ -63,6 +65,7 @@ public class BlockInit {
         BLOCKS.register(RegistryNameStair, () -> {
             StairBlock stair = new StairBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state)->(light*3)/4));
             stair.setReferenceBlocks(RegistryName, Reference.MODID + ":" + RegistryNameQuarter, Reference.MODID + ":" + RegistryNameSlab);
+            stair.setPower((power*3)/4);
             MY_BLOCKS.add(stair);
             Item newItem = new BlockItem(stair, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
             ITEMS.register(RegistryNameStair, () -> newItem);

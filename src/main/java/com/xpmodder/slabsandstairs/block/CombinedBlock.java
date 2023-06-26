@@ -118,7 +118,9 @@ public class CombinedBlock extends Block implements EntityBlock {
         if(blockEntity.Block4 != null) {
 
             player.awardStat(Stats.BLOCK_MINED.get(blockEntity.Block4.getBlock()));
-            dropResources(blockEntity.Block4, level, pos, blockEntity, player, stack);
+            if(!player.isCreative()) {
+                dropResources(blockEntity.Block4, level, pos, blockEntity, player, stack);
+            }
 
             blockEntity.Block4 = null;
             blockEntity.numSubBlocks = 3;
@@ -130,7 +132,9 @@ public class CombinedBlock extends Block implements EntityBlock {
         else if(blockEntity.Block3 != null){
 
             player.awardStat(Stats.BLOCK_MINED.get(blockEntity.Block3.getBlock()));
-            dropResources(blockEntity.Block3, level, pos, blockEntity, player, stack);
+            if(!player.isCreative()) {
+                dropResources(blockEntity.Block3, level, pos, blockEntity, player, stack);
+            }
 
             blockEntity.Block3 = null;
             blockEntity.numSubBlocks = 2;
@@ -142,7 +146,9 @@ public class CombinedBlock extends Block implements EntityBlock {
         else if(blockEntity.Block2 != null){
 
             player.awardStat(Stats.BLOCK_MINED.get(blockEntity.Block2.getBlock()));
-            dropResources(blockEntity.Block2, level, pos, blockEntity, player, stack);
+            if(!player.isCreative()) {
+                dropResources(blockEntity.Block2, level, pos, blockEntity, player, stack);
+            }
 
             BlockState newState = blockEntity.Block1;
 

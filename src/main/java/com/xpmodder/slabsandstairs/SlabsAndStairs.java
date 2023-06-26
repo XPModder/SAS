@@ -3,10 +3,7 @@ package com.xpmodder.slabsandstairs;
 import com.xpmodder.slabsandstairs.client.rendering.ModelBakeEventHandler;
 import com.xpmodder.slabsandstairs.config.BlockListHandler;
 import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
-import com.xpmodder.slabsandstairs.init.BlockEntityInit;
-import com.xpmodder.slabsandstairs.init.BlockInit;
-import com.xpmodder.slabsandstairs.init.ItemInit;
-import com.xpmodder.slabsandstairs.init.KeyInit;
+import com.xpmodder.slabsandstairs.init.*;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.ModResourceLoader;
@@ -47,12 +44,15 @@ public class SlabsAndStairs {
     ModResourceLoader resourceLoader = new ModResourceLoader();
     ModelBakeEventHandler modelBakeEventHandler = new ModelBakeEventHandler();
 
+    TagInit tagInit = new TagInit();
+
     public SlabsAndStairs(){
 
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
         eventBus.register(modelBakeEventHandler);
+        eventBus.addListener(tagInit::gatherData);
 
         BlockInit.BLOCKS.register(eventBus);
         BlockEntityInit.BLOCK_ENTITIES.register(eventBus);
@@ -77,8 +77,8 @@ public class SlabsAndStairs {
 
         LogHelper.info("SETUP");
 
-        ResourceGenerator.generate();
-        if(resourceLoader.hasGenerated) {
+        boolean hasGenerated = ResourceGenerator.generate();
+        if(resourceLoader.hasGenerated || hasGenerated) {
             Minecraft.getInstance().reloadResourcePacks();
         }
 
