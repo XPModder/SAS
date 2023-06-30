@@ -1,5 +1,5 @@
 {
-  "parent":"slabsandstairs:block/oak_acacia_slab",
+  "parent":"slabsandstairs:block/dummy",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

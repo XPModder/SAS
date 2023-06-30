@@ -8,14 +8,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
+
+import static com.xpmodder.slabsandstairs.block.CombinedBlock.LEVEL;
+import static com.xpmodder.slabsandstairs.block.CombinedBlock.POWER;
 
 public class CombinedBlockEntity extends BlockEntity {
 
@@ -36,37 +39,37 @@ public class CombinedBlockEntity extends BlockEntity {
         this.numSubBlocks = 1;
     }
 
-    public void setBlocks(BlockState block1, BlockState block2) {
-
-        this.Block1 = block1;
-        this.Block2 = block2;
-        this.numSubBlocks = 2;
-        this.updateModelData();
-
-    }
-
-    public void setBlocks(BlockState block1, BlockState block2, BlockState block3) {
-
-        this.Block1 = block1;
-        this.Block2 = block2;
-        this.Block3 = block3;
-        this.numSubBlocks = 3;
-        this.updateModelData();
-
-    }
-
-    public void setBlocks(BlockState block1, BlockState block2, BlockState block3, BlockState block4) {
-
-        this.Block1 = block1;
-        this.Block2 = block2;
-        this.Block3 = block3;
-        this.Block4 = block4;
-        this.numSubBlocks = 4;
-        this.updateModelData();
-
-    }
-
     public void updateModelData(){
+        updateModelData(this.level, this.getBlockPos());
+    }
+
+    public void updateModelData(LevelAccessor level, BlockPos pos){
+        updateModelData(level, pos, Direction.NORTH);
+    }
+
+    public void updateModelData(LevelAccessor level, BlockPos pos, Direction dir){
+        int Power = this.Block1.getSignal(level, pos, dir);
+        int Light = this.Block1.getLightEmission(level, pos);
+        if(this.numSubBlocks >= 2){
+            Power += this.Block2.getSignal(level, pos, dir);
+            Light += this.Block2.getLightEmission(level, pos);
+        }
+        if(this.numSubBlocks >= 3){
+            Power += this.Block3.getSignal(level, pos, dir);
+            Light += this.Block3.getLightEmission(level, pos);
+        }
+        if(this.numSubBlocks == 4){
+            Power += this.Block4.getSignal(level, pos, dir);
+            Light += this.Block4.getLightEmission(level, pos);
+        }
+        if(Power > 15){
+            Power = 15;
+        }
+        if(Light > 15){
+            Light = 15;
+        }
+        this.getBlockState().setValue(POWER, Power);
+        this.getBlockState().setValue(LEVEL, Light);
         requestModelDataUpdate();
     }
 
@@ -111,7 +114,7 @@ public class CombinedBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag(){
+    public @NotNull CompoundTag getUpdateTag(){
         CompoundTag tag = new CompoundTag();
 
         return write(tag);
@@ -215,7 +218,7 @@ public class CombinedBlockEntity extends BlockEntity {
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
     {
         super.onDataPacket(net, pkt);
-        requestModelDataUpdate();
+        updateModelData();
         if (level != null && level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
@@ -242,6 +245,17 @@ public class CombinedBlockEntity extends BlockEntity {
         data.setData(CombinedBlockBakedModel.NUM_BLOCKS, this.numSubBlocks);
 
         return data;
+    }
+
+
+    @Override
+    public String toString(){
+        String output = "com.xpmodder.slabsandstairs.block.CombinedBlockEntity:";
+
+        output += write(new CompoundTag()).toString();
+
+        return output;
+
     }
 
 

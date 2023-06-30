@@ -3,7 +3,10 @@ package com.xpmodder.slabsandstairs;
 import com.xpmodder.slabsandstairs.client.rendering.ModelBakeEventHandler;
 import com.xpmodder.slabsandstairs.config.BlockListHandler;
 import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
-import com.xpmodder.slabsandstairs.init.*;
+import com.xpmodder.slabsandstairs.init.BlockEntityInit;
+import com.xpmodder.slabsandstairs.init.BlockInit;
+import com.xpmodder.slabsandstairs.init.ItemInit;
+import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.ModResourceLoader;
@@ -24,6 +27,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 @Mod(Reference.MODID)
 public class SlabsAndStairs {
@@ -31,7 +35,7 @@ public class SlabsAndStairs {
     public static Logger ModLogger = LogManager.getLogger();
     public static final CreativeModeTab ITEM_GROUP_SAS = new CreativeModeTab("slabs_and_stairs") {
         @Override
-        public ItemStack makeIcon() {
+        public @NotNull ItemStack makeIcon() {
             if(BlockInit.MY_BLOCKS.size() > 0) {
                 return new ItemStack(BlockInit.MY_BLOCKS.stream().findFirst().get());
             }
@@ -44,15 +48,12 @@ public class SlabsAndStairs {
     ModResourceLoader resourceLoader = new ModResourceLoader();
     ModelBakeEventHandler modelBakeEventHandler = new ModelBakeEventHandler();
 
-    TagInit tagInit = new TagInit();
-
     public SlabsAndStairs(){
 
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
         eventBus.register(modelBakeEventHandler);
-        eventBus.addListener(tagInit::gatherData);
 
         BlockInit.BLOCKS.register(eventBus);
         BlockEntityInit.BLOCK_ENTITIES.register(eventBus);

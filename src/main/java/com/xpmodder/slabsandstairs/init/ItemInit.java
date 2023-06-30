@@ -18,15 +18,5 @@ public class ItemInit {
 
     public static final RegistryObject<Item> combinedBlock = ITEMS.register("combined_block", () -> new BlockItem(BlockInit.combinedBlock.get(), new Item.Properties()));
 
-    /*static{
-
-        for(Block block : BlockInit.MY_BLOCKS){
-            Item newItem = new BlockItem(block, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS)).setRegistryName(block.getRegistryName().getPath());
-            ITEMS.register(block.getRegistryName().getPath(), () -> newItem);
-            MY_ITEMS.add(newItem);
-        }
-
-    }*/
-
 
 }

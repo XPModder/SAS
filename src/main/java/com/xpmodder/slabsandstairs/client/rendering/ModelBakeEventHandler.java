@@ -23,6 +23,9 @@ public class ModelBakeEventHandler {
 
         }
 
+        ModelResourceLocation location = new ModelResourceLocation(BlockInit.combinedBlock.get().getRegistryName(), "inventory");
+        event.getModelRegistry().put(location, new CombinedBlockBakedModel());
+
     }
 
 }

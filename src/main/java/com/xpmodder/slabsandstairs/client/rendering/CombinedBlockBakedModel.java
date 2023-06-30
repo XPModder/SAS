@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -47,26 +46,26 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
         try {
 
-            if(state == null){
-                return Collections.emptyList();
-            }
+            if (extraData.hasProperty(NUM_BLOCKS)) {
 
-            if(extraData.hasProperty(NUM_BLOCKS)){
-
-                if(extraData.getData(NUM_BLOCKS) >= 1){
+                if (extraData.getData(NUM_BLOCKS) >= 1) {
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK1)).getQuads(extraData.getData(BLOCK1), side, rand, extraData));
                 }
-                if(extraData.getData(NUM_BLOCKS) >= 2){
+                if (extraData.getData(NUM_BLOCKS) >= 2) {
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK2)).getQuads(extraData.getData(BLOCK2), side, rand, extraData));
                 }
-                if(extraData.getData(NUM_BLOCKS) >= 3){
+                if (extraData.getData(NUM_BLOCKS) >= 3) {
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK3)).getQuads(extraData.getData(BLOCK3), side, rand, extraData));
                 }
-                if(extraData.getData(NUM_BLOCKS) == 4){
+                if (extraData.getData(NUM_BLOCKS) == 4) {
                     quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK4)).getQuads(extraData.getData(BLOCK4), side, rand, extraData));
                 }
 
             }
+            else{
+                quads.addAll(shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getQuads(BlockInit.previewSlab.get().defaultBlockState(), side, rand, extraData));
+            }
+
 
         }
         catch (NullPointerException ex){
@@ -98,24 +97,43 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public TextureAtlasSprite getParticleIcon() {
+    public @NotNull TextureAtlasSprite getParticleIcon() {
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
         return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(new ModelDataMap.Builder().build());
     }
 
     @Override
-    public ItemOverrides getOverrides() {
-        BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
-        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getOverrides();
+    public @NotNull ItemOverrides getOverrides() {
+        return new CombinedBlockItemOverrides();
     }
 
     @Override
     public TextureAtlasSprite getParticleIcon(IModelData modelData){
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
-        if(modelData.hasProperty(BLOCK1)){
+        if(modelData.hasProperty(BLOCK4) && modelData.getData(BLOCK4) != null && !modelData.getData(BLOCK4).isAir()){
+
+            return shaper.getBlockModel(modelData.getData(BLOCK4)).getParticleIcon(new ModelDataMap.Builder().build());
+
+        }
+        else if(modelData.hasProperty(BLOCK3) && modelData.getData(BLOCK3) != null && !modelData.getData(BLOCK3).isAir()){
+
+            return shaper.getBlockModel(modelData.getData(BLOCK3)).getParticleIcon(new ModelDataMap.Builder().build());
+
+        }
+        else if(modelData.hasProperty(BLOCK2) && modelData.getData(BLOCK2) != null && !modelData.getData(BLOCK2).isAir()){
+
+            return shaper.getBlockModel(modelData.getData(BLOCK2)).getParticleIcon(new ModelDataMap.Builder().build());
+
+        }
+        else if(modelData.hasProperty(BLOCK1) && modelData.getData(BLOCK1) != null && !modelData.getData(BLOCK1).isAir()){
+
             return shaper.getBlockModel(modelData.getData(BLOCK1)).getParticleIcon(new ModelDataMap.Builder().build());
+
         }
         return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(new ModelDataMap.Builder().build());
     }
+
+
+
 
 }

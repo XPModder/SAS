@@ -6,8 +6,6 @@ import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.data.tags.BlockTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -18,19 +16,16 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,6 +80,10 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
+        return this.Power;
+    }
+
+    public int getPower(){
         return this.Power;
     }
 
@@ -288,7 +287,11 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             if(worldIn.getBlockEntity(pos) == null){
                 return InteractionResult.PASS;
             }
-            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(thisState, otherState);
+            CombinedBlockEntity be = ((CombinedBlockEntity) worldIn.getBlockEntity(pos));
+            be.numSubBlocks = 2;
+            be.Block1 = thisState;
+            be.Block2 = otherState;
+            be.updateModelData(worldIn, pos);
 
             SoundType sound = otherState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
@@ -419,7 +422,11 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             if(worldIn.getBlockEntity(pos) == null){
                 return InteractionResult.PASS;
             }
-            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(slabState, quarterState);
+            CombinedBlockEntity be = ((CombinedBlockEntity) worldIn.getBlockEntity(pos));
+            be.numSubBlocks = 2;
+            be.Block1 = slabState;
+            be.Block2 = quarterState;
+            be.updateModelData(worldIn, pos);
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);

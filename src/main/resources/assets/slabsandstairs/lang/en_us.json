@@ -1,6 +1,7 @@
 {
   "item.slabsandstairs.test_item": "Test Item",
   "itemGroup.slabs_and_stairs": "Slabs and Stairs",
+  "block.slabsandstairs.combined_block": "Combined Block",
   "key.categories.slabsandstairs": "Slabs and Stairs",
   "key.slabsandstairs.placementMode": "Placement Mode",
   "key.slabsandstairs.placementRotate": "Rotate Placement"

@@ -459,7 +459,11 @@ public class StairBlock extends SlabBlock{
             if(worldIn.getBlockEntity(pos) == null){
                 return InteractionResult.PASS;
             }
-            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(stairState, quarterState);
+            CombinedBlockEntity be = ((CombinedBlockEntity) worldIn.getBlockEntity(pos));
+            be.numSubBlocks = 2;
+            be.Block1 = stairState;
+            be.Block2 = quarterState;
+            be.updateModelData(worldIn, pos);
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);

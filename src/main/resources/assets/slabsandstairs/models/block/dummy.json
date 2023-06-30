@@ -1,3 +1,11 @@
 {
-  "parent": "block/cube"
+  "parent": "block/cube",
+  "textures": {
+    "north": "slabsandstairs:block/preview_block",
+    "east": "slabsandstairs:block/preview_block",
+    "south": "slabsandstairs:block/preview_block",
+    "west": "slabsandstairs:block/preview_block",
+    "up": "slabsandstairs:block/preview_block",
+    "down": "slabsandstairs:block/preview_block"
+  }
 }

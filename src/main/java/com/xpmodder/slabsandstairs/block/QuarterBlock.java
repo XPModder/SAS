@@ -18,8 +18,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -554,7 +552,11 @@ public class QuarterBlock extends SlabBlock {
             if(worldIn.getBlockEntity(pos) == null){
                 return InteractionResult.PASS;
             }
-            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(state, slabState);
+            CombinedBlockEntity be = ((CombinedBlockEntity) worldIn.getBlockEntity(pos));
+            be.numSubBlocks = 2;
+            be.Block1 = state;
+            be.Block2 = slabState;
+            be.updateModelData(worldIn, pos);
 
             SoundType sound = slabState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
@@ -635,7 +637,11 @@ public class QuarterBlock extends SlabBlock {
             if(worldIn.getBlockEntity(pos) == null){
                 return InteractionResult.PASS;
             }
-            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(state, stairState);
+            CombinedBlockEntity be = ((CombinedBlockEntity) worldIn.getBlockEntity(pos));
+            be.numSubBlocks = 2;
+            be.Block1 = state;
+            be.Block2 = stairState;
+            be.updateModelData(worldIn, pos);
 
             SoundType sound = stairState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
@@ -1007,7 +1013,11 @@ public class QuarterBlock extends SlabBlock {
             if(worldIn.getBlockEntity(pos) == null){
                 return InteractionResult.PASS;
             }
-            ((CombinedBlockEntity) worldIn.getBlockEntity(pos)).setBlocks(state, quarterState);
+            CombinedBlockEntity be = ((CombinedBlockEntity) worldIn.getBlockEntity(pos));
+            be.numSubBlocks = 2;
+            be.Block1 = state;
+            be.Block2 = quarterState;
+            be.updateModelData(worldIn, pos);
 
             SoundType sound = quarterState.getSoundType();
             worldIn.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
