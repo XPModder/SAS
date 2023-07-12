@@ -298,6 +298,7 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             if(!player.isCreative()) {
                 player.getItemInHand(handIn).shrink(1);
             }
+            worldIn.markAndNotifyBlock(pos, worldIn.getChunkAt(pos), combinedState, combinedState, 3, 512);
 
             return InteractionResult.SUCCESS;
 
@@ -433,6 +434,7 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             if(!player.isCreative()) {
                 player.getItemInHand(handIn).shrink(1);
             }
+            worldIn.markAndNotifyBlock(pos, worldIn.getChunkAt(pos), combinedState, combinedState, 3, 512);
 
             return InteractionResult.SUCCESS;
 

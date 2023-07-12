@@ -46,10 +46,8 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
 
     private final BlockState block1;
 
-    public static final IntegerProperty POWER = BlockStateProperties.POWER;
-    public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
-
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
 
     public static BlockBehaviour.Properties props;
 
@@ -57,11 +55,11 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         super(properties);
         props = properties;
         block1 = initialState;
-        this.registerDefaultState(this.getStateDefinition().any().setValue(POWER, 0).setValue(WATERLOGGED, false).setValue(LEVEL, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(WATERLOGGED, false).setValue(LEVEL, 0));
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(POWER, WATERLOGGED, LEVEL);
+        builder.add(WATERLOGGED, LEVEL);
     }
 
     public @NotNull FluidState getFluidState(BlockState state) {
@@ -88,35 +86,16 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         }
 
         VoxelShape finalShape = be.Block1.getShape(getter, pos);
-        int Power = be.Block1.getSignal(getter, pos, Direction.NORTH);
-        int Light = be.Block1.getLightEmission(getter, pos);
 
         if (be.numSubBlocks >= 2) {
             finalShape = Shapes.or(finalShape, be.Block2.getShape(getter, pos));
-            Power += be.Block2.getSignal(getter, pos, Direction.NORTH);
-            Light += be.Block2.getLightEmission(getter, pos);
         }
         if (be.numSubBlocks >= 3) {
             finalShape = Shapes.or(finalShape, be.Block3.getShape(getter, pos));
-            Power += be.Block3.getSignal(getter, pos, Direction.NORTH);
-            Light += be.Block3.getLightEmission(getter, pos);
         }
         if (be.numSubBlocks >= 4) {
             finalShape = Shapes.or(finalShape, be.Block4.getShape(getter, pos));
-            Power += be.Block4.getSignal(getter, pos, Direction.NORTH);
-            Light += be.Block4.getLightEmission(getter, pos);
         }
-
-        if(Power > 15){
-            Power = 15;
-        }
-
-        if(Light > 15){
-            Light = 15;
-        }
-
-        state.setValue(POWER, Power);
-        state.setValue(LEVEL, Light);
 
         return finalShape;
 
@@ -125,46 +104,43 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState state2, LevelAccessor accessor, BlockPos pos, BlockPos pos2) {
         CombinedBlockEntity be = (CombinedBlockEntity) accessor.getBlockEntity(pos);
         if(be != null) {
-            be.updateModelData(accessor, pos, direction);
+            be.updateModelData();
         }
         return state;
     }
 
     public boolean isSignalSource(BlockState state) {
-        return state.getValue(POWER) > 0;
+        return false;
     }
 
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
+        if(level == null){
+            return 0;
+        }
         CombinedBlockEntity be = (CombinedBlockEntity) level.getBlockEntity(pos);
+        if(be == null){
+            return 0;
+        }
         int Power = be.Block1.getSignal(level, pos, dir);
-        int Light = be.Block1.getLightEmission(level, pos);
 
         if(be.numSubBlocks >= 2){
             Power += be.Block2.getSignal(level, pos, dir);
-            Light += be.Block2.getLightEmission(level, pos);
         }
         if(be.numSubBlocks >= 3){
             Power += be.Block3.getSignal(level, pos, dir);
-            Light += be.Block3.getLightEmission(level, pos);
         }
         if(be.numSubBlocks == 4){
             Power += be.Block4.getSignal(level, pos, dir);
-            Light += be.Block4.getLightEmission(level, pos);
         }
 
         if(Power > 15){
             Power = 15;
         }
 
-        if(Light > 15){
-            Light = 15;
-        }
+        be.POWER = Power;
 
-        state.setValue(POWER, Power);
-        state.setValue(LEVEL, Light);
         return Power;
     }
-
 
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player){
         return this.getCloneItemStack(level, pos, state);
@@ -264,6 +240,17 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         return false;
     }
 
+
+    protected void updateBlock(CombinedBlockEntity blockEntity, Level level, BlockPos pos, SoundType soundType, Player player, InteractionHand hand, boolean use){
+        level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
+
+        level.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
+
+        if(!player.isCreative() && use) {
+            player.getItemInHand(hand).shrink(1);
+        }
+    }
+
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState state2, boolean bool) {
 
         if(level.getBlockEntity(pos) instanceof CombinedBlockEntity){
@@ -305,14 +292,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 be.setChanged();
                                 be.updateModelData(level, pos);
 
-                                level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                                SoundType sound = quarterState.getSoundType();
-                                level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                                if(!player.isCreative()) {
-                                    player.getItemInHand(hand).shrink(1);
-                                }
+                                updateBlock(be, level, pos, quarterState.getSoundType(), player, hand, true);
 
                                 return InteractionResult.SUCCESS;
                             }
@@ -323,14 +303,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 be.setChanged();
                                 be.updateModelData(level, pos);
 
-                                level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                                SoundType sound = invState.getSoundType();
-                                level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                                if(!player.isCreative()) {
-                                    player.getItemInHand(hand).shrink(1);
-                                }
+                                updateBlock(be, level, pos, invState.getSoundType(), player, hand, true);
 
                                 return InteractionResult.SUCCESS;
 
@@ -353,14 +326,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 be.setChanged();
                                 be.updateModelData(level, pos);
 
-                                level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                                SoundType sound = quarterState.getSoundType();
-                                level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                                if(!player.isCreative()) {
-                                    player.getItemInHand(hand).shrink(1);
-                                }
+                                updateBlock(be, level, pos, quarterState.getSoundType(), player, hand, true);
 
                                 return InteractionResult.SUCCESS;
                             }
@@ -371,14 +337,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 be.setChanged();
                                 be.updateModelData(level, pos);
 
-                                level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                                SoundType sound = invState.getSoundType();
-                                level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                                if(!player.isCreative()) {
-                                    player.getItemInHand(hand).shrink(1);
-                                }
+                                updateBlock(be, level, pos, invState.getSoundType(), player, hand, true);
 
                                 return InteractionResult.SUCCESS;
 
@@ -472,14 +431,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                             be.setChanged();
                             be.updateModelData(level, pos);
 
-                            level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                            SoundType sound = placeState.getSoundType();
-                            level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                            if(!player.isCreative()) {
-                                player.getItemInHand(hand).shrink(1);
-                            }
+                            updateBlock(be, level, pos, placeState.getSoundType(), player, hand, true);
 
                             return InteractionResult.SUCCESS;
 
@@ -497,14 +449,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 be.setChanged();
                                 be.updateModelData(level, pos);
 
-                                level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                                SoundType sound = slabState.getSoundType();
-                                level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                                if(!player.isCreative()) {
-                                    player.getItemInHand(hand).shrink(1);
-                                }
+                                updateBlock(be, level, pos, slabState.getSoundType(), player, hand, true);
 
                                 return InteractionResult.SUCCESS;
                             }
@@ -515,14 +460,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 be.setChanged();
                                 be.updateModelData(level, pos);
 
-                                level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                                SoundType sound = invState.getSoundType();
-                                level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                                if(!player.isCreative()) {
-                                    player.getItemInHand(hand).shrink(1);
-                                }
+                                updateBlock(be, level, pos, invState.getSoundType(), player, hand, true);
 
                                 return InteractionResult.SUCCESS;
 
@@ -547,14 +485,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                             be.setChanged();
                             be.updateModelData(level, pos);
 
-                            level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                            SoundType sound = quarterState.getSoundType();
-                            level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                            if(!player.isCreative()) {
-                                player.getItemInHand(hand).shrink(1);
-                            }
+                            updateBlock(be, level, pos, quarterState.getSoundType(), player, hand, true);
 
                             return InteractionResult.SUCCESS;
                         }
@@ -565,14 +496,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
                             be.setChanged();
                             be.updateModelData(level, pos);
 
-                            level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
-
-                            SoundType sound = invState.getSoundType();
-                            level.playSound(player, pos, sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
-
-                            if(!player.isCreative()) {
-                                player.getItemInHand(hand).shrink(1);
-                            }
+                            updateBlock(be, level, pos, invState.getSoundType(), player, hand, true);
 
                             return InteractionResult.SUCCESS;
 

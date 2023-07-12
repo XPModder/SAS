@@ -2,12 +2,14 @@ package com.xpmodder.slabsandstairs.block;
 
 import com.xpmodder.slabsandstairs.client.rendering.CombinedBlockBakedModel;
 import com.xpmodder.slabsandstairs.init.BlockEntityInit;
+import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -17,9 +19,6 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import static com.xpmodder.slabsandstairs.block.CombinedBlock.LEVEL;
-import static com.xpmodder.slabsandstairs.block.CombinedBlock.POWER;
-
 public class CombinedBlockEntity extends BlockEntity {
 
     public BlockState Block1 = Blocks.AIR.defaultBlockState(),
@@ -28,6 +27,9 @@ public class CombinedBlockEntity extends BlockEntity {
             Block4 = Blocks.AIR.defaultBlockState();
 
     public int numSubBlocks = 1;
+
+    public int POWER = 0;
+    public int LIGHT = 0;
 
     public CombinedBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntityInit.COMBINED_BLOCK.get(), blockPos, blockState);
@@ -43,33 +45,32 @@ public class CombinedBlockEntity extends BlockEntity {
         updateModelData(this.level, this.getBlockPos());
     }
 
-    public void updateModelData(LevelAccessor level, BlockPos pos){
+    public void updateModelData(Level level, BlockPos pos){
         updateModelData(level, pos, Direction.NORTH);
     }
 
-    public void updateModelData(LevelAccessor level, BlockPos pos, Direction dir){
-        int Power = this.Block1.getSignal(level, pos, dir);
+    public void updateModelData(Level level, BlockPos pos, Direction dir){
+
         int Light = this.Block1.getLightEmission(level, pos);
+
         if(this.numSubBlocks >= 2){
-            Power += this.Block2.getSignal(level, pos, dir);
             Light += this.Block2.getLightEmission(level, pos);
         }
         if(this.numSubBlocks >= 3){
-            Power += this.Block3.getSignal(level, pos, dir);
             Light += this.Block3.getLightEmission(level, pos);
         }
         if(this.numSubBlocks == 4){
-            Power += this.Block4.getSignal(level, pos, dir);
             Light += this.Block4.getLightEmission(level, pos);
         }
-        if(Power > 15){
-            Power = 15;
-        }
+
         if(Light > 15){
             Light = 15;
         }
-        this.getBlockState().setValue(POWER, Power);
-        this.getBlockState().setValue(LEVEL, Light);
+
+        if(level != null && !level.isClientSide) {
+            level.setBlock(pos, this.getBlockState().setValue(CombinedBlock.LEVEL, Light), 2);
+        }
+
         requestModelDataUpdate();
     }
 

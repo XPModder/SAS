@@ -10,6 +10,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -18,7 +19,6 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static com.xpmodder.slabsandstairs.block.CombinedBlock.LEVEL;
 import static com.xpmodder.slabsandstairs.init.ItemInit.ITEMS;
 import static com.xpmodder.slabsandstairs.init.ItemInit.MY_ITEMS;
 
@@ -33,7 +33,7 @@ public class BlockInit {
     public static final RegistryObject<Block> previewSlab = BLOCKS.register("preview_slab", () -> new SlabBlock(BlockBehaviour.Properties.of(Material.STONE)));
     public static final RegistryObject<Block> previewStair = BLOCKS.register("preview_stair", () -> new StairBlock(BlockBehaviour.Properties.of(Material.STONE)));
 
-    public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE).strength(1.0f).lightLevel((state) -> state.getValue(LEVEL)), previewSlab.get().defaultBlockState()));
+    public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE).strength(1.0f).lightLevel((state) -> state.getValue(BlockStateProperties.LEVEL)), previewSlab.get().defaultBlockState()));
 
 
     public static void NewBlock(String RegistryName, Material material, float strength, int light, int power){

@@ -470,6 +470,7 @@ public class StairBlock extends SlabBlock{
             if(!player.isCreative()) {
                 player.getItemInHand(handIn).shrink(1);
             }
+            worldIn.markAndNotifyBlock(pos, worldIn.getChunkAt(pos), combinedState, combinedState, 3, 512);
 
             return InteractionResult.SUCCESS;
 
