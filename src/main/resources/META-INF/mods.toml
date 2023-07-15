@@ -27,7 +27,7 @@ displayName="SAS - The Slabs and Stairs Mod" #mandatory
 # A URL for the "homepage" for this mod, displayed in the mod UI
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="sas.png" #optional
+logoFile="ModIcon.png" #optional
 # A text field displayed in the mod UI
 credits="Thanks to Pahimar and TurtyWurty for their tutorials!" #optional
 # A text field displayed in the mod UI

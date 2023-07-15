@@ -532,21 +532,31 @@ public final class ResourceGenerator {
                 if(block.getRegistryName().getPath().contains("stair_sas")){
 
                     File recipeStonecutter = new File(recipes + "/" + block.getRegistryName().getPath() + "_stonecutter.json");
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_1_from_1_stonecutter.json")).getInputStream();
-                    OutputStream out = new FileOutputStream(recipeStonecutter);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
 
-                    hasGenerated = true;
+                    if(!recipeStonecutter.exists()) {
+
+                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_1_from_1_stonecutter.json")).getInputStream();
+                        OutputStream out = new FileOutputStream(recipeStonecutter);
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+
+                        hasGenerated = true;
+
+                    }
 
                 }
                 else if(block.getRegistryName().getPath().contains("slab_sas")){
 
                     File recipeStonecutter = new File(recipes + "/" + block.getRegistryName().getPath() + "_stonecutter.json");
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_2_from_1_stonecutter.json")).getInputStream();
-                    OutputStream out = new FileOutputStream(recipeStonecutter);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
 
-                    hasGenerated = true;
+                    if(!recipeStonecutter.exists()) {
+
+                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_2_from_1_stonecutter.json")).getInputStream();
+                        OutputStream out = new FileOutputStream(recipeStonecutter);
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+
+                        hasGenerated = true;
+
+                    }
 
                 }
                 else if(block.getRegistryName().getPath().contains("quarter_sas")){
@@ -554,15 +564,16 @@ public final class ResourceGenerator {
                     File recipeStonecutter1 = new File(recipes + "/" + block.getRegistryName().getPath() + "_from_full_stonecutter.json");
                     File recipeStonecutter2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_from_stair_stonecutter.json");
                     File recipeStonecutter3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_from_slab_stonecutter.json");
-                    InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_4_from_1_stonecutter.json")).getInputStream();
-                    InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_3_from_1_stonecutter.json")).getInputStream();
-                    InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_2_from_1_stonecutter.json")).getInputStream();
-                    OutputStream out1 = new FileOutputStream(recipeStonecutter1);
-                    OutputStream out2 = new FileOutputStream(recipeStonecutter2);
-                    OutputStream out3 = new FileOutputStream(recipeStonecutter3);
-                    copyFileAndReplace(in1, out1, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
 
-                    hasGenerated = true;
+                    if(!recipeStonecutter1.exists()) {
+
+                        InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_4_from_1_stonecutter.json")).getInputStream();
+                        OutputStream out1 = new FileOutputStream(recipeStonecutter1);
+                        copyFileAndReplace(in1, out1, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+
+                        hasGenerated = true;
+
+                    }
 
                     String stair = "", slab = "";
                     String regName = block.getRegistryName().getPath();
@@ -589,8 +600,24 @@ public final class ResourceGenerator {
                     }
                     else{
 
-                        copyFileAndReplace(in2, out2, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ stair, block.getRegistryName().toString()});
-                        copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ slab, block.getRegistryName().toString()});
+                        if(!recipeStonecutter2.exists()) {
+
+                            InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_3_from_1_stonecutter.json")).getInputStream();
+                            OutputStream out2 = new FileOutputStream(recipeStonecutter2);
+
+                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input", "placeholder_output"}, new String[]{stair, block.getRegistryName().toString()});
+                            hasGenerated = true;
+
+                        }
+                        if(!recipeStonecutter3.exists()) {
+
+                            InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_2_from_1_stonecutter.json")).getInputStream();
+                            OutputStream out3 = new FileOutputStream(recipeStonecutter3);
+
+                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output"}, new String[]{slab, block.getRegistryName().toString()});
+                            hasGenerated = true;
+
+                        }
 
                     }
 
@@ -603,14 +630,7 @@ public final class ResourceGenerator {
                     File recipeShapeless2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless2.json");
                     File recipeShapeless3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless3.json");
                     File recipeShapeless4 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless4.json");
-                    InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_3_to_1.json")).getInputStream();
-                    InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
-                    InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
-                    InputStream in4 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
-                    OutputStream out1 = new FileOutputStream(recipeShapeless1);
-                    OutputStream out2 = new FileOutputStream(recipeShapeless2);
-                    OutputStream out3 = new FileOutputStream(recipeShapeless3);
-                    OutputStream out4 = new FileOutputStream(recipeShapeless4);
+
 
                     String quarter = "", slab = "";
                     String regName = block.getRegistryName().getPath();
@@ -636,12 +656,43 @@ public final class ResourceGenerator {
                         LogHelper.error("Could not find corresponding slab or quarter!");
                     }
                     else {
-                        copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_output"}, new String[]{quarter, quarter, quarter, block.getRegistryName().toString()});
-                        copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, slab, block.getRegistryName().toString()});
-                        copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "3"});
-                        copyFileAndReplace(in4, out4, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), quarter, ((SlabBlock) block).getBaseBlock()});
 
-                        hasGenerated = true;
+                        if(!recipeShapeless1.exists()) {
+
+                            InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_3_to_1.json")).getInputStream();
+                            OutputStream out1 = new FileOutputStream(recipeShapeless1);
+
+                            copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_output"}, new String[]{quarter, quarter, quarter, block.getRegistryName().toString()});
+                            hasGenerated = true;
+
+                        }
+                        if(!recipeShapeless2.exists()) {
+
+                            InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            OutputStream out2 = new FileOutputStream(recipeShapeless2);
+
+                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, slab, block.getRegistryName().toString()});
+                            hasGenerated = true;
+
+                        }
+                        if(!recipeShapeless3.exists()) {
+
+                            InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
+                            OutputStream out3 = new FileOutputStream(recipeShapeless3);
+
+                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "3"});
+                            hasGenerated = true;
+
+                        }
+                        if(!recipeShapeless4.exists()) {
+
+                            InputStream in4 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            OutputStream out4 = new FileOutputStream(recipeShapeless4);
+
+                            copyFileAndReplace(in4, out4, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), quarter, ((SlabBlock) block).getBaseBlock()});
+                            hasGenerated = true;
+
+                        }
 
                     }
 
@@ -651,12 +702,6 @@ public final class ResourceGenerator {
                     File recipeShapeless1 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless1.json");
                     File recipeShapeless2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless2.json");
                     File recipeShapeless3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless3.json");
-                    InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
-                    InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
-                    InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
-                    OutputStream out1 = new FileOutputStream(recipeShapeless1);
-                    OutputStream out2 = new FileOutputStream(recipeShapeless2);
-                    OutputStream out3 = new FileOutputStream(recipeShapeless3);
 
                     String quarter = "";
                     String regName = block.getRegistryName().getPath();
@@ -679,11 +724,34 @@ public final class ResourceGenerator {
                         LogHelper.error("Could not find corresponding quarter!");
                     }
                     else {
-                        copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, quarter, block.getRegistryName().toString()});
-                        copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock)block).getBaseBlock()});
-                        copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "2"});
 
-                        hasGenerated = true;
+                        if(!recipeShapeless1.exists()) {
+
+                            InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            OutputStream out1 = new FileOutputStream(recipeShapeless1);
+
+                            copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, quarter, block.getRegistryName().toString()});
+                            hasGenerated = true;
+
+                        }
+                        if(!recipeShapeless2.exists()) {
+
+                            InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            OutputStream out2 = new FileOutputStream(recipeShapeless2);
+
+                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
+                            hasGenerated = true;
+
+                        }
+                        if(!recipeShapeless3.exists()) {
+
+                            InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
+                            OutputStream out3 = new FileOutputStream(recipeShapeless3);
+
+                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "2"});
+                            hasGenerated = true;
+
+                        }
 
                     }
 
@@ -691,11 +759,16 @@ public final class ResourceGenerator {
                 else if(block.getRegistryName().getPath().contains("quarter_sas")){
 
                     File recipeShapeless = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless.json");
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_4_to_1.json")).getInputStream();
-                    OutputStream out = new FileOutputStream(recipeShapeless);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_input4", "placeholder_output"}, new String[]{ block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
 
-                    hasGenerated = true;
+                    if(!recipeShapeless.exists()) {
+
+                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_4_to_1.json")).getInputStream();
+                        OutputStream out = new FileOutputStream(recipeShapeless);
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_input4", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
+
+                        hasGenerated = true;
+
+                    }
 
                 }
 

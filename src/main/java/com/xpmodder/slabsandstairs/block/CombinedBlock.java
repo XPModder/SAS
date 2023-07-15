@@ -36,13 +36,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 import static com.xpmodder.slabsandstairs.block.SlabBlock.FACING;
 import static com.xpmodder.slabsandstairs.block.SlabBlock.INVERTED;
 import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
 
 public class CombinedBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
-
-    //TODO: correct blockstate property setting?
 
     private final BlockState block1;
 
@@ -251,18 +251,22 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         }
     }
 
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState state2, boolean bool) {
+
+    //TODO: fix render after placement
+
+    public void onPlace(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull BlockState state2, boolean bool) {
+
+        level.setBlockAndUpdate(pos, state);
 
         if(level.getBlockEntity(pos) instanceof CombinedBlockEntity){
             LogHelper.info(level.getBlockEntity(pos));
-            level.getBlockEntity(pos).setChanged();
-            ((CombinedBlockEntity) level.getBlockEntity(pos)).updateModelData(level, pos);
+            ((CombinedBlockEntity) Objects.requireNonNull(level.getBlockEntity(pos))).updateModelData(level, pos);
             level.markAndNotifyBlock(pos, level.getChunkAt(pos), state2, state, 3, 512);
         }
 
     }
 
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public @NotNull InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
 
         if(!(level.getBlockEntity(pos) instanceof CombinedBlockEntity)){
             return InteractionResult.PASS;
