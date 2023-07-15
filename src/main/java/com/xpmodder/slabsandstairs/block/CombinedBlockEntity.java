@@ -5,9 +5,10 @@ import com.xpmodder.slabsandstairs.init.BlockEntityInit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -27,7 +28,6 @@ public class CombinedBlockEntity extends BlockEntity {
     public int numSubBlocks = 1;
 
     public int POWER = 0;
-    public int LIGHT = 0;
 
     public CombinedBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntityInit.COMBINED_BLOCK.get(), blockPos, blockState);
@@ -115,14 +115,25 @@ public class CombinedBlockEntity extends BlockEntity {
     @Override
     public @NotNull CompoundTag getUpdateTag(){
         CompoundTag tag = new CompoundTag();
-
         return write(tag);
 
     }
 
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+
+    public void fromItem(ItemStack stack){
+        CompoundTag tag = BlockItem.getBlockEntityData(stack);
+        if(tag != null){
+            load(tag);
+        }
+    }
+
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(@NotNull CompoundTag tag) {
 
         tag = write(tag);
 
@@ -130,7 +141,9 @@ public class CombinedBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
+    public void load(@NotNull CompoundTag tag) {
+
+        super.load(tag);
 
         String block1, block2, block3, block4;
         Direction block1Dir, block2Dir, block3Dir, block4Dir;
@@ -209,27 +222,7 @@ public class CombinedBlockEntity extends BlockEntity {
         }
 
         updateModelData();
-
-        super.load(tag);
     }
-
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
-    {
-        super.onDataPacket(net, pkt);
-        updateModelData();
-        if (level != null && level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
-    }
-
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag){
-        super.handleUpdateTag(tag);
-        updateModelData();
-    }
-
 
     @NotNull
     @Override

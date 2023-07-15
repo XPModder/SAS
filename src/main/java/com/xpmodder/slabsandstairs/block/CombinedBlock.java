@@ -2,7 +2,6 @@ package com.xpmodder.slabsandstairs.block;
 
 
 import com.xpmodder.slabsandstairs.init.KeyInit;
-import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.ShapeUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,6 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -35,8 +35,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 import static com.xpmodder.slabsandstairs.block.SlabBlock.FACING;
 import static com.xpmodder.slabsandstairs.block.SlabBlock.INVERTED;
@@ -252,19 +250,13 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
     }
 
 
-    //TODO: fix render after placement
-
-    public void onPlace(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull BlockState state2, boolean bool) {
-
-        level.setBlockAndUpdate(pos, state);
-
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
         if(level.getBlockEntity(pos) instanceof CombinedBlockEntity){
-            LogHelper.info(level.getBlockEntity(pos));
-            ((CombinedBlockEntity) Objects.requireNonNull(level.getBlockEntity(pos))).updateModelData(level, pos);
-            level.markAndNotifyBlock(pos, level.getChunkAt(pos), state2, state, 3, 512);
+            ((CombinedBlockEntity)level.getBlockEntity(pos)).fromItem(stack);
         }
-
     }
+
 
     public @NotNull InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
 
