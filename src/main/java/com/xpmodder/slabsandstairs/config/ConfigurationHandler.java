@@ -7,21 +7,15 @@ public final class ConfigurationHandler {
 
     public static class Common
     {
-        private static final int defaultInt1 = 37;
-        private static final boolean defaultBool1 = true;
-
-        public final ForgeConfigSpec.ConfigValue<Integer> Int1;
-        public final ForgeConfigSpec.ConfigValue<Boolean> Bool1;
+        private static final boolean defaultGetCombinedBlock = true;
+        public final ForgeConfigSpec.ConfigValue<Boolean> canGetCombinedBlock;
 
 
         public Common(ForgeConfigSpec.Builder builder)
         {
-            builder.push("category1");
-            this.Int1 = builder.comment("This is a nice description of your option. Make it a lot longer than this. Max is 60, default is 37. Enjoy...")
-                    .worldRestart()
-                    .defineInRange("Short but readable name", defaultInt1, 1, 60);
-            this.Bool1 = builder.comment("asdasd as asd asd asd asdas aasd as asd asd. asd as asd asd. asdasdad asd.")
-                    .define("Short but readable name 2", defaultBool1);
+            builder.push("general");
+            this.canGetCombinedBlock = builder.comment("When set to true, you can get a combined block in item form by holding down the placement mode key while breaking the block. The block can then be placed elsewhere. Default: true")
+                    .define("possible to get Combined Block as Item", defaultGetCombinedBlock);
             builder.pop();
         }
     }

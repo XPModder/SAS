@@ -11,6 +11,9 @@ import java.io.*;
 
 public class BlockListHandler {
 
+    public static boolean correctVersion = false;
+    public static String version = "";
+
     public static void read() {
 
         if(!Reference.BLOCK_LIST.exists() || !Reference.BLOCK_LIST.isFile()){
@@ -24,12 +27,30 @@ public class BlockListHandler {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
             String line;
+            boolean firstLine = true;
 
             while((line = reader.readLine()) != null){
 
                 String name, material;
                 float strength = 1.0f;
                 int light = 0, power = 0;
+
+                //First line
+                if(firstLine){
+                    if(line.contains("Version:")){
+                        version = line.split(":")[1];
+                        if(line.contains(Reference.VERSION)){
+                            correctVersion = true;
+                        }
+                        firstLine = false;
+                        continue;
+                    }
+                }
+
+                //Skip header
+                if(line.contains("Redstone Power")){
+                    continue;
+                }
 
                 String[] data = line.split(";");
 
@@ -93,6 +114,21 @@ public class BlockListHandler {
 
             }
 
+        }
+
+    }
+
+    public static void replace(){
+
+        try {
+            if (Reference.BLOCK_LIST.exists()) {
+                Reference.BLOCK_LIST.delete();
+            }
+            generate();
+        }
+        catch (Exception ex){
+            LogHelper.error("Could not delete old BLOCK_LIST file!");
+            ex.printStackTrace();
         }
 
     }

@@ -79,7 +79,6 @@ public class SlabsAndStairs {
     private void setup(final FMLCommonSetupEvent event){
 
         LogHelper.info("SETUP");
-
         boolean hasGenerated = ResourceGenerator.generate();
         if(resourceLoader.hasGenerated || hasGenerated) {
             Minecraft.getInstance().reloadResourcePacks();
@@ -88,6 +87,7 @@ public class SlabsAndStairs {
     }
 
     private void clientSetup(final FMLClientSetupEvent event){
+
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
@@ -98,7 +98,6 @@ public class SlabsAndStairs {
                 ItemBlockRenderTypes.setRenderLayer(block, RenderType.translucent());
             }
         }
-
 
         KeyInit.init();
     }

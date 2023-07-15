@@ -1,3 +1,5 @@
+Version: 0.8.0b;;;;
+Block;Material;Strength;Light Level;Redstone Power;Tool Type
 minecraft:stone;Stone;1.5;0;0
 minecraft:granite;Stone;1.5;0;0
 minecraft:polished_granite;Stone;1.5;0;0

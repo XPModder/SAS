@@ -16,7 +16,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 
 
-version = '1.18.2-0.7.0b'
+version = '1.18.2-0.8.0b'
 group = 'com.xpmodder.slabsandstairs' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'slabsandstairs'
 
@@ -180,6 +180,7 @@ jar {
         ])
     }
 }
+
 
 // Example configuration to allow publishing using the maven-publish plugin
 // This is the preferred method to reobfuscate your jar file

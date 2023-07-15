@@ -1,6 +1,7 @@
 package com.xpmodder.slabsandstairs.block;
 
 
+import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
 import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.utility.ShapeUtil;
 import net.minecraft.core.BlockPos;
@@ -170,7 +171,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         player.causeFoodExhaustion(0.005F);
 
 
-        if(KeyInit.placementModeMapping.isDown()){
+        if(KeyInit.placementModeMapping.isDown() && ConfigurationHandler.COMMON.canGetCombinedBlock.get()){
 
             if(!player.isCreative()) {
                 ItemStack itemStack = getCloneItemStack(level, pos, state);
