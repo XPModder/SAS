@@ -3,6 +3,7 @@ package com.xpmodder.slabsandstairs.config;
 import com.xpmodder.slabsandstairs.SlabsAndStairs;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
+import com.xpmodder.slabsandstairs.utility.BlockTagTypes;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.MaterialUtil;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
@@ -34,11 +35,13 @@ public class BlockListHandler {
                 String name, material;
                 float strength = 1.0f;
                 int light = 0, power = 0;
+                BlockTagTypes tool = null;
 
                 //First line
                 if(firstLine){
                     if(line.contains("Version:")){
                         version = line.split(":")[1];
+                        version = version.replaceAll(";", "");
                         if(line.contains(Reference.VERSION)){
                             correctVersion = true;
                         }
@@ -77,7 +80,11 @@ public class BlockListHandler {
                     power = Integer.parseInt(data[4].trim());
                 }
 
-                BlockInit.NewBlock(name, MaterialUtil.getMaterialFromString(material), strength, light, power);
+                if(data.length >= 6){
+                    tool = BlockTagTypes.fromName(data[5].trim());
+                }
+
+                BlockInit.NewBlock(name, MaterialUtil.getMaterialFromString(material), strength, light, power, tool);
 
             }
 

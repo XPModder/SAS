@@ -6,6 +6,9 @@ import com.xpmodder.slabsandstairs.block.QuarterBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.block.StairBlock;
 import com.xpmodder.slabsandstairs.reference.Reference;
+import com.xpmodder.slabsandstairs.utility.BlockTagTypes;
+import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -36,7 +39,7 @@ public class BlockInit {
     public static final RegistryObject<Block> combinedBlock = BLOCKS.register("combined_block", () -> new CombinedBlock(BlockBehaviour.Properties.of(Material.STONE).strength(1.0f).lightLevel((state) -> state.getValue(BlockStateProperties.LEVEL)).noOcclusion(), previewSlab.get().defaultBlockState()));
 
 
-    public static void NewBlock(String RegistryName, Material material, float strength, int light, int power){
+    public static void NewBlock(String RegistryName, Material material, float strength, int light, int power, BlockTagTypes tool){
 
         String RegistryPath = RegistryName.split(":")[1];
         String RegistryNameQuarter = RegistryPath + "_quarter_sas";
@@ -57,6 +60,9 @@ public class BlockInit {
             Item newItem = new BlockItem(quarter, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
             ITEMS.register(RegistryNameQuarter, () -> newItem);
             MY_ITEMS.add(newItem);
+            if(tool != null) {
+                ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameQuarter).toString(), tool);
+            }
             return quarter;
         });
         BLOCKS.register(RegistryNameSlab, () -> {
@@ -73,6 +79,9 @@ public class BlockInit {
             Item newItem = new BlockItem(slab, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
             ITEMS.register(RegistryNameSlab, () -> newItem);
             MY_ITEMS.add(newItem);
+            if(tool != null) {
+                ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameSlab).toString(), tool);
+            }
             return slab;
         });
         BLOCKS.register(RegistryNameStair, () -> {
@@ -89,6 +98,9 @@ public class BlockInit {
             Item newItem = new BlockItem(stair, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
             ITEMS.register(RegistryNameStair, () -> newItem);
             MY_ITEMS.add(newItem);
+            if(tool != null) {
+                ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameStair).toString(), tool);
+            }
             return stair;
         });
 

@@ -8,6 +8,7 @@ import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.ItemInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
+import com.xpmodder.slabsandstairs.utility.BlockTagTypes;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.ModResourceLoader;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
@@ -30,6 +31,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 @Mod(Reference.MODID)
 public class SlabsAndStairs {
@@ -83,6 +86,9 @@ public class SlabsAndStairs {
         if(resourceLoader.hasGenerated || hasGenerated) {
             Minecraft.getInstance().reloadResourcePacks();
         }
+
+        ResourceGenerator.addToTag(Objects.requireNonNull(BlockInit.combinedBlock.get().getRegistryName()).toString(), BlockTagTypes.AXE);
+        ResourceGenerator.addToTag(Objects.requireNonNull(BlockInit.combinedBlock.get().getRegistryName()).toString(), BlockTagTypes.PICKAXE);
 
     }
 

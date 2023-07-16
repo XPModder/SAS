@@ -13,6 +13,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public final class ResourceGenerator {
 
@@ -53,10 +57,10 @@ public final class ResourceGenerator {
         if(!dirToMake.exists()){
             if(!dirToMake.mkdirs()){
                 LogHelper.error("Could not create folder at " + dirToMake);
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     //Gets the english name for a given block
@@ -66,7 +70,7 @@ public final class ResourceGenerator {
 
         try {
 
-            String namespace = block.getRegistryName().getNamespace();
+            String namespace = Objects.requireNonNull(block.getRegistryName()).getNamespace();
 
             InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "lang/en_us.json")).getInputStream();
 
@@ -76,7 +80,7 @@ public final class ResourceGenerator {
 
         }
         catch (Exception ex){
-            LogHelper.error("Exception trying to get name for block " + block.getRegistryName().toString() + "!");
+            LogHelper.error("Exception trying to get name for block " + Objects.requireNonNull(block.getRegistryName()) + "!");
         }
 
         return output;
@@ -91,7 +95,7 @@ public final class ResourceGenerator {
 
         try{
 
-            String namespace = block.getRegistryName().getNamespace();
+            String namespace = Objects.requireNonNull(block.getRegistryName()).getNamespace();
 
             InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "models/block/" + block.getRegistryName().getPath() + ".json")).getInputStream();
 
@@ -130,7 +134,7 @@ public final class ResourceGenerator {
 
         }
         catch(Exception ex){
-            LogHelper.error("Exception trying to get texture for block " + block.getRegistryName().toString() + "!");
+            LogHelper.error("Exception trying to get texture for block " + Objects.requireNonNull(block.getRegistryName()) + "!");
         }
 
         return output;
@@ -214,6 +218,79 @@ public final class ResourceGenerator {
 
     }
 
+    public static class Mineable{
+        boolean replace;
+        String[] values;
+
+        public String toString(){
+            StringBuilder output = new StringBuilder("replace: " + replace + ", values: [");
+            if(values == null){
+                output.append("null");
+            }
+            else {
+                for (String string : values) {
+                    output.append(string).append(", ");
+                }
+            }
+            output.append("]");
+            return output.toString();
+        }
+    }
+
+    public static void addToTag(String block, BlockTagTypes type){
+        switch (type) {
+            case PICKAXE -> addToTag(block, Reference.PICK_MINEABLE);
+            case AXE -> addToTag(block, Reference.AXE_MINEABLE);
+            case SHOVEL -> addToTag(block, Reference.SHOVEL_MINEABLE);
+            case HOE -> addToTag(block, Reference.HOE_MINEABLE);
+        }
+    }
+
+    public static void addToTag(String block, File tagFile){
+
+        if(!tagFile.exists()){
+            makeFile(tagFile);
+        }
+        try {
+            Gson gson = new Gson();
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(tagFile));
+            Mineable json = gson.fromJson(reader, Mineable.class);
+            reader.close();
+
+            boolean found = false;
+            if(json == null){
+                json = new Mineable();
+                json.replace = false;
+            }
+
+            if (json.values != null) {
+                for (String value : json.values) {
+                    if (Objects.equals(value, block)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!found){
+                List<String> vals = new ArrayList<>();
+                if(json.values != null){
+                    vals.addAll(List.of(json.values));
+                }
+                vals.add(block);
+                json.values = vals.toArray(new String[0]);
+                PrintWriter writer = new PrintWriter(tagFile);
+                writer.write(gson.toJson(json));
+                writer.close();
+
+            }
+        }
+        catch (Exception ex){
+            LogHelper.error("Exception trying to add block to tag file!");
+            LogHelper.error(ex.fillInStackTrace());
+        }
+    }
+
 
     //Generates the resource files like blockstates, block and item models as well as display text
     public static boolean generate(){
@@ -234,19 +311,19 @@ public final class ResourceGenerator {
         }
 
         //Check if all the directories and files exist and create them if necessary.
-        if(!makeDir(blockstates)){
+        if(makeDir(blockstates)){
             return hasGenerated;
         }
 
-        if(!makeDir(blockModels)){
+        if(makeDir(blockModels)){
             return hasGenerated;
         }
 
-        if(!makeDir(itemModels)){
+        if(makeDir(itemModels)){
             return hasGenerated;
         }
 
-        if(!makeDir(recipes)){
+        if(makeDir(recipes)){
             return hasGenerated;
         }
 
@@ -254,7 +331,7 @@ public final class ResourceGenerator {
             return hasGenerated;
         }
 
-        if(!makeDir(lootTables)){
+        if(makeDir(lootTables)){
             return hasGenerated;
         }
 
@@ -310,7 +387,7 @@ public final class ResourceGenerator {
                     OutputStream out = new FileOutputStream(blockstate);                        //Then get an OutputStream to the file
                     InputStream in = new InputStream() {                                        //And an InputStream for the default blockstate file
                         @Override
-                        public int read() throws IOException {
+                        public int read() {
                             return 0;
                         }
                     };

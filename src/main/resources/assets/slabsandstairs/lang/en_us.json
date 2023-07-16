@@ -5,5 +5,5 @@
   "key.categories.slabsandstairs": "Slabs and Stairs",
   "key.slabsandstairs.placementMode": "Placement Mode",
   "key.slabsandstairs.placementRotate": "Rotate Placement",
-  "message.file_version_mismatch": "SAS - The slabs and stairs mod has detected that you are using an old version of the blocks.csv file! \nIf you have modified the file, please update it to the new version.\nDo you wish to replace the old file with the new default file?\nReplacing the file will require a restart of the game!"
+  "message.file_version_mismatch": "SAS - The slabs and stairs mod has detected that you are using an old version of the blocks.csv file! \nIf you have modified the file, please update it to the new version.\n\nDo you wish to replace the old file with the new default file?\n\nReplacing the file will require a restart of the game!\nClicking 'Yes' will therefore replace the file and then close the game.\nYou can safely start the game again after this.\n\nThis is NOT a crash or bug! Do not report it as such!"
 }

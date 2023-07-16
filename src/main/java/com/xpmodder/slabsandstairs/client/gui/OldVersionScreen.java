@@ -43,9 +43,9 @@ public class OldVersionScreen extends Screen {
 
     public void render(@NotNull PoseStack poseStack, int mouseX, int mouseY, float partialTick){
         this.fillGradient(poseStack, 0, 0, this.width, this.height, -12574688, -11530224);
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 90, 16777215);
-        drawCenteredString(poseStack, this.font, new TextComponent("Your Version: " + this.fileVersion + ", Current Version: " + Reference.VERSION), this.width / 2, 110, 16777215);
-        drawMultiLineCenteredString(poseStack, this.font, new TranslatableComponent("message.file_version_mismatch"), this.width / 2, 130);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 40, 16777215);
+        drawCenteredString(poseStack, this.font, new TextComponent("Your Version: " + this.fileVersion + ", Current Version: " + Reference.VERSION), this.width / 2, 70, 16777215);
+        drawMultiLineCenteredString(poseStack, this.font, new TranslatableComponent("message.file_version_mismatch"), this.width / 2, 90);
         super.render(poseStack, mouseX, mouseY, partialTick);
     }
 
