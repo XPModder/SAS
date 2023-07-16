@@ -2,19 +2,20 @@ package com.xpmodder.slabsandstairs.utility;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.xpmodder.slabsandstairs.SlabsAndStairs;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -290,6 +291,10 @@ public final class ResourceGenerator {
             LogHelper.error(ex.fillInStackTrace());
         }
     }
+    
+    public static InputStream getResourceStream(String resource){
+        return SlabsAndStairs.class.getResourceAsStream("/assets/" + Reference.MODID + resource);
+    }
 
 
     //Generates the resource files like blockstates, block and item models as well as display text
@@ -304,30 +309,34 @@ public final class ResourceGenerator {
 
         boolean hasGenerated = false;
 
-        if(!Reference.RESOURCE_FOLDER.exists() || !Reference.RESOURCE_FOLDER.isDirectory()){
-            LogHelper.error("Invalid or inexistent mod resource folder!");
-            LogHelper.error("Could not find folder: " + Reference.RESOURCE_FOLDER);
-            return hasGenerated;
+        if(FMLEnvironment.dist.isClient()) {
+
+            if (!Reference.RESOURCE_FOLDER.exists() || !Reference.RESOURCE_FOLDER.isDirectory()) {
+                LogHelper.error("Invalid or inexistent mod resource folder!");
+                LogHelper.error("Could not find folder: " + Reference.RESOURCE_FOLDER);
+                return hasGenerated;
+            }
+
+            //Check if all the directories and files exist and create them if necessary.
+            if (makeDir(blockstates)) {
+                return hasGenerated;
+            }
+
+            if (makeDir(blockModels)) {
+                return hasGenerated;
+            }
+
+            if (makeDir(itemModels)) {
+                return hasGenerated;
+            }
+
         }
 
-        //Check if all the directories and files exist and create them if necessary.
-        if(makeDir(blockstates)){
-            return hasGenerated;
-        }
-
-        if(makeDir(blockModels)){
-            return hasGenerated;
-        }
-
-        if(makeDir(itemModels)){
+        if(!makeFile(langUS)){
             return hasGenerated;
         }
 
         if(makeDir(recipes)){
-            return hasGenerated;
-        }
-
-        if(!makeFile(langUS)){
             return hasGenerated;
         }
 
@@ -340,208 +349,214 @@ public final class ResourceGenerator {
 
 
         try {
+
             FileWriter langWrite = new FileWriter(langUS);
-            langWrite.write("{\n\t");
+
+            if(FMLEnvironment.dist.isClient()) {
+
+                langWrite.write("{\n\t");
+
+            }
 
             boolean first = true;
 
             for (Block block : BlockInit.MY_BLOCKS) {
 
-                //Language file entry
-                //Get the key and the name of the base block
-                String key = block.getDescriptionId();
-                String baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock())));
-                Block baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock()));
-                String entry = "";
+                if(FMLEnvironment.dist.isClient()) {
 
-                //If we have multiple entries, add a comma and newline between them
-                if (!first) {
-                    entry = ",\n\t";
-                }
+                    //Language file entry
+                    //Get the key and the name of the base block
+                    String key = block.getDescriptionId();
+                    String baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock())));
+                    Block baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock()));
+                    String entry = "";
 
-                //Set the name correctly based on the type of block we have
-                if (block.getRegistryName().getPath().contains("quarter_sas")) {
-                    entry += "\"" + key + "\": \"" + baseBlockName + " Quarter\"";
-                } else if (block.getRegistryName().getPath().contains("stair_sas")) {
-                    entry += "\"" + key + "\": \"" + baseBlockName + " Stairs\"";
-                } else if (block.getRegistryName().getPath().contains("slab_sas")) {
-                    entry += "\"" + key + "\": \"" + baseBlockName + " Slab\"";
-                }
-
-                //Then write the new entry to the file
-                langWrite.write(entry);
-
-
-                //Blockstate
-
-                //Get the path for the blockstate file
-                String filename = block.getRegistryName().getPath() + ".json";
-                File blockstate = new File(blockstates.getPath() + "/" + filename);
-
-                if(!blockstate.exists() || !blockstate.isFile()){                               //Check if the file exists
-                    if(!blockstate.createNewFile()){                                            //If not attempt to create it
-                        LogHelper.error("Failed to create blockstate file at " + blockstate.getPath());
-                        continue;
+                    //If we have multiple entries, add a comma and newline between them
+                    if (!first) {
+                        entry = ",\n\t";
                     }
 
-                    OutputStream out = new FileOutputStream(blockstate);                        //Then get an OutputStream to the file
-                    InputStream in = new InputStream() {                                        //And an InputStream for the default blockstate file
-                        @Override
-                        public int read() {
-                            return 0;
-                        }
-                    };
-
-
-                    if(block.getRegistryName().getPath().contains("quarter_sas")) {             //Select the correct default blockstate and get it
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockstate_quarter.json")).getInputStream();
-                    }
-                    else if(block.getRegistryName().getPath().contains("slab_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockstate_slab.json")).getInputStream();
-                    }
-                    else if(block.getRegistryName().getPath().contains("stair_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockstate_stair.json")).getInputStream();
+                    //Set the name correctly based on the type of block we have
+                    if (block.getRegistryName().getPath().contains("quarter_sas")) {
+                        entry += "\"" + key + "\": \"" + baseBlockName + " Quarter\"";
+                    } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                        entry += "\"" + key + "\": \"" + baseBlockName + " Stairs\"";
+                    } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                        entry += "\"" + key + "\": \"" + baseBlockName + " Slab\"";
                     }
 
-                    //Finally copy the data from the default blockstate file to the new file and replace the placeholder with the actual registry name of the block
-                    copyFileAndReplace(in, out, new String[]{"registry_namespace", "registry_path"}, new String[]{block.getRegistryName().getNamespace(), block.getRegistryName().getPath()});
-
-                    hasGenerated = true;
-
-                }   //If the file already existed we don't need to do anything
+                    //Then write the new entry to the file
+                    langWrite.write(entry);
 
 
-                //Block Models
+                    //Blockstate
 
-                if(block.getRegistryName().getPath().contains("quarter_sas")){
+                    //Get the path for the blockstate file
+                    String filename = block.getRegistryName().getPath() + ".json";
+                    File blockstate = new File(blockstates.getPath() + "/" + filename);
 
-                    File blockModel = new File(blockModels.getPath() + "/" + filename);
-
-                    if(!blockModel.exists() || !blockModel.isFile()){
-                        if(!blockModel.createNewFile()){
-                            LogHelper.error("Failed to create block model file at " + blockModel.getPath());
+                    if (!blockstate.exists() || !blockstate.isFile()) {                               //Check if the file exists
+                        if (!blockstate.createNewFile()) {                                            //If not attempt to create it
+                            LogHelper.error("Failed to create blockstate file at " + blockstate.getPath());
                             continue;
                         }
 
-                        OutputStream out = new FileOutputStream(blockModel);
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockmodel_quarter.json")).getInputStream();
-                        copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{ getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+                        OutputStream out = new FileOutputStream(blockstate);                        //Then get an OutputStream to the file
+                        InputStream in = new InputStream() {                                        //And an InputStream for the default blockstate file
+                            @Override
+                            public int read() {
+                                return 0;
+                            }
+                        };
+
+
+                        if (block.getRegistryName().getPath().contains("quarter_sas")) {             //Select the correct default blockstate and get it
+                            in = getResourceStream("/default/blockstate_quarter.json");
+                        } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                            in = getResourceStream("/default/blockstate_slab.json");
+                        } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                            in = getResourceStream("/default/blockstate_stair.json");
+                        }
+
+                        //Finally copy the data from the default blockstate file to the new file and replace the placeholder with the actual registry name of the block
+                        copyFileAndReplace(in, out, new String[]{"registry_namespace", "registry_path"}, new String[]{block.getRegistryName().getNamespace(), block.getRegistryName().getPath()});
+
+                        hasGenerated = true;
+
+                    }   //If the file already existed we don't need to do anything
+
+
+                    //Block Models
+
+                    if (block.getRegistryName().getPath().contains("quarter_sas")) {
+
+                        File blockModel = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModel.exists() || !blockModel.isFile()) {
+                            if (!blockModel.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModel.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModel);
+                            InputStream in = getResourceStream("/default/blockmodel_quarter.json");
+                            copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+
+                            hasGenerated = true;
+
+                        }
+
+                    } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+
+                        File blockModel = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModel.exists() || !blockModel.isFile()) {
+                            if (!blockModel.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModel.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModel);
+                            InputStream in = getResourceStream("/default/blockmodel_slab.json");
+                            copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+
+                            hasGenerated = true;
+
+                        }
+
+                    } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+
+                        File blockModelStraight = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelStraight.exists() || !blockModelStraight.isFile()) {
+                            if (!blockModelStraight.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelStraight.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelStraight);
+                            InputStream in = getResourceStream("/default/blockmodel_stair.json");
+                            copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = block.getRegistryName().getPath() + "_inner.json";
+
+                        File blockModelInner = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelInner.exists() || !blockModelInner.isFile()) {
+                            if (!blockModelInner.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelInner.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelInner);
+                            InputStream in = getResourceStream("/default/blockmodel_stair_inner.json");
+                            copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = block.getRegistryName().getPath() + "_inner_mirrored.json";
+
+                        File blockModelInnerMirrored = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelInnerMirrored.exists() || !blockModelInnerMirrored.isFile()) {
+                            if (!blockModelInnerMirrored.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelInnerMirrored.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelInnerMirrored);
+                            InputStream in = getResourceStream("/default/blockmodel_stair_inner_mirrored.json");
+                            copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = block.getRegistryName().getPath() + "_outer.json";
+
+                        File blockModelOuter = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelOuter.exists() || !blockModelOuter.isFile()) {
+                            if (!blockModelOuter.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelOuter.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelOuter);
+                            InputStream in = getResourceStream("/default/blockmodel_stair_outer.json");
+                            copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
+
+                            hasGenerated = true;
+
+                        }
+
+
+                    }
+
+
+                    //Item Models
+
+                    File itemModel = new File(itemModels + "/" + block.getRegistryName().getPath() + ".json");
+
+                    if (!itemModel.exists() || !itemModel.isFile()) {
+                        if (!itemModel.createNewFile()) {
+                            LogHelper.error("Could not create item model file for block " + block.getRegistryName());
+                            continue;
+                        }
+
+                        FileWriter writer = new FileWriter(itemModel);
+                        writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + block.getRegistryName().getPath() + "\"\n}");
+                        writer.close();
 
                         hasGenerated = true;
 
                     }
-
-                }
-                else if(block.getRegistryName().getPath().contains("slab_sas")){
-
-                    File blockModel = new File(blockModels.getPath() + "/" + filename);
-
-                    if(!blockModel.exists() || !blockModel.isFile()){
-                        if(!blockModel.createNewFile()){
-                            LogHelper.error("Failed to create block model file at " + blockModel.getPath());
-                            continue;
-                        }
-
-                        OutputStream out = new FileOutputStream(blockModel);
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockmodel_slab.json")).getInputStream();
-                        copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{ getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
-
-                        hasGenerated = true;
-
-                    }
-
-                }
-                else if(block.getRegistryName().getPath().contains("stair_sas")){
-
-                    File blockModelStraight = new File(blockModels.getPath() + "/" + filename);
-
-                    if(!blockModelStraight.exists() || !blockModelStraight.isFile()){
-                        if(!blockModelStraight.createNewFile()){
-                            LogHelper.error("Failed to create block model file at " + blockModelStraight.getPath());
-                            continue;
-                        }
-
-                        OutputStream out = new FileOutputStream(blockModelStraight);
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockmodel_stair.json")).getInputStream();
-                        copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{ getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
-
-                        hasGenerated = true;
-
-                    }
-
-                    filename = block.getRegistryName().getPath() + "_inner.json";
-
-                    File blockModelInner = new File(blockModels.getPath() + "/" + filename);
-
-                    if(!blockModelInner.exists() || !blockModelInner.isFile()){
-                        if(!blockModelInner.createNewFile()){
-                            LogHelper.error("Failed to create block model file at " + blockModelInner.getPath());
-                            continue;
-                        }
-
-                        OutputStream out = new FileOutputStream(blockModelInner);
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockmodel_stair_inner.json")).getInputStream();
-                        copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{ getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
-
-                        hasGenerated = true;
-
-                    }
-
-                    filename = block.getRegistryName().getPath() + "_inner_mirrored.json";
-
-                    File blockModelInnerMirrored = new File(blockModels.getPath() + "/" + filename);
-
-                    if(!blockModelInnerMirrored.exists() || !blockModelInnerMirrored.isFile()){
-                        if(!blockModelInnerMirrored.createNewFile()){
-                            LogHelper.error("Failed to create block model file at " + blockModelInnerMirrored.getPath());
-                            continue;
-                        }
-
-                        OutputStream out = new FileOutputStream(blockModelInnerMirrored);
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockmodel_stair_inner_mirrored.json")).getInputStream();
-                        copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{ getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
-
-                        hasGenerated = true;
-
-                    }
-
-                    filename = block.getRegistryName().getPath() + "_outer.json";
-
-                    File blockModelOuter = new File(blockModels.getPath() + "/" + filename);
-
-                    if(!blockModelOuter.exists() || !blockModelOuter.isFile()){
-                        if(!blockModelOuter.createNewFile()){
-                            LogHelper.error("Failed to create block model file at " + blockModelOuter.getPath());
-                            continue;
-                        }
-
-                        OutputStream out = new FileOutputStream(blockModelOuter);
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/blockmodel_stair_outer.json")).getInputStream();
-                        copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{ getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
-
-                        hasGenerated = true;
-
-                    }
-
-
-                }
-
-
-                //Item Models
-
-                File itemModel = new File(itemModels + "/" + block.getRegistryName().getPath() + ".json");
-
-                if(!itemModel.exists() || !itemModel.isFile()){
-                    if(!itemModel.createNewFile()){
-                        LogHelper.error("Could not create item model file for block " + block.getRegistryName());
-                        continue;
-                    }
-
-                    FileWriter writer = new FileWriter(itemModel);
-                    writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + block.getRegistryName().getPath() + "\"\n}");
-                    writer.close();
-
-                    hasGenerated = true;
 
                 }
 
@@ -554,14 +569,12 @@ public final class ResourceGenerator {
 
                     InputStream in = null;
 
-                    if(block.getRegistryName().getPath().contains("quarter_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_quarter_big.json")).getInputStream();
-                    }
-                    else if(block.getRegistryName().getPath().contains("slab_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_slab_big.json")).getInputStream();
-                    }
-                    else if(block.getRegistryName().getPath().contains("stair_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_stair_big.json")).getInputStream();
+                    if (block.getRegistryName().getPath().contains("quarter_sas")) {
+                        in = getResourceStream("/default/crafting_quarter_big.json");
+                    } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                        in = getResourceStream("/default/crafting_slab_big.json");
+                    } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                        in = getResourceStream("/default/crafting_stair_big.json");
                     }
 
                     if(!recipeBig.createNewFile() || in == null){
@@ -584,13 +597,13 @@ public final class ResourceGenerator {
                     InputStream in = null;
 
                     if(block.getRegistryName().getPath().contains("quarter_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_quarter_small.json")).getInputStream();
+                        in = getResourceStream("/default/crafting_quarter_small.json");
                     }
                     else if(block.getRegistryName().getPath().contains("slab_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_slab_small.json")).getInputStream();
+                        in = getResourceStream("/default/crafting_slab_small.json");
                     }
                     else if(block.getRegistryName().getPath().contains("stair_sas")){
-                        in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_stair_small.json")).getInputStream();
+                        in = getResourceStream("/default/crafting_stair_small.json");
                     }
 
                     if(!recipeSmall.createNewFile() || in == null){
@@ -612,7 +625,7 @@ public final class ResourceGenerator {
 
                     if(!recipeStonecutter.exists()) {
 
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_1_from_1_stonecutter.json")).getInputStream();
+                        InputStream in = getResourceStream("/default/crafting_1_from_1_stonecutter.json");
                         OutputStream out = new FileOutputStream(recipeStonecutter);
                         copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
 
@@ -627,7 +640,7 @@ public final class ResourceGenerator {
 
                     if(!recipeStonecutter.exists()) {
 
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_2_from_1_stonecutter.json")).getInputStream();
+                        InputStream in = getResourceStream("/default/crafting_2_from_1_stonecutter.json");
                         OutputStream out = new FileOutputStream(recipeStonecutter);
                         copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
 
@@ -644,7 +657,7 @@ public final class ResourceGenerator {
 
                     if(!recipeStonecutter1.exists()) {
 
-                        InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_4_from_1_stonecutter.json")).getInputStream();
+                        InputStream in1 = getResourceStream("/default/crafting_4_from_1_stonecutter.json");
                         OutputStream out1 = new FileOutputStream(recipeStonecutter1);
                         copyFileAndReplace(in1, out1, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
 
@@ -679,7 +692,7 @@ public final class ResourceGenerator {
 
                         if(!recipeStonecutter2.exists()) {
 
-                            InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_3_from_1_stonecutter.json")).getInputStream();
+                            InputStream in2 = getResourceStream("/default/crafting_3_from_1_stonecutter.json");
                             OutputStream out2 = new FileOutputStream(recipeStonecutter2);
 
                             copyFileAndReplace(in2, out2, new String[]{"placeholder_input", "placeholder_output"}, new String[]{stair, block.getRegistryName().toString()});
@@ -688,7 +701,7 @@ public final class ResourceGenerator {
                         }
                         if(!recipeStonecutter3.exists()) {
 
-                            InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_2_from_1_stonecutter.json")).getInputStream();
+                            InputStream in3 = getResourceStream("/default/crafting_2_from_1_stonecutter.json");
                             OutputStream out3 = new FileOutputStream(recipeStonecutter3);
 
                             copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output"}, new String[]{slab, block.getRegistryName().toString()});
@@ -736,7 +749,7 @@ public final class ResourceGenerator {
 
                         if(!recipeShapeless1.exists()) {
 
-                            InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_3_to_1.json")).getInputStream();
+                            InputStream in1 = getResourceStream("/default/crafting_shapeless_3_to_1.json");
                             OutputStream out1 = new FileOutputStream(recipeShapeless1);
 
                             copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_output"}, new String[]{quarter, quarter, quarter, block.getRegistryName().toString()});
@@ -745,7 +758,7 @@ public final class ResourceGenerator {
                         }
                         if(!recipeShapeless2.exists()) {
 
-                            InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            InputStream in2 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out2 = new FileOutputStream(recipeShapeless2);
 
                             copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, slab, block.getRegistryName().toString()});
@@ -754,7 +767,7 @@ public final class ResourceGenerator {
                         }
                         if(!recipeShapeless3.exists()) {
 
-                            InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
+                            InputStream in3 = getResourceStream("/default/crafting_shapeless_1_to_x.json");
                             OutputStream out3 = new FileOutputStream(recipeShapeless3);
 
                             copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "3"});
@@ -763,7 +776,7 @@ public final class ResourceGenerator {
                         }
                         if(!recipeShapeless4.exists()) {
 
-                            InputStream in4 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            InputStream in4 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out4 = new FileOutputStream(recipeShapeless4);
 
                             copyFileAndReplace(in4, out4, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), quarter, ((SlabBlock) block).getBaseBlock()});
@@ -804,7 +817,7 @@ public final class ResourceGenerator {
 
                         if(!recipeShapeless1.exists()) {
 
-                            InputStream in1 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            InputStream in1 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out1 = new FileOutputStream(recipeShapeless1);
 
                             copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, quarter, block.getRegistryName().toString()});
@@ -813,7 +826,7 @@ public final class ResourceGenerator {
                         }
                         if(!recipeShapeless2.exists()) {
 
-                            InputStream in2 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_2_to_1.json")).getInputStream();
+                            InputStream in2 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out2 = new FileOutputStream(recipeShapeless2);
 
                             copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
@@ -822,7 +835,7 @@ public final class ResourceGenerator {
                         }
                         if(!recipeShapeless3.exists()) {
 
-                            InputStream in3 = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_1_to_x.json")).getInputStream();
+                            InputStream in3 = getResourceStream("/default/crafting_shapeless_1_to_x.json");
                             OutputStream out3 = new FileOutputStream(recipeShapeless3);
 
                             copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "2"});
@@ -839,7 +852,7 @@ public final class ResourceGenerator {
 
                     if(!recipeShapeless.exists()) {
 
-                        InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/crafting_shapeless_4_to_1.json")).getInputStream();
+                        InputStream in = getResourceStream("/default/crafting_shapeless_4_to_1.json");
                         OutputStream out = new FileOutputStream(recipeShapeless);
                         copyFileAndReplace(in, out, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_input4", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
 
@@ -859,7 +872,7 @@ public final class ResourceGenerator {
                         continue;
                     }
 
-                    InputStream in = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(Reference.MODID, "default/loot_table.json")).getInputStream();
+                    InputStream in = getResourceStream("/default/loot_table.json");
                     OutputStream out = new FileOutputStream(lootTable);
                     copyFileAndReplace(in, out, "placeholder_block", block.getRegistryName().toString());
 
@@ -873,8 +886,12 @@ public final class ResourceGenerator {
 
             }
 
-            langWrite.write("\n}");
-            langWrite.close();
+            if(FMLEnvironment.dist.isClient()) {
+
+                langWrite.write("\n}");
+                langWrite.close();
+
+            }
 
         }
         catch (Exception ex){

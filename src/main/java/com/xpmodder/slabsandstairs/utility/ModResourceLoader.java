@@ -8,8 +8,10 @@ import net.minecraft.server.packs.FolderPackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -85,15 +87,19 @@ public class ModResourceLoader {
             }
         }
 
-        Minecraft.getInstance().getResourcePackRepository().addPackFinder((consumer, iFactory) -> {
-            final Pack packInfo = Pack.create(Reference.MODID, true, () -> new FolderPackResources(RESOURCE_FOLDER), iFactory, Pack.Position.TOP, PackSource.BUILT_IN);
-            if(packInfo == null){
-                LogHelper.error("Failed to load resource pack!");
-                LogHelper.error("Blocks will have missing textures and models!");
-                return;
-            }
-            consumer.accept(packInfo);
-        });
+        if(FMLEnvironment.dist == Dist.CLIENT) {
+
+            Minecraft.getInstance().getResourcePackRepository().addPackFinder((consumer, iFactory) -> {
+                final Pack packInfo = Pack.create(Reference.MODID, true, () -> new FolderPackResources(RESOURCE_FOLDER), iFactory, Pack.Position.TOP, PackSource.BUILT_IN);
+                if (packInfo == null) {
+                    LogHelper.error("Failed to load resource pack!");
+                    LogHelper.error("Blocks will have missing textures and models!");
+                    return;
+                }
+                consumer.accept(packInfo);
+            });
+
+        }
 
     }
 
