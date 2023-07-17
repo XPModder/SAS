@@ -2,6 +2,8 @@ package com.xpmodder.slabsandstairs.block;
 
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
+import com.xpmodder.slabsandstairs.network.KeyHandler;
+import com.xpmodder.slabsandstairs.network.ModPacketHandler;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -928,15 +931,19 @@ public class StairBlock extends SlabBlock{
         Direction direction = context.getNearestLookingDirection().getOpposite();
         BlockPos blockPos = context.getClickedPos();
 
-        if(placementRotation == null){
+        if (placementRotation == null) {
             placementRotation = direction;
+            if(FMLEnvironment.dist.isClient()){
+                ModPacketHandler.INSTANCE.sendToServer(new ModPacketHandler.RotationMessage(placementRotation, placementInverted));
+            }
         }
 
-        if(KeyInit.placementModeMapping.isDown()){
-            if(KeyInit.placementRotateMapping.consumeClick()){
+        if (KeyHandler.isPlacementModeDown) {
+            if (KeyHandler.isPlacementRotateDown) {
                 this.rotatePlacement();
+                KeyHandler.isPlacementRotateDown = false;
             }
-            if(this.defaultBlockState().hasProperty(INVERTED)){
+            if (this.defaultBlockState().hasProperty(INVERTED)) {
                 BlockState state = this.defaultBlockState().setValue(FACING, placementRotation).setValue(INVERTED, placementInverted).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
                 return state.setValue(CONNECTED, getShapeForNeighbours(state, context));
             }

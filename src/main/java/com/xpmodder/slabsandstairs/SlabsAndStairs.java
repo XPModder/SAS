@@ -7,6 +7,8 @@ import com.xpmodder.slabsandstairs.init.BlockEntityInit;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.init.ItemInit;
 import com.xpmodder.slabsandstairs.init.KeyInit;
+import com.xpmodder.slabsandstairs.network.KeyHandler;
+import com.xpmodder.slabsandstairs.network.ModPacketHandler;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.BlockTagTypes;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
@@ -69,7 +71,11 @@ public class SlabsAndStairs {
 
         MinecraftForge.EVENT_BUS.register(resourceLoader);
 
+        MinecraftForge.EVENT_BUS.register(KeyHandler.class);
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigurationHandler.COMMON_SPEC);
+
+        ModPacketHandler.register();
 
         LogHelper.info("HANDLER");
 

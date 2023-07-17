@@ -88,6 +88,10 @@ public class BlockListHandler {
 
             }
 
+            if(!correctVersion){
+                LogHelper.error("SAS - The Slabs and Stairs mod has found an outdated blocks.csv file! Please update the file or delete it! When it is deleted, a new one will automatically be created on the next start of the game/server!");
+            }
+
         }
         catch (FileNotFoundException ex){
             LogHelper.error("Block list file not found! Cannot register blocks!");

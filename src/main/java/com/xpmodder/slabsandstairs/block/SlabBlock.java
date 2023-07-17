@@ -1,7 +1,8 @@
 package com.xpmodder.slabsandstairs.block;
 
 import com.xpmodder.slabsandstairs.init.BlockInit;
-import com.xpmodder.slabsandstairs.init.KeyInit;
+import com.xpmodder.slabsandstairs.network.KeyHandler;
+import com.xpmodder.slabsandstairs.network.ModPacketHandler;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import com.xpmodder.slabsandstairs.utility.Util;
 import net.minecraft.core.BlockPos;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,9 +53,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     protected int Power = 0;
 
-    protected static Direction placementRotation = null;
+    public static Direction placementRotation = null;
 
-    protected static boolean placementInverted = false;
+    public static boolean placementInverted = false;
 
 
     public SlabBlock(Properties properties) {
@@ -446,38 +448,47 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     protected void rotatePlacement(){
-        if(placementRotation == DOWN){
-            placementInverted = !placementInverted;
+        if(FMLEnvironment.dist.isClient()){
+            if(placementRotation == DOWN){
+                placementInverted = !placementInverted;
+            }
+            placementRotation = Util.nextDirection(placementRotation);
+
+            ModPacketHandler.INSTANCE.sendToServer(new ModPacketHandler.RotationMessage(placementRotation, placementInverted));
         }
-        placementRotation = Util.nextDirection(placementRotation);
     }
 
 
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+
         FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
         Direction direction = context.getNearestLookingDirection().getOpposite();
         BlockPos blockPos = context.getClickedPos();
 
-        if(placementRotation == null){
+        if (placementRotation == null) {
             placementRotation = direction;
+            if(FMLEnvironment.dist.isClient()){
+                ModPacketHandler.INSTANCE.sendToServer(new ModPacketHandler.RotationMessage(placementRotation, placementInverted));
+            }
         }
 
-        if(KeyInit.placementModeMapping.isDown()){
-            if(KeyInit.placementRotateMapping.consumeClick()){
+        if (KeyHandler.isPlacementModeDown) {
+            if (KeyHandler.isPlacementRotateDown) {
                 this.rotatePlacement();
+                KeyHandler.isPlacementRotateDown = false;
             }
-            if(this.defaultBlockState().hasProperty(INVERTED)){
+            if (this.defaultBlockState().hasProperty(INVERTED)) {
                 return this.defaultBlockState().setValue(FACING, placementRotation).setValue(INVERTED, placementInverted).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
             }
             return this.defaultBlockState().setValue(FACING, placementRotation).setValue(WATERLOGGED, fluidState.is(Fluids.WATER));
         }
 
-        if((context.getClickLocation().y - (double)blockPos.getY()) > 0.5D){
+        if ((context.getClickLocation().y - (double) blockPos.getY()) > 0.5D) {
             return this.defaultBlockState().setValue(FACING, DOWN).setValue(WATERLOGGED, fluidState.is(Fluids.WATER)).setValue(INVERTED, false);
-        }
-        else{
+        } else {
             return this.defaultBlockState().setValue(FACING, UP).setValue(WATERLOGGED, fluidState.is(Fluids.WATER)).setValue(INVERTED, false);
         }
+
     }
 
 

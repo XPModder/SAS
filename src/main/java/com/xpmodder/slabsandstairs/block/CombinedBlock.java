@@ -2,7 +2,7 @@ package com.xpmodder.slabsandstairs.block;
 
 
 import com.xpmodder.slabsandstairs.config.ConfigurationHandler;
-import com.xpmodder.slabsandstairs.init.KeyInit;
+import com.xpmodder.slabsandstairs.network.KeyHandler;
 import com.xpmodder.slabsandstairs.utility.ShapeUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -164,29 +164,32 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
 
         super.playerWillDestroy(level, pos, state, player);
 
-        if(blockEntity == null){
+        if (blockEntity == null) {
             return;
         }
 
         player.causeFoodExhaustion(0.005F);
 
+        if(level.isClientSide()) {
 
-        if(KeyInit.placementModeMapping.isDown() && ConfigurationHandler.COMMON.canGetCombinedBlock.get()){
+            if (KeyHandler.isPlacementModeDown && ConfigurationHandler.COMMON.canGetCombinedBlock.get()) {
 
-            if(!player.isCreative()) {
-                ItemStack itemStack = getCloneItemStack(level, pos, state);
-                popResource(level, pos, itemStack);
+                if (!player.isCreative()) {
+                    ItemStack itemStack = getCloneItemStack(level, pos, state);
+                    popResource(level, pos, itemStack);
+                }
+
+                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                return;
             }
 
-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-            return;
         }
 
 
-        if(!blockEntity.Block4.isAir()) {
+        if (!blockEntity.Block4.isAir()) {
 
             player.awardStat(Stats.BLOCK_MINED.get(blockEntity.Block4.getBlock()));
-            if(!player.isCreative()) {
+            if (!player.isCreative()) {
                 dropResources(blockEntity.Block4, level, pos, blockEntity, player, stack);
             }
 
@@ -196,11 +199,10 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
             blockEntity.updateModelData(level, pos);
             level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
 
-        }
-        else if(!blockEntity.Block3.isAir()){
+        } else if (!blockEntity.Block3.isAir()) {
 
             player.awardStat(Stats.BLOCK_MINED.get(blockEntity.Block3.getBlock()));
-            if(!player.isCreative()) {
+            if (!player.isCreative()) {
                 dropResources(blockEntity.Block3, level, pos, blockEntity, player, stack);
             }
 
@@ -210,11 +212,10 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
             blockEntity.updateModelData(level, pos);
             level.markAndNotifyBlock(pos, level.getChunkAt(pos), level.getBlockState(pos), level.getBlockState(pos), 3, 512);
 
-        }
-        else if(!blockEntity.Block2.isAir()){
+        } else if (!blockEntity.Block2.isAir()) {
 
             player.awardStat(Stats.BLOCK_MINED.get(blockEntity.Block2.getBlock()));
-            if(!player.isCreative()) {
+            if (!player.isCreative()) {
                 dropResources(blockEntity.Block2, level, pos, blockEntity, player, stack);
             }
 
