@@ -5,22 +5,24 @@ import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import static net.minecraftforge.common.model.TransformationHelper.quatFromXYZ;
+import static net.minecraftforge.common.util.TransformationHelper.quatFromXYZ;
+
 
 public class CombinedBlockItemModel extends CombinedBlockBakedModel {
 
@@ -36,7 +38,7 @@ public class CombinedBlockItemModel extends CombinedBlockBakedModel {
 
     @NotNull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull Random rand, @NotNull IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, RenderType type) {
 
         List<BakedQuad> quads = new ArrayList<>();
 
@@ -45,16 +47,16 @@ public class CombinedBlockItemModel extends CombinedBlockBakedModel {
         try {
 
             if (Block1 != null) {
-                quads.addAll(shaper.getBlockModel(Block1).getQuads(extraData.getData(BLOCK1), side, rand, extraData));
+                quads.addAll(shaper.getBlockModel(Block1).getQuads(extraData.get(BLOCK1), side, rand, extraData, type));
             }
             if (Block2 != null) {
-                quads.addAll(shaper.getBlockModel(Block2).getQuads(extraData.getData(BLOCK2), side, rand, extraData));
+                quads.addAll(shaper.getBlockModel(Block2).getQuads(extraData.get(BLOCK2), side, rand, extraData, type));
             }
             if (Block3 != null) {
-                quads.addAll(shaper.getBlockModel(Block3).getQuads(extraData.getData(BLOCK3), side, rand, extraData));
+                quads.addAll(shaper.getBlockModel(Block3).getQuads(extraData.get(BLOCK3), side, rand, extraData, type));
             }
             if (Block4 != null) {
-                quads.addAll(shaper.getBlockModel(Block4).getQuads(extraData.getData(BLOCK4), side, rand, extraData));
+                quads.addAll(shaper.getBlockModel(Block4).getQuads(extraData.get(BLOCK4), side, rand, extraData, type));
             }
 
 

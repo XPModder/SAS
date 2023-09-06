@@ -9,7 +9,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class BlockEntityInit {
 
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, Reference.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Reference.MODID);
     public static final RegistryObject<BlockEntityType<CombinedBlockEntity>> COMBINED_BLOCK =
             BLOCK_ENTITIES.register("combined_block", () -> BlockEntityType.Builder.of(CombinedBlockEntity::new, BlockInit.combinedBlock.get()).build(null));
 

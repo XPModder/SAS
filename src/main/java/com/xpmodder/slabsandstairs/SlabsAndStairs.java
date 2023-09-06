@@ -31,6 +31,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -61,6 +62,7 @@ public class SlabsAndStairs {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
+        eventBus.addListener(KeyInit::onRegisterKeyMappings);
         eventBus.register(modelBakeEventHandler);
 
         BlockInit.BLOCKS.register(eventBus);
@@ -94,25 +96,13 @@ public class SlabsAndStairs {
             Minecraft.getInstance().reloadResourcePacks();
         }
 
-        ResourceGenerator.addToTag(Objects.requireNonNull(BlockInit.combinedBlock.get().getRegistryName()).toString(), BlockTagTypes.AXE);
-        ResourceGenerator.addToTag(Objects.requireNonNull(BlockInit.combinedBlock.get().getRegistryName()).toString(), BlockTagTypes.PICKAXE);
+        ResourceGenerator.addToTag(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(BlockInit.combinedBlock.get())).toString(), BlockTagTypes.AXE);
+        ResourceGenerator.addToTag(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(BlockInit.combinedBlock.get())).toString(), BlockTagTypes.PICKAXE);
 
     }
 
     private void clientSetup(final FMLClientSetupEvent event){
 
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewStair.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewSlab.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.previewQuarter.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(BlockInit.combinedBlock.get(), RenderType.translucent());
-
-        for(Block block : BlockInit.MY_BLOCKS){
-            if(block.defaultBlockState().getMaterial() == Material.GLASS){
-                ItemBlockRenderTypes.setRenderLayer(block, RenderType.translucent());
-            }
-        }
-
-        KeyInit.init();
     }
 
 

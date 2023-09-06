@@ -14,7 +14,7 @@ public class KeyHandler {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    public static void onKeyEvent(InputEvent.KeyInputEvent event){
+    public static void onKeyEvent(InputEvent.Key event){
         if(Minecraft.getInstance().getConnection() != null) {
             if (event.getKey() == KeyInit.placementModeMapping.getKey().getValue()) {
                 if (isPlacementModeDown != KeyInit.placementModeMapping.isDown()) {

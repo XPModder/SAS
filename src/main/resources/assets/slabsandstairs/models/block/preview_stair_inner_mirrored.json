@@ -1,5 +1,6 @@
 {
   "parent": "slabsandstairs:block/inner_stair_mirrored",
+  "render_type": "translucent",
   "textures": {
     "bottom": "slabsandstairs:block/preview_block",
     "top": "slabsandstairs:block/preview_block",

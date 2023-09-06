@@ -3,22 +3,23 @@ package com.xpmodder.slabsandstairs.client.rendering;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.ChunkRenderTypeSet;
+import net.minecraftforge.client.model.IDynamicBakedModel;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
@@ -28,17 +29,15 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     public static ModelProperty<BlockState> BLOCK4 = new ModelProperty<>();
     public static ModelProperty<Integer> NUM_BLOCKS = new ModelProperty<>();
 
-    public static ModelDataMap getEmptyIModelData(){
-        ModelDataMap.Builder builder = new ModelDataMap.Builder();
-        builder.withInitial(NUM_BLOCKS, 1).withInitial(BLOCK1, BlockInit.previewSlab.get().defaultBlockState())
-                .withProperty(BLOCK2).withProperty(BLOCK3).withProperty(BLOCK4);
-        return builder.build();
+
+    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data){
+        return ChunkRenderTypeSet.of(RenderType.translucent());
     }
 
 
     @NotNull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull Random rand, @NotNull IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, RenderType type) {
 
         List<BakedQuad> quads = new ArrayList<>();
 
@@ -46,24 +45,24 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
         try {
 
-            if (extraData.hasProperty(NUM_BLOCKS)) {
+            if (extraData.has(NUM_BLOCKS)) {
 
-                if (extraData.getData(NUM_BLOCKS) >= 1) {
-                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK1)).getQuads(extraData.getData(BLOCK1), side, rand, extraData));
+                if (extraData.get(NUM_BLOCKS) >= 1) {
+                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK1)).getQuads(extraData.get(BLOCK1), side, rand, extraData, type));
                 }
-                if (extraData.getData(NUM_BLOCKS) >= 2) {
-                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK2)).getQuads(extraData.getData(BLOCK2), side, rand, extraData));
+                if (extraData.get(NUM_BLOCKS) >= 2) {
+                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK2)).getQuads(extraData.get(BLOCK2), side, rand, extraData, type));
                 }
-                if (extraData.getData(NUM_BLOCKS) >= 3) {
-                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK3)).getQuads(extraData.getData(BLOCK3), side, rand, extraData));
+                if (extraData.get(NUM_BLOCKS) >= 3) {
+                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK3)).getQuads(extraData.get(BLOCK3), side, rand, extraData, type));
                 }
-                if (extraData.getData(NUM_BLOCKS) == 4) {
-                    quads.addAll(shaper.getBlockModel(extraData.getData(BLOCK4)).getQuads(extraData.getData(BLOCK4), side, rand, extraData));
+                if (extraData.get(NUM_BLOCKS) == 4) {
+                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK4)).getQuads(extraData.get(BLOCK4), side, rand, extraData, type));
                 }
 
             }
             else{
-                quads.addAll(shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getQuads(BlockInit.previewSlab.get().defaultBlockState(), side, rand, extraData));
+                quads.addAll(shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getQuads(BlockInit.previewSlab.get().defaultBlockState(), side, rand, extraData, type));
             }
 
 
@@ -99,7 +98,7 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     @Override
     public @NotNull TextureAtlasSprite getParticleIcon() {
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
-        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(new ModelDataMap.Builder().build());
+        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(ModelData.builder().build());
     }
 
     @Override
@@ -108,29 +107,29 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public TextureAtlasSprite getParticleIcon(IModelData modelData){
+    public TextureAtlasSprite getParticleIcon(ModelData modelData){
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
-        if(modelData.hasProperty(BLOCK4) && modelData.getData(BLOCK4) != null && !modelData.getData(BLOCK4).isAir()){
+        if(modelData.has(BLOCK4) && modelData.get(BLOCK4) != null && !modelData.get(BLOCK4).isAir()){
 
-            return shaper.getBlockModel(modelData.getData(BLOCK4)).getParticleIcon(new ModelDataMap.Builder().build());
-
-        }
-        else if(modelData.hasProperty(BLOCK3) && modelData.getData(BLOCK3) != null && !modelData.getData(BLOCK3).isAir()){
-
-            return shaper.getBlockModel(modelData.getData(BLOCK3)).getParticleIcon(new ModelDataMap.Builder().build());
+            return shaper.getBlockModel(modelData.get(BLOCK4)).getParticleIcon(ModelData.builder().build());
 
         }
-        else if(modelData.hasProperty(BLOCK2) && modelData.getData(BLOCK2) != null && !modelData.getData(BLOCK2).isAir()){
+        else if(modelData.has(BLOCK3) && modelData.get(BLOCK3) != null && !modelData.get(BLOCK3).isAir()){
 
-            return shaper.getBlockModel(modelData.getData(BLOCK2)).getParticleIcon(new ModelDataMap.Builder().build());
-
-        }
-        else if(modelData.hasProperty(BLOCK1) && modelData.getData(BLOCK1) != null && !modelData.getData(BLOCK1).isAir()){
-
-            return shaper.getBlockModel(modelData.getData(BLOCK1)).getParticleIcon(new ModelDataMap.Builder().build());
+            return shaper.getBlockModel(modelData.get(BLOCK3)).getParticleIcon(ModelData.builder().build());
 
         }
-        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(new ModelDataMap.Builder().build());
+        else if(modelData.has(BLOCK2) && modelData.get(BLOCK2) != null && !modelData.get(BLOCK2).isAir()){
+
+            return shaper.getBlockModel(modelData.get(BLOCK2)).getParticleIcon(ModelData.builder().build());
+
+        }
+        else if(modelData.has(BLOCK1) && modelData.get(BLOCK1) != null && !modelData.get(BLOCK1).isAir()){
+
+            return shaper.getBlockModel(modelData.get(BLOCK1)).getParticleIcon(ModelData.builder().build());
+
+        }
+        return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(ModelData.builder().build());
     }
 
 

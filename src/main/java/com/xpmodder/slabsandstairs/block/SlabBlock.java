@@ -47,9 +47,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     protected static final VoxelShape SHAPE_UP = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
     protected static final VoxelShape SHAPE_DOWN = Block.box(0.0D, 8.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 
-    protected String BaseBlock = Blocks.AIR.getRegistryName().toString();
-    protected String SlabQuarterBlock = Blocks.AIR.getRegistryName().toString();
-    protected String StairBlock = Blocks.AIR.getRegistryName().toString();
+    protected String BaseBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
+    protected String SlabQuarterBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
+    protected String StairBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
 
     protected int Power = 0;
 
@@ -110,7 +110,7 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             if(getBlockFromItem(heldItem) instanceof SlabBlock){
                 Block base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock));
                 if(base == null){
-                    LogHelper.error("Error: Could not get Base Block for " + this.getRegistryName());
+                    LogHelper.error("Error: Could not get Base Block for " + ForgeRegistries.BLOCKS.getKey(this));
                     return InteractionResult.PASS;
                 }
                 worldIn.setBlockAndUpdate(pos, base.defaultBlockState());
@@ -126,7 +126,7 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
             if(SlabQuarterBlock instanceof QuarterBlock){
 
                 if(StairBlock == null){
-                    LogHelper.error("Error: Unable to get stair block for " + this.getRegistryName());
+                    LogHelper.error("Error: Unable to get stair block for " + ForgeRegistries.BLOCKS.getKey(this));
                     return InteractionResult.PASS;
                 }
 

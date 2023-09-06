@@ -9,6 +9,7 @@ import com.xpmodder.slabsandstairs.reference.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
@@ -71,9 +72,9 @@ public final class ResourceGenerator {
 
         try {
 
-            String namespace = Objects.requireNonNull(block.getRegistryName()).getNamespace();
+            String namespace = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getNamespace();
 
-            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "lang/en_us.json")).getInputStream();
+            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "lang/en_us.json")).get().open();
 
             JsonObject object = new Gson().fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), JsonObject.class);
 
@@ -81,7 +82,7 @@ public final class ResourceGenerator {
 
         }
         catch (Exception ex){
-            LogHelper.error("Exception trying to get name for block " + Objects.requireNonNull(block.getRegistryName()) + "!");
+            LogHelper.error("Exception trying to get name for block " + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)) + "!");
         }
 
         return output;
@@ -96,9 +97,9 @@ public final class ResourceGenerator {
 
         try{
 
-            String namespace = Objects.requireNonNull(block.getRegistryName()).getNamespace();
+            String namespace = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getNamespace();
 
-            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "models/block/" + block.getRegistryName().getPath() + ".json")).getInputStream();
+            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "models/block/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + ".json")).get().open();
 
             JsonObject object = new Gson().fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), JsonObject.class);
 
@@ -135,7 +136,7 @@ public final class ResourceGenerator {
 
         }
         catch(Exception ex){
-            LogHelper.error("Exception trying to get texture for block " + Objects.requireNonNull(block.getRegistryName()) + "!");
+            LogHelper.error("Exception trying to get texture for block " + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)) + "!");
         }
 
         return output;
@@ -377,11 +378,11 @@ public final class ResourceGenerator {
                     }
 
                     //Set the name correctly based on the type of block we have
-                    if (block.getRegistryName().getPath().contains("quarter_sas")) {
+                    if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")) {
                         entry += "\"" + key + "\": \"" + baseBlockName + " Quarter\"";
-                    } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
                         entry += "\"" + key + "\": \"" + baseBlockName + " Stairs\"";
-                    } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")) {
                         entry += "\"" + key + "\": \"" + baseBlockName + " Slab\"";
                     }
 
@@ -392,7 +393,7 @@ public final class ResourceGenerator {
                     //Blockstate
 
                     //Get the path for the blockstate file
-                    String filename = block.getRegistryName().getPath() + ".json";
+                    String filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + ".json";
                     File blockstate = new File(blockstates.getPath() + "/" + filename);
 
                     if (!blockstate.exists() || !blockstate.isFile()) {                               //Check if the file exists
@@ -410,16 +411,16 @@ public final class ResourceGenerator {
                         };
 
 
-                        if (block.getRegistryName().getPath().contains("quarter_sas")) {             //Select the correct default blockstate and get it
+                        if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")) {             //Select the correct default blockstate and get it
                             in = getResourceStream("/default/blockstate_quarter.json");
-                        } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                        } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")) {
                             in = getResourceStream("/default/blockstate_slab.json");
-                        } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                        } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
                             in = getResourceStream("/default/blockstate_stair.json");
                         }
 
                         //Finally copy the data from the default blockstate file to the new file and replace the placeholder with the actual registry name of the block
-                        copyFileAndReplace(in, out, new String[]{"registry_namespace", "registry_path"}, new String[]{block.getRegistryName().getNamespace(), block.getRegistryName().getPath()});
+                        copyFileAndReplace(in, out, new String[]{"registry_namespace", "registry_path"}, new String[]{ForgeRegistries.BLOCKS.getKey(block).getNamespace(), ForgeRegistries.BLOCKS.getKey(block).getPath()});
 
                         hasGenerated = true;
 
@@ -428,7 +429,7 @@ public final class ResourceGenerator {
 
                     //Block Models
 
-                    if (block.getRegistryName().getPath().contains("quarter_sas")) {
+                    if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")) {
 
                         File blockModel = new File(blockModels.getPath() + "/" + filename);
 
@@ -440,13 +441,16 @@ public final class ResourceGenerator {
 
                             OutputStream out = new FileOutputStream(blockModel);
                             InputStream in = getResourceStream("/default/blockmodel_quarter.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_quarter_translucent.json");
+                            }
                             copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
 
                             hasGenerated = true;
 
                         }
 
-                    } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")) {
 
                         File blockModel = new File(blockModels.getPath() + "/" + filename);
 
@@ -458,13 +462,16 @@ public final class ResourceGenerator {
 
                             OutputStream out = new FileOutputStream(blockModel);
                             InputStream in = getResourceStream("/default/blockmodel_slab.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_slab_translucent.json");
+                            }
                             copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
 
                             hasGenerated = true;
 
                         }
 
-                    } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
 
                         File blockModelStraight = new File(blockModels.getPath() + "/" + filename);
 
@@ -476,13 +483,16 @@ public final class ResourceGenerator {
 
                             OutputStream out = new FileOutputStream(blockModelStraight);
                             InputStream in = getResourceStream("/default/blockmodel_stair.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_stair_translucent.json");
+                            }
                             copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
 
                             hasGenerated = true;
 
                         }
 
-                        filename = block.getRegistryName().getPath() + "_inner.json";
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_inner.json";
 
                         File blockModelInner = new File(blockModels.getPath() + "/" + filename);
 
@@ -494,13 +504,16 @@ public final class ResourceGenerator {
 
                             OutputStream out = new FileOutputStream(blockModelInner);
                             InputStream in = getResourceStream("/default/blockmodel_stair_inner.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_stair_inner_translucent.json");
+                            }
                             copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
 
                             hasGenerated = true;
 
                         }
 
-                        filename = block.getRegistryName().getPath() + "_inner_mirrored.json";
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_inner_mirrored.json";
 
                         File blockModelInnerMirrored = new File(blockModels.getPath() + "/" + filename);
 
@@ -512,13 +525,16 @@ public final class ResourceGenerator {
 
                             OutputStream out = new FileOutputStream(blockModelInnerMirrored);
                             InputStream in = getResourceStream("/default/blockmodel_stair_inner_mirrored.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_stair_inner_mirrored_translucent.json");
+                            }
                             copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
 
                             hasGenerated = true;
 
                         }
 
-                        filename = block.getRegistryName().getPath() + "_outer.json";
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_outer.json";
 
                         File blockModelOuter = new File(blockModels.getPath() + "/" + filename);
 
@@ -530,6 +546,9 @@ public final class ResourceGenerator {
 
                             OutputStream out = new FileOutputStream(blockModelOuter);
                             InputStream in = getResourceStream("/default/blockmodel_stair_outer.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_stair_outer_translucent.json");
+                            }
                             copyFileAndReplace(in, out, new String[]{"texture_path_top", "texture_path_bottom", "texture_path_side"}, new String[]{getTextureForBlock(baseBlock, "top"), getTextureForBlock(baseBlock, "bottom"), getTextureForBlock(baseBlock, "side")});
 
                             hasGenerated = true;
@@ -542,16 +561,16 @@ public final class ResourceGenerator {
 
                     //Item Models
 
-                    File itemModel = new File(itemModels + "/" + block.getRegistryName().getPath() + ".json");
+                    File itemModel = new File(itemModels + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + ".json");
 
                     if (!itemModel.exists() || !itemModel.isFile()) {
                         if (!itemModel.createNewFile()) {
-                            LogHelper.error("Could not create item model file for block " + block.getRegistryName());
+                            LogHelper.error("Could not create item model file for block " + ForgeRegistries.BLOCKS.getKey(block));
                             continue;
                         }
 
                         FileWriter writer = new FileWriter(itemModel);
-                        writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + block.getRegistryName().getPath() + "\"\n}");
+                        writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "\"\n}");
                         writer.close();
 
                         hasGenerated = true;
@@ -563,121 +582,121 @@ public final class ResourceGenerator {
                 //Crafting Recipes
 
                 //Regular Crafting big recipes (crafting table)
-                File recipeBig = new File(recipes + "/" + block.getRegistryName().getPath() + "_big.json");
+                File recipeBig = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_big.json");
 
                 if(!recipeBig.exists() || !recipeBig.isFile()){
 
                     InputStream in = null;
 
-                    if (block.getRegistryName().getPath().contains("quarter_sas")) {
+                    if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")) {
                         in = getResourceStream("/default/crafting_quarter_big.json");
-                    } else if (block.getRegistryName().getPath().contains("slab_sas")) {
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")) {
                         in = getResourceStream("/default/crafting_slab_big.json");
-                    } else if (block.getRegistryName().getPath().contains("stair_sas")) {
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
                         in = getResourceStream("/default/crafting_stair_big.json");
                     }
 
                     if(!recipeBig.createNewFile() || in == null){
-                        LogHelper.error("Could not create crafting recipe 'big' for block " + block.getRegistryName());
+                        LogHelper.error("Could not create crafting recipe 'big' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         continue;
                     }
 
                     OutputStream out = new FileOutputStream(recipeBig);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
 
                     hasGenerated = true;
 
                 }
 
                 //Regular crafting small recipes (2x2 grid in inventory)
-                File recipeSmall = new File(recipes + "/" + block.getRegistryName().getPath() + "_small.json");
+                File recipeSmall = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_small.json");
 
                 if(!recipeSmall.exists() || !recipeSmall.isFile()){
 
                     InputStream in = null;
 
-                    if(block.getRegistryName().getPath().contains("quarter_sas")){
+                    if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")){
                         in = getResourceStream("/default/crafting_quarter_small.json");
                     }
-                    else if(block.getRegistryName().getPath().contains("slab_sas")){
+                    else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")){
                         in = getResourceStream("/default/crafting_slab_small.json");
                     }
-                    else if(block.getRegistryName().getPath().contains("stair_sas")){
+                    else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")){
                         in = getResourceStream("/default/crafting_stair_small.json");
                     }
 
                     if(!recipeSmall.createNewFile() || in == null){
-                        LogHelper.error("Could not create crafting recipe 'small' for block " + block.getRegistryName());
+                        LogHelper.error("Could not create crafting recipe 'small' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         continue;
                     }
 
                     OutputStream out = new FileOutputStream(recipeSmall);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
 
                     hasGenerated = true;
 
                 }
 
                 //Stonecutter crafting recipes
-                if(block.getRegistryName().getPath().contains("stair_sas")){
+                if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")){
 
-                    File recipeStonecutter = new File(recipes + "/" + block.getRegistryName().getPath() + "_stonecutter.json");
+                    File recipeStonecutter = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_stonecutter.json");
 
                     if(!recipeStonecutter.exists()) {
 
                         InputStream in = getResourceStream("/default/crafting_1_from_1_stonecutter.json");
                         OutputStream out = new FileOutputStream(recipeStonecutter);
-                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
 
                         hasGenerated = true;
 
                     }
 
                 }
-                else if(block.getRegistryName().getPath().contains("slab_sas")){
+                else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")){
 
-                    File recipeStonecutter = new File(recipes + "/" + block.getRegistryName().getPath() + "_stonecutter.json");
+                    File recipeStonecutter = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_stonecutter.json");
 
                     if(!recipeStonecutter.exists()) {
 
                         InputStream in = getResourceStream("/default/crafting_2_from_1_stonecutter.json");
                         OutputStream out = new FileOutputStream(recipeStonecutter);
-                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
 
                         hasGenerated = true;
 
                     }
 
                 }
-                else if(block.getRegistryName().getPath().contains("quarter_sas")){
+                else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")){
 
-                    File recipeStonecutter1 = new File(recipes + "/" + block.getRegistryName().getPath() + "_from_full_stonecutter.json");
-                    File recipeStonecutter2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_from_stair_stonecutter.json");
-                    File recipeStonecutter3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_from_slab_stonecutter.json");
+                    File recipeStonecutter1 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_from_full_stonecutter.json");
+                    File recipeStonecutter2 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_from_stair_stonecutter.json");
+                    File recipeStonecutter3 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_from_slab_stonecutter.json");
 
                     if(!recipeStonecutter1.exists()) {
 
                         InputStream in1 = getResourceStream("/default/crafting_4_from_1_stonecutter.json");
                         OutputStream out1 = new FileOutputStream(recipeStonecutter1);
-                        copyFileAndReplace(in1, out1, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), block.getRegistryName().toString()});
+                        copyFileAndReplace(in1, out1, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
 
                         hasGenerated = true;
 
                     }
 
                     String stair = "", slab = "";
-                    String regName = block.getRegistryName().getPath();
+                    String regName = ForgeRegistries.BLOCKS.getKey(block).getPath();
                     regName = regName.replace("quarter_sas", "");
 
                     for(Block block1 : BlockInit.MY_BLOCKS){
 
-                        if(block1.getRegistryName().getPath().contains(regName)){
+                        if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains(regName)){
 
-                            if(block1.getRegistryName().getPath().contains("stair_sas")){
-                                stair = block1.getRegistryName().toString();
+                            if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains("stair_sas")){
+                                stair = ForgeRegistries.BLOCKS.getKey(block1).toString();
                             }
-                            else if(block1.getRegistryName().getPath().contains("slab_sas")){
-                                slab = block1.getRegistryName().toString();
+                            else if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains("slab_sas")){
+                                slab = ForgeRegistries.BLOCKS.getKey(block1).toString();
                             }
 
                         }
@@ -685,7 +704,7 @@ public final class ResourceGenerator {
                     }
 
                     if(stair.equals("") || slab.equals("")){
-                        LogHelper.error("Could not create crafting recipe 'stonecutter' for block " + block.getRegistryName());
+                        LogHelper.error("Could not create crafting recipe 'stonecutter' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         LogHelper.error("Could not find corresponding slab or stair!");
                     }
                     else{
@@ -695,7 +714,7 @@ public final class ResourceGenerator {
                             InputStream in2 = getResourceStream("/default/crafting_3_from_1_stonecutter.json");
                             OutputStream out2 = new FileOutputStream(recipeStonecutter2);
 
-                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input", "placeholder_output"}, new String[]{stair, block.getRegistryName().toString()});
+                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input", "placeholder_output"}, new String[]{stair, ForgeRegistries.BLOCKS.getKey(block).toString()});
                             hasGenerated = true;
 
                         }
@@ -704,7 +723,7 @@ public final class ResourceGenerator {
                             InputStream in3 = getResourceStream("/default/crafting_2_from_1_stonecutter.json");
                             OutputStream out3 = new FileOutputStream(recipeStonecutter3);
 
-                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output"}, new String[]{slab, block.getRegistryName().toString()});
+                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output"}, new String[]{slab, ForgeRegistries.BLOCKS.getKey(block).toString()});
                             hasGenerated = true;
 
                         }
@@ -714,27 +733,27 @@ public final class ResourceGenerator {
                 }
 
                 //Shapeless recipes
-                if(block.getRegistryName().getPath().contains("stair_sas")){
+                if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")){
 
-                    File recipeShapeless1 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless1.json");
-                    File recipeShapeless2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless2.json");
-                    File recipeShapeless3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless3.json");
-                    File recipeShapeless4 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless4.json");
+                    File recipeShapeless1 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless1.json");
+                    File recipeShapeless2 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless2.json");
+                    File recipeShapeless3 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless3.json");
+                    File recipeShapeless4 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless4.json");
 
 
                     String quarter = "", slab = "";
-                    String regName = block.getRegistryName().getPath();
+                    String regName = ForgeRegistries.BLOCKS.getKey(block).getPath();
                     regName = regName.replace("stair_sas", "");
 
                     for(Block block1 : BlockInit.MY_BLOCKS){
 
-                        if(block1.getRegistryName().getPath().contains(regName)){
+                        if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains(regName)){
 
-                            if(block1.getRegistryName().getPath().contains("quarter_sas")){
-                                quarter = block1.getRegistryName().toString();
+                            if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains("quarter_sas")){
+                                quarter = ForgeRegistries.BLOCKS.getKey(block1).toString();
                             }
-                            else if(block1.getRegistryName().getPath().contains("slab_sas")){
-                                slab = block1.getRegistryName().toString();
+                            else if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains("slab_sas")){
+                                slab = ForgeRegistries.BLOCKS.getKey(block1).toString();
                             }
 
                         }
@@ -742,7 +761,7 @@ public final class ResourceGenerator {
                     }
 
                     if(quarter.equals("") || slab.equals("")){
-                        LogHelper.error("Could not create crafting recipe 'shapeless' for block " + block.getRegistryName());
+                        LogHelper.error("Could not create crafting recipe 'shapeless' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         LogHelper.error("Could not find corresponding slab or quarter!");
                     }
                     else {
@@ -752,7 +771,7 @@ public final class ResourceGenerator {
                             InputStream in1 = getResourceStream("/default/crafting_shapeless_3_to_1.json");
                             OutputStream out1 = new FileOutputStream(recipeShapeless1);
 
-                            copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_output"}, new String[]{quarter, quarter, quarter, block.getRegistryName().toString()});
+                            copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_output"}, new String[]{quarter, quarter, quarter, ForgeRegistries.BLOCKS.getKey(block).toString()});
                             hasGenerated = true;
 
                         }
@@ -761,7 +780,7 @@ public final class ResourceGenerator {
                             InputStream in2 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out2 = new FileOutputStream(recipeShapeless2);
 
-                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, slab, block.getRegistryName().toString()});
+                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, slab, ForgeRegistries.BLOCKS.getKey(block).toString()});
                             hasGenerated = true;
 
                         }
@@ -770,7 +789,7 @@ public final class ResourceGenerator {
                             InputStream in3 = getResourceStream("/default/crafting_shapeless_1_to_x.json");
                             OutputStream out3 = new FileOutputStream(recipeShapeless3);
 
-                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "3"});
+                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{ForgeRegistries.BLOCKS.getKey(block).toString(), quarter, "3"});
                             hasGenerated = true;
 
                         }
@@ -779,7 +798,7 @@ public final class ResourceGenerator {
                             InputStream in4 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out4 = new FileOutputStream(recipeShapeless4);
 
-                            copyFileAndReplace(in4, out4, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), quarter, ((SlabBlock) block).getBaseBlock()});
+                            copyFileAndReplace(in4, out4, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{ForgeRegistries.BLOCKS.getKey(block).toString(), quarter, ((SlabBlock) block).getBaseBlock()});
                             hasGenerated = true;
 
                         }
@@ -787,22 +806,22 @@ public final class ResourceGenerator {
                     }
 
                 }
-                else if(block.getRegistryName().getPath().contains("slab_sas")){
+                else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")){
 
-                    File recipeShapeless1 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless1.json");
-                    File recipeShapeless2 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless2.json");
-                    File recipeShapeless3 = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless3.json");
+                    File recipeShapeless1 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless1.json");
+                    File recipeShapeless2 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless2.json");
+                    File recipeShapeless3 = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless3.json");
 
                     String quarter = "";
-                    String regName = block.getRegistryName().getPath();
+                    String regName = ForgeRegistries.BLOCKS.getKey(block).getPath();
                     regName = regName.replace("slab_sas", "");
 
                     for(Block block1 : BlockInit.MY_BLOCKS){
 
-                        if(block1.getRegistryName().getPath().contains(regName)){
+                        if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains(regName)){
 
-                            if(block1.getRegistryName().getPath().contains("quarter_sas")){
-                                quarter = block1.getRegistryName().toString();
+                            if(ForgeRegistries.BLOCKS.getKey(block1).getPath().contains("quarter_sas")){
+                                quarter = ForgeRegistries.BLOCKS.getKey(block1).toString();
                             }
 
                         }
@@ -810,7 +829,7 @@ public final class ResourceGenerator {
                     }
 
                     if(quarter.equals("")){
-                        LogHelper.error("Could not create crafting recipe 'shapeless' for block " + block.getRegistryName());
+                        LogHelper.error("Could not create crafting recipe 'shapeless' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         LogHelper.error("Could not find corresponding quarter!");
                     }
                     else {
@@ -820,7 +839,7 @@ public final class ResourceGenerator {
                             InputStream in1 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out1 = new FileOutputStream(recipeShapeless1);
 
-                            copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, quarter, block.getRegistryName().toString()});
+                            copyFileAndReplace(in1, out1, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{quarter, quarter, ForgeRegistries.BLOCKS.getKey(block).toString()});
                             hasGenerated = true;
 
                         }
@@ -829,7 +848,7 @@ public final class ResourceGenerator {
                             InputStream in2 = getResourceStream("/default/crafting_shapeless_2_to_1.json");
                             OutputStream out2 = new FileOutputStream(recipeShapeless2);
 
-                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
+                            copyFileAndReplace(in2, out2, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_output"}, new String[]{ForgeRegistries.BLOCKS.getKey(block).toString(), ForgeRegistries.BLOCKS.getKey(block).toString(), ((SlabBlock) block).getBaseBlock()});
                             hasGenerated = true;
 
                         }
@@ -838,7 +857,7 @@ public final class ResourceGenerator {
                             InputStream in3 = getResourceStream("/default/crafting_shapeless_1_to_x.json");
                             OutputStream out3 = new FileOutputStream(recipeShapeless3);
 
-                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{block.getRegistryName().toString(), quarter, "2"});
+                            copyFileAndReplace(in3, out3, new String[]{"placeholder_input", "placeholder_output", "placeholder_count"}, new String[]{ForgeRegistries.BLOCKS.getKey(block).toString(), quarter, "2"});
                             hasGenerated = true;
 
                         }
@@ -846,15 +865,15 @@ public final class ResourceGenerator {
                     }
 
                 }
-                else if(block.getRegistryName().getPath().contains("quarter_sas")){
+                else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")){
 
-                    File recipeShapeless = new File(recipes + "/" + block.getRegistryName().getPath() + "_shapeless.json");
+                    File recipeShapeless = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_shapeless.json");
 
                     if(!recipeShapeless.exists()) {
 
                         InputStream in = getResourceStream("/default/crafting_shapeless_4_to_1.json");
                         OutputStream out = new FileOutputStream(recipeShapeless);
-                        copyFileAndReplace(in, out, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_input4", "placeholder_output"}, new String[]{block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), block.getRegistryName().toString(), ((SlabBlock) block).getBaseBlock()});
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input1", "placeholder_input2", "placeholder_input3", "placeholder_input4", "placeholder_output"}, new String[]{ForgeRegistries.BLOCKS.getKey(block).toString(), ForgeRegistries.BLOCKS.getKey(block).toString(), ForgeRegistries.BLOCKS.getKey(block).toString(), ForgeRegistries.BLOCKS.getKey(block).toString(), ((SlabBlock) block).getBaseBlock()});
 
                         hasGenerated = true;
 
@@ -864,17 +883,17 @@ public final class ResourceGenerator {
 
 
                 //Loot tables
-                File lootTable = new File(lootTables + "/" + block.getRegistryName().getPath() + ".json");
+                File lootTable = new File(lootTables + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + ".json");
 
                 if(!lootTable.exists() || !lootTable.isFile()){
                     if(!lootTable.createNewFile()){
-                        LogHelper.error("Could not create loot table file for block " + block.getRegistryName());
+                        LogHelper.error("Could not create loot table file for block " + ForgeRegistries.BLOCKS.getKey(block));
                         continue;
                     }
 
                     InputStream in = getResourceStream("/default/loot_table.json");
                     OutputStream out = new FileOutputStream(lootTable);
-                    copyFileAndReplace(in, out, "placeholder_block", block.getRegistryName().toString());
+                    copyFileAndReplace(in, out, "placeholder_block", ForgeRegistries.BLOCKS.getKey(block).toString());
 
                     hasGenerated = true;
 

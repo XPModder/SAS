@@ -393,7 +393,7 @@ public class QuarterBlock extends SlabBlock {
 
                 Block base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock));
                 if(base == null){
-                    LogHelper.error("Error: Could not get Base Block for " + this.getRegistryName());
+                    LogHelper.error("Error: Could not get Base Block for " + ForgeRegistries.BLOCKS.getKey(this));
                     return InteractionResult.PASS;
                 }
 

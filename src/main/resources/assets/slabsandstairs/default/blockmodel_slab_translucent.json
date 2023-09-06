@@ -1,0 +1,9 @@
+{
+  "parent": "slabsandstairs:block/vertical_slab",
+  "render_type": "translucent",
+  "textures": {
+    "bottom": "texture_path_bottom",
+    "top": "texture_path_top",
+    "side": "texture_path_side"
+  }
+}

@@ -23,6 +23,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -108,7 +109,7 @@ public class PreviewRenderer {
 
         matrixStack.scale(1.0f, 1.0f, 1.0f);
 
-        blockRendererDispatcher.getModelRenderer().renderModel(matrixStack.last(), instance.renderBuffers().bufferSource().getBuffer(RenderType.translucent()), blockState, blockRendererDispatcher.getBlockModel(blockState), 255.0f, 255.0f, 255.0f, 15728880, OverlayTexture.NO_OVERLAY, net.minecraftforge.client.model.data.EmptyModelData.INSTANCE);
+        blockRendererDispatcher.getModelRenderer().renderModel(matrixStack.last(), instance.renderBuffers().bufferSource().getBuffer(RenderType.translucent()), blockState, blockRendererDispatcher.getBlockModel(blockState), 255.0f, 255.0f, 255.0f, 15728880, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.translucent());
 
         matrixStack.popPose();
     }

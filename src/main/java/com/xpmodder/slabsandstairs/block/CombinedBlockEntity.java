@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -79,7 +79,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 1) {
 
-            tag.putString("block1", this.Block1.getBlock().getRegistryName().toString());
+            tag.putString("block1", ForgeRegistries.BLOCKS.getKey(this.Block1.getBlock()).toString());
             tag.putString("block1Dir", this.Block1.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block1Inv", this.Block1.getValue(StairBlock.INVERTED));
 
@@ -87,7 +87,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 2) {
 
-            tag.putString("block2", this.Block2.getBlock().getRegistryName().toString());
+            tag.putString("block2", ForgeRegistries.BLOCKS.getKey(this.Block2.getBlock()).toString());
             tag.putString("block2Dir", this.Block2.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block2Inv", this.Block2.getValue(StairBlock.INVERTED));
 
@@ -95,7 +95,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 3) {
 
-            tag.putString("block3", this.Block3.getBlock().getRegistryName().toString());
+            tag.putString("block3", ForgeRegistries.BLOCKS.getKey(this.Block3.getBlock()).toString());
             tag.putString("block3Dir", this.Block3.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block3Inv", this.Block3.getValue(StairBlock.INVERTED));
 
@@ -103,7 +103,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 4) {
 
-            tag.putString("block4", this.Block4.getBlock().getRegistryName().toString());
+            tag.putString("block4", ForgeRegistries.BLOCKS.getKey(this.Block4.getBlock()).toString());
             tag.putString("block4Dir", this.Block4.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block4Inv", this.Block4.getValue(StairBlock.INVERTED));
 
@@ -226,17 +226,17 @@ public class CombinedBlockEntity extends BlockEntity {
 
     @NotNull
     @Override
-    public IModelData getModelData() {
+    public ModelData getModelData() {
 
-        IModelData data = CombinedBlockBakedModel.getEmptyIModelData();
+        ModelData.Builder builder = ModelData.builder();
 
-        data.setData(CombinedBlockBakedModel.BLOCK1, this.Block1);
-        data.setData(CombinedBlockBakedModel.BLOCK2, this.Block2);
-        data.setData(CombinedBlockBakedModel.BLOCK3, this.Block3);
-        data.setData(CombinedBlockBakedModel.BLOCK4, this.Block4);
-        data.setData(CombinedBlockBakedModel.NUM_BLOCKS, this.numSubBlocks);
+        builder.with(CombinedBlockBakedModel.BLOCK1, this.Block1)
+                .with(CombinedBlockBakedModel.BLOCK2, this.Block2)
+                .with(CombinedBlockBakedModel.BLOCK3, this.Block3)
+                .with(CombinedBlockBakedModel.BLOCK4, this.Block4)
+                .with(CombinedBlockBakedModel.NUM_BLOCKS, this.numSubBlocks);
 
-        return data;
+        return builder.build();
     }
 
 

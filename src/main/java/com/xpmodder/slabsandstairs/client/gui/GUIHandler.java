@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 public class GUIHandler {
 
     @SubscribeEvent
-    public static void onGuiInit(ScreenEvent.InitScreenEvent event){
+    public static void onGuiInit(ScreenEvent.Init event){
 
         if(!BlockListHandler.correctVersion && event.getScreen() instanceof TitleScreen){
             Screen oldScreen = Minecraft.getInstance().screen;

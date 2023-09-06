@@ -1,5 +1,6 @@
 {
   "parent": "slabsandstairs:block/vertical_slab",
+  "render_type": "translucent",
   "textures": {
     "bottom": "slabsandstairs:block/preview_block",
     "top": "slabsandstairs:block/preview_block",

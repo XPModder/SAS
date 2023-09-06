@@ -6,25 +6,26 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModelBakeEventHandler {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    public void onBakeModel(ModelBakeEvent event){
+    public void onBakeModel(ModelEvent.BakingCompleted event){
 
         for(BlockState state : BlockInit.combinedBlock.get().getStateDefinition().getPossibleStates()){
 
             ModelResourceLocation location = BlockModelShaper.stateToModelLocation(state);
 
-            event.getModelRegistry().put(location, new CombinedBlockBakedModel());
+            event.getModels().put(location, new CombinedBlockBakedModel());
 
         }
 
-        ModelResourceLocation location = new ModelResourceLocation(BlockInit.combinedBlock.get().getRegistryName(), "inventory");
-        event.getModelRegistry().put(location, new CombinedBlockBakedModel());
+        ModelResourceLocation location = new ModelResourceLocation(ForgeRegistries.BLOCKS.getKey(BlockInit.combinedBlock.get()), "inventory");
+        event.getModels().put(location, new CombinedBlockBakedModel());
 
     }
 
