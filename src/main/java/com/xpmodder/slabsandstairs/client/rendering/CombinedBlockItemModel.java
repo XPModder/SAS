@@ -103,7 +103,7 @@ public class CombinedBlockItemModel extends CombinedBlockBakedModel {
         }
 
         if(!tr.isIdentity()) {
-            tr.push(poseStack);
+            poseStack.pushTransformation(tr);
         }
         return model;
 
