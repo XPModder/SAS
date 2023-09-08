@@ -3,7 +3,9 @@ package com.xpmodder.slabsandstairs.utility;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.xpmodder.slabsandstairs.SlabsAndStairs;
+import com.xpmodder.slabsandstairs.block.FenceBlock;
 import com.xpmodder.slabsandstairs.block.SlabBlock;
+import com.xpmodder.slabsandstairs.block.WallBlock;
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import net.minecraft.client.Minecraft;
@@ -109,29 +111,38 @@ public final class ResourceGenerator {
             else if(object.getAsJsonObject("textures").has("all")){
                 output = object.getAsJsonObject("textures").get("all").getAsString();
             }
-            else if(object.getAsJsonObject("textures").has("end")){
-                output = object.getAsJsonObject("textures").get("end").getAsString();
-            }
             else if(object.getAsJsonObject("textures").has("pattern")){
                 output = object.getAsJsonObject("textures").get("pattern").getAsString();
             }
-            else if(object.getAsJsonObject("textures").has("up") && texture.contains("top")){
-                output = object.getAsJsonObject("textures").get("up").getAsString();
+            else if(object.getAsJsonObject("textures").has("side")){
+                output = object.getAsJsonObject("textures").get("side").getAsString();
             }
-            else if(object.getAsJsonObject("textures").has("down") && texture.contains("bottom")){
-                output = object.getAsJsonObject("textures").get("down").getAsString();
-            }
-            else if(object.getAsJsonObject("textures").has("north") && texture.contains("side")){
+            else if(object.getAsJsonObject("textures").has("north")){
                 output = object.getAsJsonObject("textures").get("north").getAsString();
             }
-            else if(object.getAsJsonObject("textures").has("east") && texture.contains("side")){
+            else if(object.getAsJsonObject("textures").has("east")){
                 output = object.getAsJsonObject("textures").get("east").getAsString();
             }
-            else if(object.getAsJsonObject("textures").has("south") && texture.contains("side")){
+            else if(object.getAsJsonObject("textures").has("south")){
                 output = object.getAsJsonObject("textures").get("south").getAsString();
             }
-            else if(object.getAsJsonObject("textures").has("west") && texture.contains("side")){
+            else if(object.getAsJsonObject("textures").has("west")){
                 output = object.getAsJsonObject("textures").get("west").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("end")){
+                output = object.getAsJsonObject("textures").get("end").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("up")){
+                output = object.getAsJsonObject("textures").get("up").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("down")){
+                output = object.getAsJsonObject("textures").get("down").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("bottom")){
+                output = object.getAsJsonObject("textures").get("bottom").getAsString();
+            }
+            else if(object.getAsJsonObject("textures").has("top")){
+                output = object.getAsJsonObject("textures").get("top").getAsString();
             }
 
         }
@@ -245,6 +256,8 @@ public final class ResourceGenerator {
             case AXE -> addToTag(block, Reference.AXE_MINEABLE);
             case SHOVEL -> addToTag(block, Reference.SHOVEL_MINEABLE);
             case HOE -> addToTag(block, Reference.HOE_MINEABLE);
+            case FENCE -> addToTag(block, Reference.FENCES);
+            case WALL -> addToTag(block, Reference.WALLS);
         }
     }
 
@@ -368,8 +381,19 @@ public final class ResourceGenerator {
                     //Language file entry
                     //Get the key and the name of the base block
                     String key = block.getDescriptionId();
-                    String baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock())));
-                    Block baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock()));
+                    String baseBlockName = "";
+                    Block baseBlock;
+                    if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")){
+                        baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((FenceBlock) block).getBaseBlock())));
+                        baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((FenceBlock) block).getBaseBlock()));
+                    } else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+                        baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((WallBlock) block).getBaseBlock())));
+                        baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((WallBlock) block).getBaseBlock()));
+                    } else{
+                        baseBlockName = getNameForBlock(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock())));
+                        baseBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(((SlabBlock) block).getBaseBlock()));
+                    }
+
                     String entry = "";
 
                     //If we have multiple entries, add a comma and newline between them
@@ -384,6 +408,10 @@ public final class ResourceGenerator {
                         entry += "\"" + key + "\": \"" + baseBlockName + " Stairs\"";
                     } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")) {
                         entry += "\"" + key + "\": \"" + baseBlockName + " Slab\"";
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")){
+                        entry += "\"" + key + "\": \"" + baseBlockName + " Fence\"";
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+                        entry += "\"" + key + "\": \"" + baseBlockName + " Wall\"";
                     }
 
                     //Then write the new entry to the file
@@ -417,6 +445,10 @@ public final class ResourceGenerator {
                             in = getResourceStream("/default/blockstate_slab.json");
                         } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
                             in = getResourceStream("/default/blockstate_stair.json");
+                        } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")){
+                            in = getResourceStream("/default/blockstate_fence.json");
+                        } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+                            in = getResourceStream("/default/blockstate_wall.json");
                         }
 
                         //Finally copy the data from the default blockstate file to the new file and replace the placeholder with the actual registry name of the block
@@ -556,6 +588,157 @@ public final class ResourceGenerator {
                         }
 
 
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")){
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_post.json";
+
+                        File blockModelPost = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelPost.exists() || !blockModelPost.isFile()) {
+                            if (!blockModelPost.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelPost.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelPost);
+                            InputStream in = getResourceStream("/default/blockmodel_fence_post.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_fence_post_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "texture"));
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_side.json";
+
+                        File blockModelSide = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelSide.exists() || !blockModelSide.isFile()) {
+                            if (!blockModelSide.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelSide.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelSide);
+                            InputStream in = getResourceStream("/default/blockmodel_fence_side.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_fence_side_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "texture"));
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_inventory.json";
+
+                        File blockModelInv = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelInv.exists() || !blockModelInv.isFile()) {
+                            if (!blockModelInv.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelInv.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelInv);
+                            InputStream in = getResourceStream("/default/blockmodel_fence_inventory.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_fence_inventory_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "texture"));
+
+                            hasGenerated = true;
+
+                        }
+
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_post.json";
+
+                        File blockModelPost = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelPost.exists() || !blockModelPost.isFile()) {
+                            if (!blockModelPost.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelPost.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelPost);
+                            InputStream in = getResourceStream("/default/blockmodel_wall_post.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_wall_post_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "wall"));
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_side.json";
+
+                        File blockModelSide = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelSide.exists() || !blockModelSide.isFile()) {
+                            if (!blockModelSide.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelSide.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelSide);
+                            InputStream in = getResourceStream("/default/blockmodel_wall_side.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_wall_side_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "wall"));
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_side_tall.json";
+
+                        File blockModelSideTall = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelSideTall.exists() || !blockModelSideTall.isFile()) {
+                            if (!blockModelSideTall.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelSideTall.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelSideTall);
+                            InputStream in = getResourceStream("/default/blockmodel_wall_side_tall.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_wall_side_tall_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "wall"));
+
+                            hasGenerated = true;
+
+                        }
+
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_inventory.json";
+
+                        File blockModelInv = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelInv.exists() || !blockModelInv.isFile()) {
+                            if (!blockModelInv.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelInv.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelInv);
+                            InputStream in = getResourceStream("/default/blockmodel_wall_inventory.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_wall_inventory_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "wall"));
+
+                            hasGenerated = true;
+
+                        }
+
                     }
 
 
@@ -570,7 +753,11 @@ public final class ResourceGenerator {
                         }
 
                         FileWriter writer = new FileWriter(itemModel);
-                        writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "\"\n}");
+                        if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas") || ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+                            writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_inventory\"\n}");
+                        } else {
+                            writer.write("{\n\t\"parent\": \"" + Reference.MODID + ":block/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "\"\n}");
+                        }
                         writer.close();
 
                         hasGenerated = true;
@@ -594,6 +781,10 @@ public final class ResourceGenerator {
                         in = getResourceStream("/default/crafting_slab_big.json");
                     } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
                         in = getResourceStream("/default/crafting_stair_big.json");
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")) {
+                        in = getResourceStream("/default/crafting_fence_big.json");
+                    } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")) {
+                        in = getResourceStream("/default/crafting_wall_big.json");
                     }
 
                     if(!recipeBig.createNewFile() || in == null){
@@ -602,39 +793,48 @@ public final class ResourceGenerator {
                     }
 
                     OutputStream out = new FileOutputStream(recipeBig);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
+                    String baseBlock = "";
+                    if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")){
+                        baseBlock = ((FenceBlock) block).getBaseBlock();
+                    } else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+                        baseBlock = ((WallBlock) block).getBaseBlock();
+                    } else{
+                        baseBlock = ((SlabBlock) block).getBaseBlock();
+                    }
+
+                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ baseBlock, ForgeRegistries.BLOCKS.getKey(block).toString()});
 
                     hasGenerated = true;
 
                 }
 
                 //Regular crafting small recipes (2x2 grid in inventory)
-                File recipeSmall = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_small.json");
+                if(!ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas") && !ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")) {
+                    File recipeSmall = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_small.json");
 
-                if(!recipeSmall.exists() || !recipeSmall.isFile()){
+                    if (!recipeSmall.exists() || !recipeSmall.isFile()) {
 
-                    InputStream in = null;
+                        InputStream in = null;
 
-                    if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")){
-                        in = getResourceStream("/default/crafting_quarter_small.json");
+                        if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("quarter_sas")) {
+                            in = getResourceStream("/default/crafting_quarter_small.json");
+                        } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")) {
+                            in = getResourceStream("/default/crafting_slab_small.json");
+                        } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")) {
+                            in = getResourceStream("/default/crafting_stair_small.json");
+                        }
+
+                        if (!recipeSmall.createNewFile() || in == null) {
+                            LogHelper.error("Could not create crafting recipe 'small' for block " + ForgeRegistries.BLOCKS.getKey(block));
+                            continue;
+                        }
+
+                        OutputStream out = new FileOutputStream(recipeSmall);
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
+
+                        hasGenerated = true;
+
                     }
-                    else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("slab_sas")){
-                        in = getResourceStream("/default/crafting_slab_small.json");
-                    }
-                    else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")){
-                        in = getResourceStream("/default/crafting_stair_small.json");
-                    }
-
-                    if(!recipeSmall.createNewFile() || in == null){
-                        LogHelper.error("Could not create crafting recipe 'small' for block " + ForgeRegistries.BLOCKS.getKey(block));
-                        continue;
-                    }
-
-                    OutputStream out = new FileOutputStream(recipeSmall);
-                    copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{ ((SlabBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
-
-                    hasGenerated = true;
-
                 }
 
                 //Stonecutter crafting recipes
@@ -730,7 +930,36 @@ public final class ResourceGenerator {
 
                     }
 
+                } else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("fence_sas")){
+
+                    File recipeStonecutter = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_stonecutter.json");
+
+                    if(!recipeStonecutter.exists()) {
+
+                        InputStream in = getResourceStream("/default/crafting_1_from_1_stonecutter.json");
+                        OutputStream out = new FileOutputStream(recipeStonecutter);
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((FenceBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
+
+                        hasGenerated = true;
+
+                    }
+
+                } else if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
+
+                    File recipeStonecutter = new File(recipes + "/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + "_stonecutter.json");
+
+                    if(!recipeStonecutter.exists()) {
+
+                        InputStream in = getResourceStream("/default/crafting_1_from_1_stonecutter.json");
+                        OutputStream out = new FileOutputStream(recipeStonecutter);
+                        copyFileAndReplace(in, out, new String[]{"placeholder_input", "placeholder_output"}, new String[]{((WallBlock) block).getBaseBlock(), ForgeRegistries.BLOCKS.getKey(block).toString()});
+
+                        hasGenerated = true;
+
+                    }
+
                 }
+
 
                 //Shapeless recipes
                 if(ForgeRegistries.BLOCKS.getKey(block).getPath().contains("stair_sas")){

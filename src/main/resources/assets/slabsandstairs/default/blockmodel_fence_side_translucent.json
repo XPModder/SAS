@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/fence_side",
+  "render_type": "translucent",
+  "textures": {
+    "texture": "placeholder"
+  }
+}

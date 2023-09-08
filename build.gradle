@@ -16,7 +16,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 
 
-version = '1.19.2-0.8.0b'
+version = '1.19.2-0.8.5b'
 group = 'com.xpmodder.slabsandstairs' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'slabsandstairs'
 

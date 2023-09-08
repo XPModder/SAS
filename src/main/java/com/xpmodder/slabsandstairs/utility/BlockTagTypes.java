@@ -5,7 +5,9 @@ public enum BlockTagTypes {
     PICKAXE("pickaxe"),
     AXE("axe"),
     SHOVEL("shovel"),
-    HOE("hoe");
+    HOE("hoe"),
+    FENCE("fence"),
+    WALL("wall");
 
     private final String name;
     BlockTagTypes(String name){
@@ -28,6 +30,12 @@ public enum BlockTagTypes {
         }
         else if(HOE.getName().equals(name)){
             return HOE;
+        }
+        else if(FENCE.getName().equals(name)){
+            return FENCE;
+        }
+        else if(WALL.getName().equals(name)){
+            return WALL;
         }
         return null;
     }

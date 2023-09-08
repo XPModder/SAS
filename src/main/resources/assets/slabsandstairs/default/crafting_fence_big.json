@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "ASA",
+    "ASA"
+  ],
+  "key": {
+    "A": {
+      "item": "placeholder_input"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "placeholder_output",
+    "count": 4
+  }
+}

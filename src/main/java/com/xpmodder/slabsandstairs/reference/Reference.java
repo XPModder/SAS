@@ -18,6 +18,8 @@ public class Reference {
     public static final File AXE_MINEABLE = new File(BLOCK_TAGS_FOLDER, "mineable/axe.json");
     public static final File SHOVEL_MINEABLE = new File(BLOCK_TAGS_FOLDER, "mineable/shovel.json");
     public static final File HOE_MINEABLE = new File(BLOCK_TAGS_FOLDER, "mineable/hoe.json");
+    public static final File FENCES = new File(BLOCK_TAGS_FOLDER, "fences.json");
+    public static final File WALLS = new File(BLOCK_TAGS_FOLDER, "walls.json");
 
     public static final String KEY_CATEGORY = "key.categories." + MODID;
 

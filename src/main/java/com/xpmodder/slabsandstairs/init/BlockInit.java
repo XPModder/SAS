@@ -1,10 +1,7 @@
 package com.xpmodder.slabsandstairs.init;
 
 import com.xpmodder.slabsandstairs.SlabsAndStairs;
-import com.xpmodder.slabsandstairs.block.CombinedBlock;
-import com.xpmodder.slabsandstairs.block.QuarterBlock;
-import com.xpmodder.slabsandstairs.block.SlabBlock;
-import com.xpmodder.slabsandstairs.block.StairBlock;
+import com.xpmodder.slabsandstairs.block.*;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import com.xpmodder.slabsandstairs.utility.BlockTagTypes;
 import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
@@ -45,6 +42,8 @@ public class BlockInit {
         String RegistryNameQuarter = RegistryPath + "_quarter_sas";
         String RegistryNameSlab = RegistryPath + "_slab_sas";
         String RegistryNameStair = RegistryPath + "_stair_sas";
+        String RegistryNameFence = RegistryPath + "_fence_sas";
+        String RegistryNameWall = RegistryPath + "_wall_sas";
 
         BLOCKS.register(RegistryNameQuarter, () -> {
             QuarterBlock quarter;
@@ -103,6 +102,47 @@ public class BlockInit {
             }
             return stair;
         });
+        BLOCKS.register(RegistryNameFence, () -> {
+            FenceBlock fence;
+            if(material == Material.GLASS) {
+                fence = new FenceBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state) -> (light * 3) / 4).noOcclusion());
+            }
+            else{
+                fence = new FenceBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state) -> (light * 3) / 4));
+            }
+            fence.setReferenceBlocks(RegistryName);
+            fence.setPower((power*3)/4);
+            MY_BLOCKS.add(fence);
+            Item newItem = new BlockItem(fence, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
+            ITEMS.register(RegistryNameFence, () -> newItem);
+            MY_ITEMS.add(newItem);
+            ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameFence).toString(), BlockTagTypes.FENCE);
+            if(tool != null) {
+                ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameFence).toString(), tool);
+            }
+            return fence;
+        });
+        BLOCKS.register(RegistryNameWall, () -> {
+            WallBlock wall;
+            if(material == Material.GLASS) {
+                wall = new WallBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state) -> (light * 3) / 4).noOcclusion());
+            }
+            else{
+                wall = new WallBlock(BlockBehaviour.Properties.of(material).strength(strength).lightLevel((state) -> (light * 3) / 4));
+            }
+            wall.setReferenceBlocks(RegistryName);
+            wall.setPower((power*3)/4);
+            MY_BLOCKS.add(wall);
+            Item newItem = new BlockItem(wall, new Item.Properties().tab(SlabsAndStairs.ITEM_GROUP_SAS));
+            ITEMS.register(RegistryNameWall, () -> newItem);
+            MY_ITEMS.add(newItem);
+            ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameWall).toString(), BlockTagTypes.WALL);
+            if(tool != null) {
+                ResourceGenerator.addToTag(new ResourceLocation(Reference.MODID, RegistryNameWall).toString(), tool);
+            }
+            return wall;
+        });
+
 
     }
 
