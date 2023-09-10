@@ -2,6 +2,7 @@ package com.xpmodder.slabsandstairs.client.rendering;
 
 import com.xpmodder.slabsandstairs.init.BlockInit;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
+import com.xpmodder.slabsandstairs.utility.Rect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -11,6 +12,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.ChunkRenderTypeSet;
 import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.ModelData;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
@@ -30,7 +33,7 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     public static ModelProperty<Integer> NUM_BLOCKS = new ModelProperty<>();
 
 
-    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data){
+    public @NotNull ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data){
         return ChunkRenderTypeSet.of(RenderType.translucent());
     }
 
@@ -45,25 +48,78 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
 
         try {
 
+            List<BakedQuad> removeList = new ArrayList<>();
+            List<BakedQuad> transparentQuads = new ArrayList<>();
+            List<BakedQuad> partiallyCovered = new ArrayList<>();
+
             if (extraData.has(NUM_BLOCKS)) {
 
                 if (extraData.get(NUM_BLOCKS) >= 1) {
-                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK1)).getQuads(extraData.get(BLOCK1), side, rand, extraData, type));
+                    //Get the quads from the block, remove any that are in the same place as existing quads, mark corresponding existing quad for removal and add remaining quads
+                    List<BakedQuad> model = shaper.getBlockModel(Objects.requireNonNull(extraData.get(BLOCK1))).getQuads(extraData.get(BLOCK1), side, rand, extraData, type);
+                    if(Objects.requireNonNull(extraData.get(BLOCK1)).getMaterial() == Material.GLASS){
+                        transparentQuads.addAll(model);
+                    }
+                    quads.addAll(model);
                 }
                 if (extraData.get(NUM_BLOCKS) >= 2) {
-                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK2)).getQuads(extraData.get(BLOCK2), side, rand, extraData, type));
+                    List<BakedQuad> model = shaper.getBlockModel(Objects.requireNonNull(extraData.get(BLOCK2))).getQuads(extraData.get(BLOCK2), side, rand, extraData, type);
+                    if(Objects.requireNonNull(extraData.get(BLOCK2)).getMaterial() == Material.GLASS){
+                        transparentQuads.addAll(model);
+                    }
+                    quads.addAll(model);
                 }
                 if (extraData.get(NUM_BLOCKS) >= 3) {
-                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK3)).getQuads(extraData.get(BLOCK3), side, rand, extraData, type));
+                    List<BakedQuad> model = shaper.getBlockModel(Objects.requireNonNull(extraData.get(BLOCK3))).getQuads(extraData.get(BLOCK3), side, rand, extraData, type);
+                    if(Objects.requireNonNull(extraData.get(BLOCK3)).getMaterial() == Material.GLASS){
+                        transparentQuads.addAll(model);
+                    }
+                    quads.addAll(model);
                 }
                 if (extraData.get(NUM_BLOCKS) == 4) {
-                    quads.addAll(shaper.getBlockModel(extraData.get(BLOCK4)).getQuads(extraData.get(BLOCK4), side, rand, extraData, type));
+                    List<BakedQuad> model = shaper.getBlockModel(Objects.requireNonNull(extraData.get(BLOCK4))).getQuads(extraData.get(BLOCK4), side, rand, extraData, type);
+                    if(Objects.requireNonNull(extraData.get(BLOCK4)).getMaterial() == Material.GLASS){
+                        transparentQuads.addAll(model);
+                    }
+                    quads.addAll(model);
                 }
 
             }
             else{
                 quads.addAll(shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getQuads(BlockInit.previewSlab.get().defaultBlockState(), side, rand, extraData, type));
             }
+
+            for(int i = 0; i < quads.size(); i++){
+                for(int j = 0; j < quads.size(); j++){
+                    if(i != j && !removeList.contains(quads.get(j))){
+                        int res = Rect.fromQuad(quads.get(i)).compareTo(Rect.fromQuad(quads.get(j)));
+                        if(res == 0){
+                            if(transparentQuads.contains(quads.get(i)) && !transparentQuads.contains(quads.get(j))){
+                                removeList.add(quads.get(i));
+                            } else if(transparentQuads.contains(quads.get(j)) && !transparentQuads.contains(quads.get(i))){
+                                removeList.add(quads.get(j));
+                            } else {
+                                removeList.add(quads.get(i));
+                                removeList.add(quads.get(j));
+                            }
+                        } else if(res == 1){
+                            if(transparentQuads.contains(quads.get(j)) && !transparentQuads.contains(quads.get(i))){
+                                continue;
+                            }
+                            removeList.add(quads.get(i));
+                            if(partiallyCovered.contains(quads.get(j))){
+                                removeList.add(quads.get(j));
+                            } else {
+                                partiallyCovered.add(quads.get(j));
+                            }
+                        }
+                    }
+                }
+            }
+
+            //LogHelper.info(removeList.size() + " quads marked for removal!");
+            //Remove all quads that were marked for removal, thus completely removing duplicate faces
+            quads.removeAll(removeList);
 
 
         }
@@ -107,26 +163,26 @@ public class CombinedBlockBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public TextureAtlasSprite getParticleIcon(ModelData modelData){
+    public @NotNull TextureAtlasSprite getParticleIcon(ModelData modelData){
         BlockModelShaper shaper = Minecraft.getInstance().getModelManager().getBlockModelShaper();
-        if(modelData.has(BLOCK4) && modelData.get(BLOCK4) != null && !modelData.get(BLOCK4).isAir()){
+        if(modelData.has(BLOCK4) && modelData.get(BLOCK4) != null && !Objects.requireNonNull(modelData.get(BLOCK4)).isAir()){
 
-            return shaper.getBlockModel(modelData.get(BLOCK4)).getParticleIcon(ModelData.builder().build());
-
-        }
-        else if(modelData.has(BLOCK3) && modelData.get(BLOCK3) != null && !modelData.get(BLOCK3).isAir()){
-
-            return shaper.getBlockModel(modelData.get(BLOCK3)).getParticleIcon(ModelData.builder().build());
+            return shaper.getBlockModel(Objects.requireNonNull(modelData.get(BLOCK4))).getParticleIcon(ModelData.builder().build());
 
         }
-        else if(modelData.has(BLOCK2) && modelData.get(BLOCK2) != null && !modelData.get(BLOCK2).isAir()){
+        else if(modelData.has(BLOCK3) && modelData.get(BLOCK3) != null && !Objects.requireNonNull(modelData.get(BLOCK3)).isAir()){
 
-            return shaper.getBlockModel(modelData.get(BLOCK2)).getParticleIcon(ModelData.builder().build());
+            return shaper.getBlockModel(Objects.requireNonNull(modelData.get(BLOCK3))).getParticleIcon(ModelData.builder().build());
 
         }
-        else if(modelData.has(BLOCK1) && modelData.get(BLOCK1) != null && !modelData.get(BLOCK1).isAir()){
+        else if(modelData.has(BLOCK2) && modelData.get(BLOCK2) != null && !Objects.requireNonNull(modelData.get(BLOCK2)).isAir()){
 
-            return shaper.getBlockModel(modelData.get(BLOCK1)).getParticleIcon(ModelData.builder().build());
+            return shaper.getBlockModel(Objects.requireNonNull(modelData.get(BLOCK2))).getParticleIcon(ModelData.builder().build());
+
+        }
+        else if(modelData.has(BLOCK1) && modelData.get(BLOCK1) != null && !Objects.requireNonNull(modelData.get(BLOCK1)).isAir()){
+
+            return shaper.getBlockModel(Objects.requireNonNull(modelData.get(BLOCK1))).getParticleIcon(ModelData.builder().build());
 
         }
         return shaper.getBlockModel(BlockInit.previewSlab.get().defaultBlockState()).getParticleIcon(ModelData.builder().build());
