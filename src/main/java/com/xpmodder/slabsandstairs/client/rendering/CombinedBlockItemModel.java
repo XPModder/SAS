@@ -23,7 +23,7 @@ import java.util.List;
 
 import static net.minecraftforge.common.util.TransformationHelper.quatFromXYZ;
 
-
+@SuppressWarnings("unused")
 public class CombinedBlockItemModel extends CombinedBlockBakedModel {
 
     private final BlockState Block1, Block2, Block3, Block4;
@@ -68,7 +68,6 @@ public class CombinedBlockItemModel extends CombinedBlockBakedModel {
         return quads;
     }
 
-    @SuppressWarnings("deprecation")
     public BakedModel handlePerspective(ItemTransforms.TransformType type, PoseStack poseStack)
     {
 

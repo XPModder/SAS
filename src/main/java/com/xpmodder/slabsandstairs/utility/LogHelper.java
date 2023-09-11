@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Level;
 
 import static com.xpmodder.slabsandstairs.SlabsAndStairs.ModLogger;
 
+@SuppressWarnings("unused")
 public class LogHelper {
 
     public static void log(Level logLevel, Object object){

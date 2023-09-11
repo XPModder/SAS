@@ -1,10 +1,10 @@
 package com.xpmodder.slabsandstairs.reference;
 
 import net.minecraftforge.fml.loading.FMLPaths;
-import org.lwjgl.system.CallbackI;
 
 import java.io.File;
 
+@SuppressWarnings("unused")
 public class Reference {
 
     public static final String MODID = "slabsandstairs";

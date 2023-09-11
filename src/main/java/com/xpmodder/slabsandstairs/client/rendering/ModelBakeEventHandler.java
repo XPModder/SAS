@@ -10,6 +10,9 @@ import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Objects;
+
+@SuppressWarnings("unused")
 public class ModelBakeEventHandler {
 
     @SubscribeEvent
@@ -24,7 +27,7 @@ public class ModelBakeEventHandler {
 
         }
 
-        ModelResourceLocation location = new ModelResourceLocation(ForgeRegistries.BLOCKS.getKey(BlockInit.combinedBlock.get()), "inventory");
+        ModelResourceLocation location = new ModelResourceLocation(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(BlockInit.combinedBlock.get())), "inventory");
         event.getModels().put(location, new CombinedBlockBakedModel());
 
     }

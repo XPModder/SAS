@@ -10,6 +10,7 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public class ItemInit {
 
     public static Set<Item> MY_ITEMS = new LinkedHashSet<>();

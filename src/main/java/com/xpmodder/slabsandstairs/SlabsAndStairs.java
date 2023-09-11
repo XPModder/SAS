@@ -41,7 +41,7 @@ public class SlabsAndStairs {
     public static final CreativeModeTab ITEM_GROUP_SAS = new CreativeModeTab("slabs_and_stairs") {
         @Override
         public @NotNull ItemStack makeIcon() {
-            if(BlockInit.MY_BLOCKS.size() > 0) {
+            if(!BlockInit.MY_BLOCKS.isEmpty()) {
                 return new ItemStack(BlockInit.MY_BLOCKS.stream().findFirst().get());
             }
             else{
@@ -74,8 +74,6 @@ public class SlabsAndStairs {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigurationHandler.COMMON_SPEC);
 
         ModPacketHandler.register();
-
-        LogHelper.info("HANDLER");
 
         BlockListHandler.read();
 

@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 @OnlyIn(Dist.CLIENT)
 public class OldVersionScreen extends Screen {
 
-    private Screen oldScreen;
-    private String fileVersion;
+    private final Screen oldScreen;
+    private final String fileVersion;
 
     public OldVersionScreen(Screen oldScreen, String fileVersion) {
         super(Component.literal("File version mismatch"));

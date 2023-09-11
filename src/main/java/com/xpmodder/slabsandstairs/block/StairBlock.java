@@ -1,7 +1,6 @@
 package com.xpmodder.slabsandstairs.block;
 
 import com.xpmodder.slabsandstairs.init.BlockInit;
-import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.network.KeyHandler;
 import com.xpmodder.slabsandstairs.network.ModPacketHandler;
 import com.xpmodder.slabsandstairs.utility.LogHelper;
@@ -38,10 +37,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
 import static net.minecraft.core.Direction.*;
 
+@SuppressWarnings("unused")
 public class StairBlock extends SlabBlock{
 
     public static final EnumProperty<StairsShape> CONNECTED = BlockStateProperties.STAIRS_SHAPE;
@@ -358,7 +359,7 @@ public class StairBlock extends SlabBlock{
 
     }
 
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public @NotNull VoxelShape getShape(BlockState state, @NotNull BlockGetter p_220053_2_, @NotNull BlockPos p_220053_3_, @NotNull CollisionContext p_220053_4_) {
         return makeShape(state.getValue(FACING), state.getValue(INVERTED), state.getValue(CONNECTED));
     }
 
@@ -366,7 +367,7 @@ public class StairBlock extends SlabBlock{
         builder.add(FACING, WATERLOGGED, INVERTED, CONNECTED);
     }
 
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level worldIn, @NotNull BlockPos pos, Player player, @NotNull InteractionHand handIn, @NotNull BlockHitResult hit) {
 
         Block SlabQuarterBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.SlabQuarterBlock));
         Block StairBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.StairBlock));
@@ -383,8 +384,8 @@ public class StairBlock extends SlabBlock{
         Item heldItem = player.getItemInHand(handIn).getItem();
         if(SlabQuarterBlock == getBlockFromItem(heldItem)){
             if(SlabQuarterBlock instanceof QuarterBlock){
-                worldIn.setBlockAndUpdate(pos, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState());
-                SoundType soundType = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock)).defaultBlockState().getSoundType();
+                worldIn.setBlockAndUpdate(pos, Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock))).defaultBlockState());
+                SoundType soundType = Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.BaseBlock))).defaultBlockState().getSoundType();
                 worldIn.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.volume, soundType.pitch);
                 if(!player.isCreative()) {
                     player.getItemInHand(handIn).shrink(1);
@@ -485,8 +486,8 @@ public class StairBlock extends SlabBlock{
         return InteractionResult.PASS;
     }
 
-
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState state2, LevelAccessor accessor, BlockPos pos, BlockPos pos2){
+    @SuppressWarnings("deprecation")
+    public @NotNull BlockState updateShape(BlockState state, @NotNull Direction direction, @NotNull BlockState state2, @NotNull LevelAccessor accessor, @NotNull BlockPos pos, @NotNull BlockPos pos2){
         if (state.getValue(WATERLOGGED)) {
             accessor.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(accessor));
         }
@@ -962,7 +963,7 @@ public class StairBlock extends SlabBlock{
     }
 
 
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
 
         //Get all the neighboring blocks
         BlockState north = worldIn.getBlockState(pos.north());

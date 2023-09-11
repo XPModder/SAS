@@ -7,9 +7,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Objects;
+
+@SuppressWarnings("unused")
 public class WallBlock extends net.minecraft.world.level.block.WallBlock {
 
-    protected String BaseBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
+    protected String BaseBlock = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(Blocks.AIR)).toString();
 
     protected int Power = 0;
 
@@ -29,10 +32,12 @@ public class WallBlock extends net.minecraft.world.level.block.WallBlock {
         this.Power = power;
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isSignalSource(BlockState state) {
         return this.Power > 0;
     }
 
+    @SuppressWarnings("deprecation")
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
         return this.Power;
     }

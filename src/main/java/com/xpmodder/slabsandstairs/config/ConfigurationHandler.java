@@ -3,6 +3,7 @@ package com.xpmodder.slabsandstairs.config;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
+@SuppressWarnings("unused")
 public final class ConfigurationHandler {
 
     public static class Common

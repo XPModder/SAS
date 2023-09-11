@@ -1,7 +1,6 @@
 package com.xpmodder.slabsandstairs.network;
 
 import com.xpmodder.slabsandstairs.block.SlabBlock;
-import com.xpmodder.slabsandstairs.init.KeyInit;
 import com.xpmodder.slabsandstairs.reference.Reference;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -12,6 +11,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class ModPacketHandler {
 
     private static final String PROTOCOL_VERSION = "1";

@@ -1,5 +1,6 @@
 package com.xpmodder.slabsandstairs.utility;
 
+@SuppressWarnings("unused")
 public enum BlockTagTypes {
 
     PICKAXE("pickaxe"),

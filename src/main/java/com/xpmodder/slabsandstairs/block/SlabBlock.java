@@ -31,9 +31,12 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
 import static net.minecraft.core.Direction.*;
 
+@SuppressWarnings("unused")
 public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -47,9 +50,9 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
     protected static final VoxelShape SHAPE_UP = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
     protected static final VoxelShape SHAPE_DOWN = Block.box(0.0D, 8.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 
-    protected String BaseBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
-    protected String SlabQuarterBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
-    protected String StairBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
+    protected String BaseBlock = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(Blocks.AIR)).toString();
+    protected String SlabQuarterBlock = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(Blocks.AIR)).toString();
+    protected String StairBlock = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(Blocks.AIR)).toString();
 
     protected int Power = 0;
 
@@ -77,11 +80,13 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         this.Power = power;
     }
 
-    public boolean isSignalSource(BlockState state) {
+    @SuppressWarnings("deprecation")
+    public boolean isSignalSource(@NotNull BlockState state) {
         return this.Power > 0;
     }
 
-    public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
+    @SuppressWarnings("deprecation")
+    public int getSignal(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull Direction dir) {
         return this.Power;
     }
 
@@ -89,8 +94,8 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         return this.Power;
     }
 
-
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    @SuppressWarnings("deprecation")
+    public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level worldIn, @NotNull BlockPos pos, Player player, @NotNull InteractionHand handIn, @NotNull BlockHitResult hit) {
 
         Item heldItem = player.getItemInHand(handIn).getItem();
 
@@ -491,8 +496,8 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
 
     }
 
-
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    @SuppressWarnings("deprecation")
+    public @NotNull VoxelShape getShape(BlockState state, @NotNull BlockGetter getter, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return switch (state.getValue(FACING)) {
             case EAST -> SHAPE_EAST;
             case WEST -> SHAPE_WEST;
@@ -507,10 +512,12 @@ public class SlabBlock extends Block implements SimpleWaterloggedBlock {
         builder.add(FACING, WATERLOGGED, INVERTED);
     }
 
+    @SuppressWarnings("deprecation")
     public @NotNull BlockState rotate(BlockState state, Rotation rot) {
         return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
+    @SuppressWarnings("deprecation")
     public @NotNull FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }

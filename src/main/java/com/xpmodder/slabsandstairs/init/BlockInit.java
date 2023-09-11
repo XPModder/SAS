@@ -22,6 +22,7 @@ import java.util.Set;
 import static com.xpmodder.slabsandstairs.init.ItemInit.ITEMS;
 import static com.xpmodder.slabsandstairs.init.ItemInit.MY_ITEMS;
 
+@SuppressWarnings("unused")
 public class BlockInit {
 
 

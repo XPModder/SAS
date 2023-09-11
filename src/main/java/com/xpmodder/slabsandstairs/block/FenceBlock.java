@@ -6,10 +6,14 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
+@SuppressWarnings("unused")
 public class FenceBlock extends net.minecraft.world.level.block.FenceBlock {
 
-    protected String BaseBlock = ForgeRegistries.BLOCKS.getKey(Blocks.AIR).toString();
+    protected String BaseBlock = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(Blocks.AIR)).toString();
 
     protected int Power = 0;
 
@@ -29,11 +33,13 @@ public class FenceBlock extends net.minecraft.world.level.block.FenceBlock {
         this.Power = power;
     }
 
-    public boolean isSignalSource(BlockState state) {
+    @SuppressWarnings("deprecation")
+    public boolean isSignalSource(@NotNull BlockState state) {
         return this.Power > 0;
     }
 
-    public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
+    @SuppressWarnings("deprecation")
+    public int getSignal(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull Direction dir) {
         return this.Power;
     }
 

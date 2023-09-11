@@ -10,6 +10,7 @@ import com.xpmodder.slabsandstairs.utility.ResourceGenerator;
 
 import java.io.*;
 
+@SuppressWarnings("unused")
 public class BlockListHandler {
 
     public static boolean correctVersion = false;
@@ -120,7 +121,7 @@ public class BlockListHandler {
                 }
                 catch (Exception ex){
                     LogHelper.error("Could not generate BLOCK_LIST file!");
-                    ex.printStackTrace();
+                    ex.fillInStackTrace();
                 }
 
             }
@@ -133,13 +134,15 @@ public class BlockListHandler {
 
         try {
             if (Reference.BLOCK_LIST.exists()) {
-                Reference.BLOCK_LIST.delete();
+                if(!Reference.BLOCK_LIST.delete()){
+                    throw new RuntimeException("Could not delete file at " + Reference.BLOCK_LIST + "!");
+                }
             }
             generate();
         }
         catch (Exception ex){
             LogHelper.error("Could not delete old BLOCK_LIST file!");
-            ex.printStackTrace();
+            ex.fillInStackTrace();
         }
 
     }

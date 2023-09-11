@@ -10,7 +10,7 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@SuppressWarnings("unused")
 public final class KeyInit {
 
     @OnlyIn(Dist.CLIENT)

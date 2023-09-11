@@ -37,10 +37,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 import static com.xpmodder.slabsandstairs.block.SlabBlock.FACING;
 import static com.xpmodder.slabsandstairs.block.SlabBlock.INVERTED;
 import static com.xpmodder.slabsandstairs.utility.Util.getBlockFromItem;
 
+@SuppressWarnings("unused")
 public class CombinedBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
     private final BlockState block1;
@@ -61,6 +64,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         builder.add(WATERLOGGED, LEVEL);
     }
 
+    @SuppressWarnings("deprecation")
     public @NotNull FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
@@ -76,7 +80,8 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
 
     }
 
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
+    @SuppressWarnings("deprecation")
+    public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter getter, @NotNull BlockPos pos, @NotNull CollisionContext context) {
 
         CombinedBlockEntity be = (CombinedBlockEntity) getter.getBlockEntity(pos);
 
@@ -100,7 +105,8 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
 
     }
 
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState state2, LevelAccessor accessor, BlockPos pos, BlockPos pos2) {
+    @SuppressWarnings("deprecation")
+    public @NotNull BlockState updateShape(@NotNull BlockState state, @NotNull Direction direction, @NotNull BlockState state2, LevelAccessor accessor, @NotNull BlockPos pos, @NotNull BlockPos pos2) {
         CombinedBlockEntity be = (CombinedBlockEntity) accessor.getBlockEntity(pos);
         if(be != null) {
             be.updateModelData();
@@ -108,14 +114,13 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         return state;
     }
 
-    public boolean isSignalSource(BlockState state) {
+    @SuppressWarnings("deprecation")
+    public boolean isSignalSource(@NotNull BlockState state) {
         return false;
     }
 
-    public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction dir) {
-        if(level == null){
-            return 0;
-        }
+    @SuppressWarnings("deprecation")
+    public int getSignal(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull Direction dir) {
         CombinedBlockEntity be = (CombinedBlockEntity) level.getBlockEntity(pos);
         if(be == null){
             return 0;
@@ -145,7 +150,8 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         return this.getCloneItemStack(level, pos, state);
     }
 
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+    @SuppressWarnings("deprecation")
+    public @NotNull ItemStack getCloneItemStack(BlockGetter level, @NotNull BlockPos pos, @NotNull BlockState state) {
         ItemStack itemStack = new ItemStack(this);
         CombinedBlockEntity blockEntity = (CombinedBlockEntity) level.getBlockEntity(pos);
         if(blockEntity != null) {
@@ -156,7 +162,7 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
 
 
 
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player){
+    public void playerWillDestroy(Level level, @NotNull BlockPos pos, @NotNull BlockState state, Player player){
 
         CombinedBlockEntity blockEntity = (CombinedBlockEntity) level.getBlockEntity(pos);
 
@@ -232,11 +238,8 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
         return true;
     }
 
-    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-
-    }
-
-    public boolean dropFromExplosion(Explosion p_49826_) {
+    @SuppressWarnings("deprecation")
+    public boolean dropFromExplosion(@NotNull Explosion explosion) {
         return false;
     }
 
@@ -253,16 +256,16 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
 
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
+    public void setPlacedBy(Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity entity, @NotNull ItemStack stack) {
         if(level.getBlockEntity(pos) instanceof CombinedBlockEntity){
-            ((CombinedBlockEntity)level.getBlockEntity(pos)).fromItem(stack);
+            ((CombinedBlockEntity) Objects.requireNonNull(level.getBlockEntity(pos))).fromItem(stack);
         }
     }
 
-
+    @SuppressWarnings("deprecation")
     public @NotNull InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
 
-        if(!(level.getBlockEntity(pos) instanceof CombinedBlockEntity)){
+        if(!(level.getBlockEntity(pos) instanceof CombinedBlockEntity be)){
             return InteractionResult.PASS;
         }
 
@@ -271,8 +274,6 @@ public class CombinedBlock extends Block implements EntityBlock, SimpleWaterlogg
             return InteractionResult.PASS;
         }
 
-
-        CombinedBlockEntity be = (CombinedBlockEntity) level.getBlockEntity(pos);
 
         if(be.numSubBlocks == 2){
 

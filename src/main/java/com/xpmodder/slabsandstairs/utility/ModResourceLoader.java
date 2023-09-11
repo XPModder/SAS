@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import static com.xpmodder.slabsandstairs.reference.Reference.DATAPACK_FOLDER;
 import static com.xpmodder.slabsandstairs.reference.Reference.RESOURCE_FOLDER;
 
+@SuppressWarnings("unused")
 public class ModResourceLoader {
 
 
@@ -48,6 +49,9 @@ public class ModResourceLoader {
                     }
                     OutputStream mcmeta = new FileOutputStream(mcmetaFile);
                     InputStream in = this.getClass().getResourceAsStream("/assets/" + Reference.MODID + "/default/pack.mcmeta");
+                    if(in == null){
+                        throw new NullPointerException("default/pack.mcmeta stream was null!");
+                    }
                     IOUtils.copy(in, mcmeta);
                 }
                 catch (Exception ex){
@@ -77,6 +81,9 @@ public class ModResourceLoader {
                     }
                     OutputStream mcmeta = new FileOutputStream(mcmetaFile);
                     InputStream in = this.getClass().getResourceAsStream("/assets/" + Reference.MODID + "/default/datapack.mcmeta");
+                    if(in == null){
+                        throw new NullPointerException("default/pack.mcmeta stream was null!");
+                    }
                     IOUtils.copy(in, mcmeta);
                 }
                 catch (Exception ex){

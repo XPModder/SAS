@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public final class ResourceGenerator {
 
     //Utility method that checks if the given file exists and if not attempts to create it.
@@ -101,7 +102,7 @@ public final class ResourceGenerator {
 
             String namespace = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getNamespace();
 
-            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "models/block/" + ForgeRegistries.BLOCKS.getKey(block).getPath() + ".json")).get().open();
+            InputStream stream = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(namespace, "models/block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath() + ".json")).get().open();
 
             JsonObject object = new Gson().fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), JsonObject.class);
 
@@ -903,7 +904,7 @@ public final class ResourceGenerator {
 
                     }
 
-                    if(stair.equals("") || slab.equals("")){
+                    if(stair.isEmpty() || slab.isEmpty()){
                         LogHelper.error("Could not create crafting recipe 'stonecutter' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         LogHelper.error("Could not find corresponding slab or stair!");
                     }
@@ -989,7 +990,7 @@ public final class ResourceGenerator {
 
                     }
 
-                    if(quarter.equals("") || slab.equals("")){
+                    if(quarter.isEmpty() || slab.isEmpty()){
                         LogHelper.error("Could not create crafting recipe 'shapeless' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         LogHelper.error("Could not find corresponding slab or quarter!");
                     }
@@ -1057,7 +1058,7 @@ public final class ResourceGenerator {
 
                     }
 
-                    if(quarter.equals("")){
+                    if(quarter.isEmpty()){
                         LogHelper.error("Could not create crafting recipe 'shapeless' for block " + ForgeRegistries.BLOCKS.getKey(block));
                         LogHelper.error("Could not find corresponding quarter!");
                     }

@@ -5,9 +5,10 @@ import net.minecraft.world.level.material.Material;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class MaterialUtil {
 
-    private static class Mat{
+    protected static class Mat{
         public String name;
         public Material material;
 

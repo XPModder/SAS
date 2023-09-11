@@ -18,6 +18,9 @@ import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
+@SuppressWarnings("unused")
 public class CombinedBlockEntity extends BlockEntity {
 
     public BlockState Block1 = Blocks.AIR.defaultBlockState(),
@@ -79,7 +82,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 1) {
 
-            tag.putString("block1", ForgeRegistries.BLOCKS.getKey(this.Block1.getBlock()).toString());
+            tag.putString("block1", Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.Block1.getBlock())).toString());
             tag.putString("block1Dir", this.Block1.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block1Inv", this.Block1.getValue(StairBlock.INVERTED));
 
@@ -87,7 +90,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 2) {
 
-            tag.putString("block2", ForgeRegistries.BLOCKS.getKey(this.Block2.getBlock()).toString());
+            tag.putString("block2", Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.Block2.getBlock())).toString());
             tag.putString("block2Dir", this.Block2.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block2Inv", this.Block2.getValue(StairBlock.INVERTED));
 
@@ -95,7 +98,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 3) {
 
-            tag.putString("block3", ForgeRegistries.BLOCKS.getKey(this.Block3.getBlock()).toString());
+            tag.putString("block3", Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.Block3.getBlock())).toString());
             tag.putString("block3Dir", this.Block3.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block3Inv", this.Block3.getValue(StairBlock.INVERTED));
 
@@ -103,7 +106,7 @@ public class CombinedBlockEntity extends BlockEntity {
 
         if(numSubBlocks >= 4) {
 
-            tag.putString("block4", ForgeRegistries.BLOCKS.getKey(this.Block4.getBlock()).toString());
+            tag.putString("block4", Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.Block4.getBlock())).toString());
             tag.putString("block4Dir", this.Block4.getValue(SlabBlock.FACING).getName());
             tag.putBoolean("block4Inv", this.Block4.getValue(StairBlock.INVERTED));
 
