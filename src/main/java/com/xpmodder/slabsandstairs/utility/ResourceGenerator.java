@@ -654,6 +654,27 @@ public final class ResourceGenerator {
 
                         }
 
+                        filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_side_z.json";
+
+                        File blockModelSideZ = new File(blockModels.getPath() + "/" + filename);
+
+                        if (!blockModelSideZ.exists() || !blockModelSideZ.isFile()) {
+                            if (!blockModelSideZ.createNewFile()) {
+                                LogHelper.error("Failed to create block model file at " + blockModelSideZ.getPath());
+                                continue;
+                            }
+
+                            OutputStream out = new FileOutputStream(blockModelSideZ);
+                            InputStream in = getResourceStream("/default/blockmodel_fence_side_z.json");
+                            if(block.defaultBlockState().getMaterial() == Material.GLASS){
+                                in = getResourceStream("/default/blockmodel_fence_side_z_translucent.json");
+                            }
+                            copyFileAndReplace(in, out, "placeholder", getTextureForBlock(baseBlock, "texture"));
+
+                            hasGenerated = true;
+
+                        }
+
                     } else if (ForgeRegistries.BLOCKS.getKey(block).getPath().contains("wall_sas")){
 
                         filename = ForgeRegistries.BLOCKS.getKey(block).getPath() + "_post.json";

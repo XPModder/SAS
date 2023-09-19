@@ -5,12 +5,20 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class WallBlock extends net.minecraft.world.level.block.WallBlock {
+
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public static final BooleanProperty POST = BooleanProperty.create("post");
+
+
 
     protected String BaseBlock = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(Blocks.AIR)).toString();
 

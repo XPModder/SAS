@@ -1,0 +1,6 @@
+{
+  "parent": "slabsandstairs:block/fence_side_z",
+  "textures": {
+    "texture": "placeholder"
+  }
+}

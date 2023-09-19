@@ -1,6 +1,7 @@
 package com.xpmodder.slabsandstairs.utility;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.datafix.fixes.VillagerRebuildLevelAndXpFix;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,6 +43,25 @@ public class ShapeUtil {
     public static final VoxelShape SlabWest = Block.box(8, 0, 0, 16, 16, 16);
     public static final VoxelShape SlabUp = Block.box(0, 0, 0, 16, 8, 16);
     public static final VoxelShape SlabDown = Block.box(0, 8, 0, 16, 16, 16);
+
+
+    public static final VoxelShape FencePost = Block.box(6, 0, 6, 10, 16, 10);
+    public static final VoxelShape FencePostHEW = Block.box(0, 6,6, 16, 10, 10);
+    public static final VoxelShape FencePostHNS = Block.box(6, 6, 0, 10, 10, 16);
+    public static final VoxelShape FenceNorth = Block.box(6, 0, 0, 10, 16, 10);
+    public static final VoxelShape FenceWest = Block.box(0, 0, 6, 10, 16, 10);
+    public static final VoxelShape FenceSouth = Block.box(6, 0, 10, 10, 16, 16);
+    public static final VoxelShape FenceEast = Block.box(10, 0, 6, 16, 16, 10);
+    public static final VoxelShape FenceWestH = Block.box(0, 6, 0, 6, 10, 16);
+    public static final VoxelShape FenceEastH = Block.box(10, 6, 0, 16, 10, 16);
+    public static final VoxelShape FenceNorthH = Block.box(0, 6, 0, 16, 10, 10);
+    public static final VoxelShape FenceSouthH = Block.box(0, 6, 10, 16, 10, 16);
+    public static final VoxelShape FenceDownEW = Block.box(0, 0, 6, 16, 6, 10);
+    public static final VoxelShape FenceDownNS = Block.box(6, 0, 0, 10, 6, 16);
+    public static final VoxelShape FenceUpEW = Block.box(0, 10, 6, 16, 16, 10);
+    public static final VoxelShape FenceUpNS = Block.box(6, 10, 0, 10, 16, 16);
+
+
 
     public static final VoxelShape StairNorthInv = Shapes.or(NWU_CORNER, NEU_CORNER, SWU_CORNER, SEU_CORNER, NWD_CORNER, NED_CORNER);
     public static final VoxelShape StairNorth = Shapes.or(NWD_CORNER, NED_CORNER, SWD_CORNER, SED_CORNER, NWU_CORNER, NEU_CORNER);

@@ -1,0 +1,7 @@
+{
+  "parent": "slabsandstairs:block/fence_side_z",
+  "render_type": "translucent",
+  "textures": {
+    "texture": "placeholder"
+  }
+}

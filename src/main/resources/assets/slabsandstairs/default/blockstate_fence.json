@@ -2,7 +2,56 @@
   "multipart": [
     {
       "apply": {
+        "model": "registry_namespace:block/registry_path_post",
+        "x": 90
+      },
+      "when": {
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_post",
+        "x": 90
+      },
+      "when": {
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_post",
+        "x": 90,
+        "y": 90
+      },
+      "when": {
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_post",
+        "x": 90,
+        "y": 90
+      },
+      "when": {
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
         "model": "registry_namespace:block/registry_path_post"
+      },
+      "when": {
+        "facing": "up"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_post"
+      },
+      "when": {
+        "facing": "down"
       }
     },
     {
@@ -11,6 +60,7 @@
         "uvlock": true
       },
       "when": {
+        "facing": "up",
         "north": "true"
       }
     },
@@ -21,6 +71,7 @@
         "y": 90
       },
       "when": {
+        "facing": "up",
         "east": "true"
       }
     },
@@ -31,6 +82,7 @@
         "y": 180
       },
       "when": {
+        "facing": "up",
         "south": "true"
       }
     },
@@ -41,6 +93,240 @@
         "y": 270
       },
       "when": {
+        "facing": "up",
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+      },
+      "when": {
+        "facing": "down",
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+      },
+      "when": {
+        "facing": "down",
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 180
+      },
+      "when": {
+        "facing": "down",
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+      },
+      "when": {
+        "facing": "down",
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 90
+      },
+      "when": {
+        "facing": "north",
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "facing": "north",
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": -90,
+        "y": 180
+      },
+      "when": {
+        "facing": "north",
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+      },
+      "when": {
+        "facing": "north",
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 90,
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+      },
+      "when": {
+        "facing": "south",
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": -90
+      },
+      "when": {
+        "facing": "south",
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "facing": "south",
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "y": 0
+      },
+      "when": {
+        "facing": "west",
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 90,
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "x": 180,
+        "y": 0
+      },
+      "when": {
+        "facing": "west",
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": -90,
+        "y": 90
+      },
+      "when": {
+        "facing": "west",
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+      },
+      "when": {
+        "facing": "east",
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": 90,
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side_z",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "facing": "east",
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "registry_namespace:block/registry_path_side",
+        "uvlock": true,
+        "x": -90,
+        "y": 270
+      },
+      "when": {
+        "facing": "east",
         "west": "true"
       }
     }
